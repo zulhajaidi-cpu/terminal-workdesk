@@ -301,13 +301,14 @@ export function ProjectDetailContent({ project, currentUserRole, currentUserId, 
   const total = tasks.length
   const done = tasks.filter(t => t.status === 'Completed').length
   const pct = total > 0 ? Math.round((done / total) * 100) : project.progress
-  const allChecked = total > 0 && tasks.every(t => t.checked)
+  const atLeastOneChecked = total === 0 || tasks.some(t => t.checked)
 
   const isLeaderPlus = canEditProject(currentUserRole) // leader_divisi / spv_manager / super_admin
   const isPic = currentUserId === project.picId
   const underReview = projectStatus === 'Need Review'
   const isCompleted = projectStatus === 'Completed'
-  const canSubmitResults = (isPic || isLeaderPlus || currentUserRole === 'head_director') && !underReview && !isCompleted
+  const hasActivePendingApproval = !!project.approval && project.approval.status === 'Pending'
+  const canSubmitResults = (isPic || isLeaderPlus || currentUserRole === 'head_director') && !isCompleted && !hasActivePendingApproval
 
   function canCheckTask(t: TaskItem) {
     return isLeaderPlus || isPic || t.assignees.some(a => a.id === currentUserId)
@@ -331,7 +332,7 @@ export function ProjectDetailContent({ project, currentUserRole, currentUserId, 
   }
 
   async function submitForApproval() {
-    if (!allChecked) return
+    if (!atLeastOneChecked || submitting) return
     if (!confirm('Kirim hasil project ini untuk direview SPV → Manager → Direktur?')) return
     setSubmitting(true)
     const res = await fetch(`/api/projects/${project.id}/submit-approval`, { method: 'POST' })
@@ -376,6 +377,11 @@ export function ProjectDetailContent({ project, currentUserRole, currentUserId, 
                 <StatusBadge status={projectStatus} />
               )}
               <PriorityBadge priority={project.priority} />
+              {(project.approval?.status === 'Approved' || isCompleted) && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(63,208,138,0.12)', border: '1px solid rgba(63,208,138,0.35)', borderRadius: '100px', padding: '2px 10px', fontSize: '11px', fontWeight: 700, color: '#3FD08A', fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <CheckCircle2 size={11} /> Approved
+                </span>
+              )}
             </div>
           </div>
           <Link href={`/projects/${project.id}/edit`}
@@ -504,19 +510,19 @@ export function ProjectDetailContent({ project, currentUserRole, currentUserId, 
             {/* Submit results */}
             {canSubmitResults && (
               <div className="p-4 border-t border-[rgba(255,255,255,0.06)]">
-                <button onClick={submitForApproval} disabled={!allChecked || submitting}
+                <button onClick={submitForApproval} disabled={!atLeastOneChecked || submitting}
                   className="w-full flex items-center justify-center gap-2 rounded-xl py-3 font-grotesk font-bold text-[14px] transition-all"
                   style={{
-                    background: allChecked && !submitting ? '#FF6A1A' : 'rgba(255,255,255,0.06)',
-                    color: allChecked && !submitting ? '#0C0F16' : '#6B7385',
-                    cursor: allChecked && !submitting ? 'pointer' : 'not-allowed',
-                    boxShadow: allChecked && !submitting ? '0 10px 25px -8px rgba(255,106,26,0.7)' : 'none',
+                    background: atLeastOneChecked && !submitting ? '#FF6A1A' : 'rgba(255,255,255,0.06)',
+                    color: atLeastOneChecked && !submitting ? '#0C0F16' : '#6B7385',
+                    cursor: atLeastOneChecked && !submitting ? 'pointer' : 'not-allowed',
+                    boxShadow: atLeastOneChecked && !submitting ? '0 10px 25px -8px rgba(255,106,26,0.7)' : 'none',
                   }}>
                   <Send size={15} /> {submitting ? 'Mengirim...' : 'Kirim Hasil untuk Approval'}
                 </button>
-                {!allChecked && (
+                {!atLeastOneChecked && total > 0 && (
                   <p className="text-[12px] text-[#6B7385] text-center mt-2">
-                    Selesaikan semua task ({done}/{total} Completed) untuk mengaktifkan pengiriman hasil.
+                    Centang minimal 1 task untuk mengaktifkan pengiriman hasil.
                   </p>
                 )}
               </div>

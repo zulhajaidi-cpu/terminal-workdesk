@@ -33,15 +33,16 @@ export async function recalcProjectProgress(projectId: string | null | undefined
   return { total, done, progress }
 }
 
-/** True when a project has at least one task and every task has status 'Completed'. */
+/** True when a project has at least one task checked (checked = true). */
 export async function allTasksChecked(projectId: string): Promise<{ ready: boolean; total: number; done: number }> {
   const rows = await sql`
     SELECT count(*)::int AS total,
-           count(*) FILTER (WHERE status = 'Completed')::int AS done
+           count(*) FILTER (WHERE checked = true)::int AS done
     FROM tasks
     WHERE project_id = ${projectId} AND deleted_at IS NULL
   ` as { total: number; done: number }[]
   const total = rows[0]?.total ?? 0
   const done = rows[0]?.done ?? 0
-  return { ready: total > 0 && done === total, total, done }
+  // Allow submission if there are no tasks, or at least one task is checked.
+  return { ready: total === 0 || done >= 1, total, done }
 }

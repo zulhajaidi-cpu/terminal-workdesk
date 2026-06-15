@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { projects, approvalRequests, approvalSteps, users, notifications } from '@/lib/db/schema'
-import { eq, and, inArray } from 'drizzle-orm'
+import { eq, and, inArray, isNull } from 'drizzle-orm'
 import { canEditProject } from '@/lib/roles'
 import { allTasksChecked } from '@/lib/projects'
 
@@ -25,24 +25,29 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
   const allowed = project.picId === session.id || canEditProject(session.role)
   if (!allowed) return NextResponse.json({ error: 'Tidak punya akses untuk mengirim hasil project' }, { status: 403 })
 
-  if (project.status === 'Need Review') {
-    return NextResponse.json({ error: 'Project sudah dalam proses review' }, { status: 400 })
-  }
   if (project.status === 'Completed') {
     return NextResponse.json({ error: 'Project sudah selesai & disetujui' }, { status: 400 })
   }
 
-  // Gate: every task must be checked.
+  // Block re-submission if an approval is already pending (regardless of project status).
+  const [existingPending] = await db
+    .select({ id: approvalRequests.id })
+    .from(approvalRequests)
+    .where(and(eq(approvalRequests.relatedEntityId, id), eq(approvalRequests.status, 'Pending')))
+    .limit(1)
+  if (existingPending) {
+    return NextResponse.json({ error: 'Project sudah dalam proses review, tunggu hasil approval sebelumnya.' }, { status: 400 })
+  }
+
+  // Gate: need at least 1 task checked.
   const { ready, total, done } = await allTasksChecked(id)
   if (!ready) {
     return NextResponse.json({
-      error: total === 0
-        ? 'Belum ada task. Tambahkan task lalu selesaikan semua (status: Completed) sebelum mengirim hasil.'
-        : `Belum semua task selesai (${done}/${total} Completed). Selesaikan semua task dulu.`,
+      error: `Centang minimal 1 task sebelum mengirim hasil (${done}/${total} di-centang).`,
     }, { status: 400 })
   }
 
-  // Fresh start: drop any prior approval request for this project (cascade clears steps).
+  // Drop any prior rejected/revised approval before creating a new one.
   await db.delete(approvalRequests).where(eq(approvalRequests.relatedEntityId, id))
 
   // Approval ladder. If submitter is the SPV (leader_divisi), step 1 is auto-approved.

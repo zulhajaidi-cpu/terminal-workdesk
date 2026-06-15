@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Trophy, Plus, X, Crown, Zap } from 'lucide-react'
 import { ROLE_LABELS } from '@/lib/roles'
 
@@ -46,6 +46,14 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
   const [period, setPeriod] = useState<'month'|'last'|'all'>('month')
   const [divFilter, setDivFilter] = useState('Semua')
   const [showAddPoints, setShowAddPoints] = useState(false)
+
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const canManage = ['super_admin','spv_manager','head_director'].includes(currentUser.role)
 
@@ -162,8 +170,8 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
       ) : (
         <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', overflow: 'hidden' }}>
           {/* Table header */}
-          <div style={{ display: 'grid', gridTemplateColumns: '48px 1fr 120px 80px', gap: '12px', padding: '10px 16px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            {['#','Anggota','Divisi','Poin'].map(h => (
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '40px 1fr 70px' : '48px 1fr 120px 80px', gap: '12px', padding: '10px 16px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            {(isMobile ? ['#','Anggota','Poin'] : ['#','Anggota','Divisi','Poin']).map(h => (
               <div key={h} style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</div>
             ))}
           </div>
@@ -172,7 +180,7 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
             const rankColor = u.rank === 1 ? '#F59E0B' : u.rank === 2 ? '#94A3B8' : u.rank === 3 ? '#B45309' : '#4a5160'
             return (
               <div key={u.id}
-                style={{ display: 'grid', gridTemplateColumns: '48px 1fr 120px 80px', gap: '12px', padding: '12px 16px', borderBottom: i<filtered.length-1?'1px solid rgba(255,255,255,0.04)':'none', background: isMe?'rgba(255,106,26,0.04)':'transparent', alignItems: 'center' }}>
+                style={{ display: 'grid', gridTemplateColumns: isMobile ? '40px 1fr 70px' : '48px 1fr 120px 80px', gap: '12px', padding: '12px 16px', borderBottom: i<filtered.length-1?'1px solid rgba(255,255,255,0.04)':'none', background: isMe?'rgba(255,106,26,0.04)':'transparent', alignItems: 'center' }}>
                 {/* Rank */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {u.rank <= 3
@@ -181,7 +189,7 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
                   }
                 </div>
                 {/* User */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: 'rgba(255,106,26,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: isMe ? '2px solid #FF6A1A' : '2px solid rgba(255,255,255,0.08)' }}>
                     {u.avatarUrl
                       ? <img src={u.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
@@ -189,19 +197,21 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
                     }
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <p style={{ fontSize: '13px', fontWeight: isMe ? 700 : 600, color: isMe ? '#FF8A4C' : '#EDF0F5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: isMe ? 700 : 600, color: isMe ? '#FF8A4C' : '#EDF0F5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {u.fullName}{isMe && ' (Kamu)'}
                     </p>
                     <div style={{ display: 'flex', gap: '4px', marginTop: '2px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '10px', color: '#6B7385' }}>{ROLE_LABELS[u.role] ?? u.role}</span>
+                      <span style={{ fontSize: '10px', color: '#6B7385', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {isMobile ? (u.divisionName ?? ROLE_LABELS[u.role] ?? u.role) : (ROLE_LABELS[u.role] ?? u.role)}
+                      </span>
                       {u.badges.slice(0,3).map((b, bi) => (
                         <span key={bi} title={b.badgeName ?? ''} style={{ fontSize: '11px' }}>{b.badgeIcon ?? '🏅'}</span>
                       ))}
                     </div>
                   </div>
                 </div>
-                {/* Division */}
-                <p style={{ fontSize: '12px', color: '#6B7385', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.divisionName ?? '—'}</p>
+                {/* Division (desktop only) */}
+                {!isMobile && <p style={{ fontSize: '12px', color: '#6B7385', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.divisionName ?? '—'}</p>}
                 {/* Points */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '14px', fontWeight: 800, color: u.points>0 ? '#F59E0B' : '#4a5160', fontFamily: "'Space Grotesk', sans-serif" }}>

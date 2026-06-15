@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { Calendar, Plus, X, MapPin, ExternalLink, Clock, Search, ChevronRight, Pencil, Trash2, Filter, Users, UserPlus, Briefcase } from 'lucide-react'
 
@@ -145,6 +145,14 @@ export function EventsContent({ events: init, divisions, allUsers, participantRo
     setModal(null)
   }
 
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
   const inp: React.CSSProperties = { background:'#141925', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'10px', padding:'10px 12px', color:'#EDF0F5', fontSize:'13px', outline:'none', width:'100%', fontFamily:"'Plus Jakarta Sans',sans-serif" }
 
   return (
@@ -198,7 +206,7 @@ export function EventsContent({ events: init, divisions, allUsers, participantRo
       </div>
 
       {/* Layout */}
-      <div style={{ display:'grid', gridTemplateColumns: selected ? '1fr 400px' : '1fr', gap:'20px', alignItems:'start' }}>
+      <div style={{ display:'grid', gridTemplateColumns: (selected && !isMobile) ? '1fr 400px' : '1fr', gap:'20px', alignItems:'start' }}>
         {/* Event list */}
         <div>
           {filtered.length === 0 ? (
@@ -267,8 +275,13 @@ export function EventsContent({ events: init, divisions, allUsers, participantRo
           const past = !isUpcoming(selected.startAt)
           const isOwner = selected.createdBy === currentUser.id || ['super_admin','spv_manager','head_director'].includes(currentUser.role)
           const evParticipants = participantMap.get(selected.id) ?? []
+          const panelStyle: React.CSSProperties = isMobile
+            ? { background:'#10141d', border:`1px solid ${c.border}40`, borderRadius:'20px 20px 0 0', overflow:'hidden', position:'fixed', bottom:0, left:0, right:0, maxHeight:'85vh', overflowY:'auto', zIndex:50, boxShadow:'0 -8px 40px rgba(0,0,0,0.6)' }
+            : { background:'#10141d', border:`1px solid ${c.border}40`, borderRadius:'18px', overflow:'hidden', position:'sticky', top:'80px', maxHeight:'calc(100vh - 120px)', overflowY:'auto' }
           return (
-            <div style={{ background:'#10141d', border:`1px solid ${c.border}40`, borderRadius:'18px', overflow:'hidden', position:'sticky', top:'80px', maxHeight:'calc(100vh - 120px)', overflowY:'auto' }}>
+            <>
+            {isMobile && <div onClick={() => setSelected(null)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:49 }}/>}
+            <div style={panelStyle}>
               {/* Panel header */}
               <div style={{ padding:'16px 20px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', justifyContent:'space-between', alignItems:'center', background:c.bg, position:'sticky', top:0, zIndex:1 }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
@@ -351,6 +364,7 @@ export function EventsContent({ events: init, divisions, allUsers, participantRo
                 </div>
               </div>
             </div>
+            </>
           )
         })()}
       </div>
