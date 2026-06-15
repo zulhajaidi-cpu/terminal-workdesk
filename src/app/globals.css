@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+:root {
+  --bg-base: #0C0F16;
+  --bg-card: #141925;
+  --bg-elevated: #10141d;
+  --bg-hover: #1a2030;
+  --border: rgba(255,255,255,0.07);
+  --border-strong: rgba(255,255,255,0.12);
+
+  --orange-primary: #FF6A1A;
+  --orange-light: #FF8A4C;
+  --orange-dark: #E2540A;
+  --orange-muted: rgba(255,106,26,0.12);
+  --orange-border: rgba(255,106,26,0.28);
+
+  --text-primary: #EDF0F5;
+  --text-secondary: #A5AEC0;
+  --text-muted: #6B7385;
+
+  --green: #3FD08A;
+  --red: #FF6B6B;
+  --blue: #56A9E8;
+  --yellow: #FFB489;
+}
+
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Hide scrollbar for mobile nav */
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Font utilities */
+.font-mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+.font-grotesk {
+  font-family: 'Space Grotesk', sans-serif;
+}
+.font-jakarta {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Orange glow */
+.glow-orange {
+  box-shadow: 0 8px 20px -8px rgba(255,106,26,0.7);
+}
+.glow-orange-lg {
+  box-shadow: 0 14px 30px -12px rgba(255,106,26,0.9);
+}
+
+/* Animations */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes grow-bar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+.animate-float {
+  animation: float 7s ease-in-out infinite;
+}
+.animate-grow-bar {
+  animation: grow-bar 0.8s ease-out forwards;
+  transform-origin: left;
+}
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
