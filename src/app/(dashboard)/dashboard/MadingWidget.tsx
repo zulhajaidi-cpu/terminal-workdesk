@@ -1,9 +1,15 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { createMadingPost, deleteMadingPost } from './mading-actions'
+import {
+  createMadingPost, deleteMadingPost,
+  toggleMadingReaction, getMadingComments, addMadingComment, deleteMadingComment,
+  type MadingCommentRow,
+} from './mading-actions'
 import { Avatar } from '@/components/ui/avatar'
-import { Megaphone, Plus, X, Send, ImageIcon, Trash2 } from 'lucide-react'
+import { Megaphone, Plus, X, Send, ImageIcon, Trash2, MessageCircle, ThumbsUp } from 'lucide-react'
+
+export interface MadingReaction { emoji: string; count: number }
 
 export interface MadingPost {
   id: string
@@ -14,12 +20,27 @@ export interface MadingPost {
   creatorName: string
   creatorAvatar: string | null
   creatorRole: string
+  reactions: MadingReaction[]
+  myReaction: string | null
+  commentCount: number
 }
 
 interface Props {
   posts: MadingPost[]
   canPost: boolean
+  canModerate: boolean
+  currentUserId: string
 }
+
+// Reaksi ala Facebook
+const REACTIONS: { emoji: string; label: string; color: string }[] = [
+  { emoji: '👍', label: 'Suka',  color: '#4A9EFF' },
+  { emoji: '❤️', label: 'Cinta', color: '#FF4D6D' },
+  { emoji: '😆', label: 'Haha',  color: '#F5C451' },
+  { emoji: '😮', label: 'Wow',   color: '#F5C451' },
+  { emoji: '😢', label: 'Sedih', color: '#F5C451' },
+  { emoji: '😡', label: 'Marah', color: '#FF6A1A' },
+]
 
 const ROLE_LABEL: Record<string, string> = {
   super_admin:    'Super Admin',
@@ -38,7 +59,7 @@ function formatWIB(iso: string) {
   }) + ' WIB'
 }
 
-export function MadingWidget({ posts: initialPosts, canPost }: Props) {
+export function MadingWidget({ posts: initialPosts, canPost, canModerate, currentUserId }: Props) {
   const [posts, setPosts] = useState<MadingPost[]>(initialPosts)
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -94,7 +115,8 @@ export function MadingWidget({ posts: initialPosts, canPost }: Props) {
         {posts.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#6B7385', fontSize: 13, padding: '32px 0' }}>Belum ada pengumuman. 📋</div>
         ) : posts.map(post => (
-          <PostCard key={post.id} post={post} canDelete={canPost} onDelete={handleDelete} deletingId={deletingId} />
+          <PostCard key={post.id} post={post} canDelete={canPost} onDelete={handleDelete} deletingId={deletingId}
+            canModerate={canModerate} currentUserId={currentUserId} />
         ))}
       </div>
 
@@ -199,9 +221,78 @@ function ImageLightbox({ url, onClose }: { url: string; onClose: () => void }) {
   )
 }
 
-function PostCard({ post, canDelete, onDelete, deletingId }: { post: MadingPost; canDelete: boolean; onDelete: (id: string) => void; deletingId: string | null }) {
+function PostCard({ post, canDelete, onDelete, deletingId, canModerate, currentUserId }: {
+  post: MadingPost; canDelete: boolean; onDelete: (id: string) => void; deletingId: string | null
+  canModerate: boolean; currentUserId: string
+}) {
   const isDeleting = deletingId === post.id
   const [lightbox, setLightbox] = useState<string | null>(null)
+
+  // Reaction state (managed locally setelah aksi server)
+  const [reactions, setReactions] = useState<MadingReaction[]>(post.reactions)
+  const [myReaction, setMyReaction] = useState<string | null>(post.myReaction)
+  const [showPicker, setShowPicker] = useState(false)
+  const [, startReact] = useTransition()
+
+  // Comment state
+  const [showComments, setShowComments] = useState(false)
+  const [comments, setComments] = useState<MadingCommentRow[] | null>(null)
+  const [loadingComments, setLoadingComments] = useState(false)
+  const [commentCount, setCommentCount] = useState(post.commentCount)
+  const [commentText, setCommentText] = useState('')
+  const [postingComment, setPostingComment] = useState(false)
+
+  const totalReactions = reactions.reduce((s, r) => s + r.count, 0)
+  const topEmojis = reactions.slice(0, 3).map(r => r.emoji)
+  const myReactionMeta = REACTIONS.find(r => r.emoji === myReaction)
+
+  function react(emoji: string) {
+    setShowPicker(false)
+    startReact(async () => {
+      const res = await toggleMadingReaction(post.id, emoji)
+      if (res.success) {
+        setReactions(res.reactions ?? [])
+        setMyReaction(res.myReaction ?? null)
+      }
+    })
+  }
+
+  async function toggleComments() {
+    const next = !showComments
+    setShowComments(next)
+    if (next && comments === null) {
+      setLoadingComments(true)
+      const res = await getMadingComments(post.id)
+      setComments(res.comments ?? [])
+      setLoadingComments(false)
+    }
+  }
+
+  function submitComment() {
+    const text = commentText.trim()
+    if (!text || postingComment) return
+    setPostingComment(true)
+    startReact(async () => {
+      const res = await addMadingComment(post.id, text)
+      if (res.success && res.comment) {
+        setComments(prev => [...(prev ?? []), res.comment!])
+        setCommentCount(c => c + 1)
+        setCommentText('')
+      }
+      setPostingComment(false)
+    })
+  }
+
+  function removeComment(id: string) {
+    startReact(async () => {
+      const res = await deleteMadingComment(id)
+      if (res.success) {
+        setComments(prev => (prev ?? []).filter(c => c.id !== id))
+        setCommentCount(c => Math.max(0, c - 1))
+      }
+    })
+  }
+
   return (
     <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '14px 16px', opacity: isDeleting ? 0.5 : 1, transition: 'opacity 0.2s' }}>
       {lightbox && <ImageLightbox url={lightbox} onClose={() => setLightbox(null)} />}
@@ -235,6 +326,109 @@ function PostCard({ post, canDelete, onDelete, deletingId }: { post: MadingPost;
             onClick={() => setLightbox(post.mediaUrl)}
             style={{ width: '100%', maxHeight: 240, objectFit: 'cover' as const, borderRadius: 12, display: 'block', cursor: 'zoom-in' }}
           />
+        </div>
+      )}
+
+      {/* ── Reaction summary + comment count ── */}
+      {(totalReactions > 0 || commentCount > 0) && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, fontSize: 11, color: '#6B7385' }}>
+          {totalReactions > 0 ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ display: 'inline-flex' }}>{topEmojis.map((e, i) => <span key={i} style={{ marginLeft: i ? -3 : 0, fontSize: 13 }}>{e}</span>)}</span>
+              <span>{totalReactions}</span>
+            </div>
+          ) : <span />}
+          {commentCount > 0 && (
+            <button onClick={toggleComments} style={{ background: 'none', border: 'none', color: '#6B7385', cursor: 'pointer', fontSize: 11, padding: 0 }}>
+              {commentCount} komentar
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── Action bar: Suka / Komentar ── */}
+      <div style={{ display: 'flex', gap: 6, marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.06)', position: 'relative' }}>
+        <div style={{ flex: 1, position: 'relative' }}
+          onMouseEnter={() => setShowPicker(true)} onMouseLeave={() => setShowPicker(false)}>
+          {showPicker && (
+            <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: 6, background: '#1c1f2b', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 100, padding: '5px 8px', display: 'flex', gap: 4, boxShadow: '0 8px 24px rgba(0,0,0,0.5)', zIndex: 20 }}>
+              {REACTIONS.map(r => (
+                <button key={r.emoji} onClick={() => react(r.emoji)} title={r.label}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: 2, transition: 'transform 0.12s', borderRadius: 8 }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.35)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)' }}>
+                  {r.emoji}
+                </button>
+              ))}
+            </div>
+          )}
+          <button onClick={() => react(myReaction ?? '👍')}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'transparent', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: 8, color: myReactionMeta ? myReactionMeta.color : '#9aa3b5', fontSize: 12.5, fontWeight: 600, fontFamily: "'Space Grotesk',sans-serif", transition: 'background 0.15s' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}>
+            {myReactionMeta ? <span style={{ fontSize: 15 }}>{myReactionMeta.emoji}</span> : <ThumbsUp size={14} />}
+            {myReactionMeta ? myReactionMeta.label : 'Suka'}
+          </button>
+        </div>
+        <button onClick={toggleComments}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'transparent', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: 8, color: showComments ? '#FF6A1A' : '#9aa3b5', fontSize: 12.5, fontWeight: 600, fontFamily: "'Space Grotesk',sans-serif", transition: 'background 0.15s' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}>
+          <MessageCircle size={14} /> Komentar
+        </button>
+      </div>
+
+      {/* ── Comment section ── */}
+      {showComments && (
+        <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {loadingComments ? (
+            <div style={{ fontSize: 12, color: '#6B7385', textAlign: 'center', padding: '8px 0' }}>Memuat komentar...</div>
+          ) : (comments && comments.length > 0) ? (
+            comments.map(c => (
+              <div key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <Avatar name={c.userName ?? '?'} imageUrl={c.userAvatar ?? undefined} size="sm" />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '7px 11px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#EDF0F5', fontFamily: "'Space Grotesk',sans-serif" }}>{c.userName ?? 'Pengguna'}</span>
+                      {c.userRole && <span style={{ fontSize: 9, color: '#6B7385' }}>{ROLE_LABEL[c.userRole] ?? c.userRole}</span>}
+                    </div>
+                    <div style={{ fontSize: 13, color: '#C7CDD9', lineHeight: 1.5, whiteSpace: 'pre-wrap' as const, wordBreak: 'break-word' as const }}>{c.content}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3, paddingLeft: 4 }}>
+                    <span style={{ fontSize: 10, color: '#6B7385', fontFamily: "'IBM Plex Mono',monospace" }}>{formatWIB(c.createdAt)}</span>
+                    {(c.userId === currentUserId || canModerate) && (
+                      <button onClick={() => removeComment(c.id)}
+                        style={{ background: 'none', border: 'none', color: '#6B7385', cursor: 'pointer', fontSize: 10, padding: 0 }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#FF6B6B' }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#6B7385' }}>
+                        Hapus
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div style={{ fontSize: 12, color: '#6B7385', textAlign: 'center', padding: '4px 0' }}>Belum ada komentar. Jadilah yang pertama! 💬</div>
+          )}
+
+          {/* Comment input */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+            <textarea
+              value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitComment() } }}
+              placeholder="Tulis komentar..." rows={1} maxLength={1000}
+              style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '8px 12px', color: '#EDF0F5', fontSize: 13, outline: 'none', resize: 'none' as const, fontFamily: 'inherit', boxSizing: 'border-box' as const, lineHeight: 1.4 }}
+              onFocus={e => { e.currentTarget.style.borderColor = 'rgba(255,106,26,0.5)' }}
+              onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
+            />
+            <button onClick={submitComment} disabled={postingComment || !commentText.trim()}
+              style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 12, background: (postingComment || !commentText.trim()) ? 'rgba(255,106,26,0.35)' : '#FF6A1A', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: (postingComment || !commentText.trim()) ? 'not-allowed' : 'pointer' }}>
+              <Send size={15} color="#fff" />
+            </button>
+          </div>
         </div>
       )}
     </div>

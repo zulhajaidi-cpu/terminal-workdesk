@@ -418,3 +418,20 @@ export const madingPosts = pgTable('mading_posts', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
 })
+
+export const madingReactions = pgTable('mading_reactions', {
+  id:        uuid('id').primaryKey().defaultRandom(),
+  postId:    uuid('post_id').notNull().references(() => madingPosts.id, { onDelete: 'cascade' }),
+  userId:    uuid('user_id').notNull().references(() => users.id),
+  emoji:     text('emoji').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [unique().on(t.postId, t.userId)])
+
+export const madingComments = pgTable('mading_comments', {
+  id:        uuid('id').primaryKey().defaultRandom(),
+  postId:    uuid('post_id').notNull().references(() => madingPosts.id, { onDelete: 'cascade' }),
+  userId:    uuid('user_id').notNull().references(() => users.id),
+  content:   text('content').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
+})

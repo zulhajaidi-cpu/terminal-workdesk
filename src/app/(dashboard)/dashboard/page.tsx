@@ -158,6 +158,27 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     .map(([uid, v], i) => ({ rank: i + 1, userId: uid, ...v }))
   const myRank = leaderboardList.findIndex(l => l.userId === session.id) + 1
 
+  // Mading reactions & comment counts
+  const madingIds = madingRows.map(r => r.id)
+  let reactionCountRows: { post_id: string; emoji: string; cnt: number }[] = []
+  let myReactionRows: { post_id: string; emoji: string }[] = []
+  let commentCountRows: { post_id: string; cnt: number }[] = []
+  if (madingIds.length > 0) {
+    ;[reactionCountRows, myReactionRows, commentCountRows] = (await Promise.all([
+      sqlRaw`SELECT post_id, emoji, COUNT(*)::int AS cnt FROM mading_reactions WHERE post_id = ANY(${madingIds}) GROUP BY post_id, emoji ORDER BY cnt DESC`,
+      sqlRaw`SELECT post_id, emoji FROM mading_reactions WHERE user_id = ${session.id} AND post_id = ANY(${madingIds})`,
+      sqlRaw`SELECT post_id, COUNT(*)::int AS cnt FROM mading_comments WHERE deleted_at IS NULL AND post_id = ANY(${madingIds}) GROUP BY post_id`,
+    ])) as unknown as [typeof reactionCountRows, typeof myReactionRows, typeof commentCountRows]
+  }
+  const reactionsByPost: Record<string, { emoji: string; count: number }[]> = {}
+  for (const r of reactionCountRows) {
+    ;(reactionsByPost[r.post_id] ??= []).push({ emoji: r.emoji, count: r.cnt })
+  }
+  const myReactionByPost: Record<string, string> = {}
+  for (const r of myReactionRows) myReactionByPost[r.post_id] = r.emoji
+  const commentCountByPost: Record<string, number> = {}
+  for (const r of commentCountRows) commentCountByPost[r.post_id] = r.cnt
+
   return (
     <DashboardContent
       profile={{ full_name: session.fullName, role: session.role, avatar_url: session.avatarUrl } as any}
@@ -194,8 +215,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         creatorName: r.creatorName ?? 'Unknown',
         creatorAvatar: r.creatorAvatar ?? null,
         creatorRole: r.creatorRole ?? 'staff',
+        reactions: reactionsByPost[r.id] ?? [],
+        myReaction: myReactionByPost[r.id] ?? null,
+        commentCount: commentCountByPost[r.id] ?? 0,
       }))}
+      currentUserId={session.id}
       canPostMading={['leader_divisi', 'spv_manager', 'head_director', 'super_admin'].includes(session.role)}
+      canModerateMading={['head_director', 'super_admin'].includes(session.role)}
       todayMood={todayMoodRows[0] ? { emoji: todayMoodRows[0].moodEmoji, label: todayMoodRows[0].moodLabel } : null}
     />
   )

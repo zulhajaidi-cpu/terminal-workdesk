@@ -39,6 +39,8 @@ interface Props {
   selectedDivision: string
   madingPosts: MadingPost[]
   canPostMading: boolean
+  canModerateMading: boolean
+  currentUserId: string
   todayMood: { emoji: string; label: string } | null
 }
 
@@ -111,7 +113,7 @@ function CompletionBar({ label, done, total, pct }: { label: string; done: numbe
   )
 }
 
-export function DashboardContent({ profile, stats, recentProjects, myTasks, upcomingEvents, myKpi, leaderboard, myPoints, myRank, monthlyReward, chartData, progress, divisions, selectedDivision, madingPosts, canPostMading, todayMood }: Props) {
+export function DashboardContent({ profile, stats, recentProjects, myTasks, upcomingEvents, myKpi, leaderboard, myPoints, myRank, monthlyReward, chartData, progress, divisions, selectedDivision, madingPosts, canPostMading, canModerateMading, currentUserId, todayMood }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const now = new Date()
@@ -174,7 +176,7 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
-          <MadingWidget posts={madingPosts} canPost={canPostMading} />
+          <MadingWidget posts={madingPosts} canPost={canPostMading} canModerate={canModerateMading} currentUserId={currentUserId} />
         </div>
         <MoodTracker todayMood={todayMood} />
       </div>
