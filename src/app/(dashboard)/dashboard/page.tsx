@@ -5,7 +5,6 @@ import { neon } from '@neondatabase/serverless'
 import { projects, tasks, calendarEvents, kpiItems, pointsLedger, monthlyRewards, taskAssignees, users, divisions, madingPosts, userMoods } from '@/lib/db/schema'
 import { eq, and, ne, isNull, gte, lte, desc, asc, sql } from 'drizzle-orm'
 import { DashboardContent } from './dashboard-content'
-import { canViewBudget } from '@/lib/roles'
 
 const sqlRaw = neon(process.env.DATABASE_URL!)
 
@@ -32,6 +31,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     activeTasksRows,
     overdueTasksRows,
     completedTasksRows,
+    projectsDoneRows,
+    projectsTotalRows,
+    tasksDoneRows,
+    tasksTotalRows,
     recentProjects,
     myTasks,
     upcomingEvents,
@@ -59,6 +62,16 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       )),
     db.select({ count: sql<number>`count(*)` }).from(tasks)
       .where(and(isNull(tasks.deletedAt), eq(tasks.status, 'Completed'), gte(tasks.completedAt, monthStart), ...(divId ? [eq(tasks.divisionId, divId)] : []))),
+    // Project completion progress (Completed vs all non-cancelled)
+    db.select({ count: sql<number>`count(*)` }).from(projects)
+      .where(and(isNull(projects.deletedAt), eq(projects.status, 'Completed'), ...(divId ? [eq(projects.divisionId, divId)] : []))),
+    db.select({ count: sql<number>`count(*)` }).from(projects)
+      .where(and(isNull(projects.deletedAt), ne(projects.status, 'Cancelled'), ...(divId ? [eq(projects.divisionId, divId)] : []))),
+    // Task completion progress (Completed vs all non-cancelled)
+    db.select({ count: sql<number>`count(*)` }).from(tasks)
+      .where(and(isNull(tasks.deletedAt), eq(tasks.status, 'Completed'), ...(divId ? [eq(tasks.divisionId, divId)] : []))),
+    db.select({ count: sql<number>`count(*)` }).from(tasks)
+      .where(and(isNull(tasks.deletedAt), ne(tasks.status, 'Cancelled'), ...(divId ? [eq(tasks.divisionId, divId)] : []))),
     db.select({
       id: projects.id, name: projects.name, status: projects.status,
       priority: projects.priority, progress: projects.progress,
@@ -116,29 +129,19 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   const myTotalPoints = myPointsRaw.reduce((sum, r) => sum + (r.points ?? 0), 0)
 
-  const canSeeBudget = canViewBudget(session.role)
-  let budgetData: { name: string; budget: number }[] = []
   let taskStatusData: { status: string; cnt: number }[]
   let trendData: { day: string; cnt: number }[]
 
-  const budgetQuery = canSeeBudget
-    ? (divId
-        ? sqlRaw`SELECT p.name, SUM(b.planned)::bigint AS budget FROM budgets b JOIN projects p ON b.project_id = p.id WHERE b.deleted_at IS NULL AND p.deleted_at IS NULL AND p.division_id = ${divId} GROUP BY p.id, p.name HAVING SUM(b.planned) > 0 ORDER BY budget DESC LIMIT 7`
-        : sqlRaw`SELECT p.name, SUM(b.planned)::bigint AS budget FROM budgets b JOIN projects p ON b.project_id = p.id WHERE b.deleted_at IS NULL AND p.deleted_at IS NULL GROUP BY p.id, p.name HAVING SUM(b.planned) > 0 ORDER BY budget DESC LIMIT 7`)
-    : Promise.resolve([])
-
   if (divId) {
-    ;[budgetData, taskStatusData, trendData] = (await Promise.all([
-      budgetQuery,
+    ;[taskStatusData, trendData] = (await Promise.all([
       sqlRaw`SELECT status, COUNT(*)::int AS cnt FROM tasks WHERE deleted_at IS NULL AND division_id = ${divId} AND status NOT IN ('Cancelled') GROUP BY status ORDER BY cnt DESC`,
       sqlRaw`SELECT TO_CHAR(completed_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') AS day, COUNT(*)::int AS cnt FROM tasks WHERE deleted_at IS NULL AND status = 'Completed' AND completed_at IS NOT NULL AND completed_at >= NOW() - INTERVAL '14 days' AND division_id = ${divId} GROUP BY DATE(completed_at AT TIME ZONE 'Asia/Jakarta'), TO_CHAR(completed_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') ORDER BY DATE(completed_at AT TIME ZONE 'Asia/Jakarta')`,
-    ])) as unknown as [typeof budgetData, typeof taskStatusData, typeof trendData]
+    ])) as unknown as [typeof taskStatusData, typeof trendData]
   } else {
-    ;[budgetData, taskStatusData, trendData] = (await Promise.all([
-      budgetQuery,
+    ;[taskStatusData, trendData] = (await Promise.all([
       sqlRaw`SELECT status, COUNT(*)::int AS cnt FROM tasks WHERE deleted_at IS NULL AND status NOT IN ('Cancelled') GROUP BY status ORDER BY cnt DESC`,
       sqlRaw`SELECT TO_CHAR(completed_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') AS day, COUNT(*)::int AS cnt FROM tasks WHERE deleted_at IS NULL AND status = 'Completed' AND completed_at IS NOT NULL AND completed_at >= NOW() - INTERVAL '14 days' GROUP BY DATE(completed_at AT TIME ZONE 'Asia/Jakarta'), TO_CHAR(completed_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') ORDER BY DATE(completed_at AT TIME ZONE 'Asia/Jakarta')`,
-    ])) as unknown as [typeof budgetData, typeof taskStatusData, typeof trendData]
+    ])) as unknown as [typeof taskStatusData, typeof trendData]
   }
 
   const pointsMap: Record<string, { name: string; division: string; total: number }> = {}
@@ -173,7 +176,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       myPoints={myTotalPoints}
       myRank={myRank}
       monthlyReward={monthlyRewardRow[0] as any ?? null}
-      chartData={{ budget: budgetData, taskStatus: taskStatusData, trend: trendData }}
+      chartData={{ taskStatus: taskStatusData, trend: trendData }}
+      progress={{
+        projectsDone: Number(projectsDoneRows[0]?.count ?? 0),
+        projectsTotal: Number(projectsTotalRows[0]?.count ?? 0),
+        tasksDone: Number(tasksDoneRows[0]?.count ?? 0),
+        tasksTotal: Number(tasksTotalRows[0]?.count ?? 0),
+      }}
       divisions={allDivisions}
       selectedDivision={selectedDivision}
       madingPosts={madingRows.map(r => ({

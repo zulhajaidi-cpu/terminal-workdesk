@@ -14,9 +14,8 @@ import {
 import { MadingWidget } from './MadingWidget'
 import type { MadingPost } from './MadingWidget'
 import { saveMood } from './mood-actions'
-import { canViewBudget } from '@/lib/roles'
 import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
+  ResponsiveContainer, XAxis, YAxis, Tooltip, Cell,
   PieChart, Pie, AreaChart, Area, Legend, TooltipProps,
 } from 'recharts'
 
@@ -32,10 +31,10 @@ interface Props {
   myRank: number
   monthlyReward: { reward_name: string; rank: number } | null
   chartData: {
-    budget: { name: string; budget: number }[]
     taskStatus: { status: string; cnt: number }[]
     trend: { day: string; cnt: number }[]
   }
+  progress: { projectsDone: number; projectsTotal: number; tasksDone: number; tasksTotal: number }
   divisions: { id: string; name: string }[]
   selectedDivision: string
   madingPosts: MadingPost[]
@@ -89,24 +88,44 @@ function ChartTooltip({ active, payload, label }: any) {
 const CARD = 'rounded-3xl p-5'
 const cardStyle: React.CSSProperties = { background: '#161a23', border: '1px solid rgba(255,255,255,0.06)' }
 
-export function DashboardContent({ profile, stats, recentProjects, myTasks, upcomingEvents, myKpi, leaderboard, myPoints, myRank, monthlyReward, chartData, divisions, selectedDivision, madingPosts, canPostMading, todayMood }: Props) {
+/* Gradient progress bar — % penyelesaian Projects / Tasks */
+function CompletionBar({ label, done, total, pct }: { label: string; done: number; total: number; pct: number }) {
+  return (
+    <div>
+      <div className="flex items-end justify-between mb-1.5">
+        <span className="font-grotesk text-[13px] text-[#A5AEC0]">{label}</span>
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-grotesk font-bold text-[26px] text-[#EDF0F5] leading-none">{pct}%</span>
+          <span className="text-[11px] text-[#6B7385] font-mono">{done}/{total}</span>
+        </div>
+      </div>
+      <div style={{ height: 14, borderRadius: 100, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+        <div style={{
+          height: '100%', width: `${pct}%`, borderRadius: 100,
+          background: 'linear-gradient(90deg, #A3E635 0%, #3FD08A 55%, #22D3EE 100%)',
+          boxShadow: '0 0 12px rgba(63,208,138,0.45)',
+          transition: 'width 0.6s ease',
+        }} />
+      </div>
+    </div>
+  )
+}
+
+export function DashboardContent({ profile, stats, recentProjects, myTasks, upcomingEvents, myKpi, leaderboard, myPoints, myRank, monthlyReward, chartData, progress, divisions, selectedDivision, madingPosts, canPostMading, todayMood }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const now = new Date()
   const monthName = now.toLocaleString('id-ID', { month: 'long', timeZone: 'Asia/Jakarta' })
   const year = now.getFullYear()
-  const showBudget = canViewBudget(profile?.role ?? '')
   const isAllDivisions = selectedDivision === 'all'
+  const projectPct = progress.projectsTotal > 0 ? Math.round((progress.projectsDone / progress.projectsTotal) * 100) : 0
+  const taskPct = progress.tasksTotal > 0 ? Math.round((progress.tasksDone / progress.tasksTotal) * 100) : 0
 
   function handleDivisionChange(value: string) {
     startTransition(() => router.push(`/dashboard?division=${value}`))
   }
 
   // Chart-ready data from server
-  const budgetChartData = chartData.budget.map(b => ({
-    name: b.name.length > 18 ? b.name.slice(0, 17) + '…' : b.name,
-    budget: Math.round(Number(b.budget) / 1_000_000),
-  }))
   const taskStatusChartData = chartData.taskStatus.map(s => ({
     name: s.status, value: s.cnt, color: STATUS_COLORS[s.status] ?? '#475569',
   }))
@@ -178,30 +197,19 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
       </div>
 
       {/* ── CHARTS (live data) ── */}
-      <div className={`grid grid-cols-1 gap-4 ${showBudget ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
-        {/* Bar: Budget per Project */}
-        {showBudget && (
-          <div className={CARD} style={cardStyle}>
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp size={15} className="text-[#3FD08A]" />
-              <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Budget Project</span>
-            </div>
-            <p className="text-[11px] text-[#6B7385] mb-4">{isAllDivisions ? 'Semua divisi · ' : ''}Rp juta</p>
-            {budgetChartData.length === 0 ? (
-              <div className="flex items-center justify-center h-[210px] text-[#6B7385] text-sm">Belum ada data budget</div>
-            ) : (
-              <ResponsiveContainer width="100%" height={210}>
-                <BarChart data={budgetChartData} margin={{ top: 4, right: 4, left: -12, bottom: 40 }}>
-                  <XAxis dataKey="name" tick={{ fill: '#6B7385', fontSize: 9 }} axisLine={false} tickLine={false}
-                    interval={0} angle={-35} textAnchor="end" />
-                  <YAxis tick={{ fill: '#6B7385', fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                  <Bar dataKey="budget" name="Budget (juta)" fill="#FF6A1A" radius={[6, 6, 0, 0]} maxBarSize={28} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Progress: % Projects & Tasks selesai */}
+        <div className={CARD} style={cardStyle}>
+          <div className="flex items-center gap-2 mb-1">
+            <TrendingUp size={15} className="text-[#3FD08A]" />
+            <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Progress Penyelesaian</span>
           </div>
-        )}
+          <p className="text-[11px] text-[#6B7385] mb-5">{isAllDivisions ? 'Semua divisi' : 'Divisi terpilih'}</p>
+          <div className="flex flex-col gap-6 pt-1">
+            <CompletionBar label="Projects" done={progress.projectsDone} total={progress.projectsTotal} pct={projectPct} />
+            <CompletionBar label="Tasks" done={progress.tasksDone} total={progress.tasksTotal} pct={taskPct} />
+          </div>
+        </div>
 
         {/* Donut: Task status breakdown */}
         <div className={CARD} style={cardStyle}>
