@@ -351,15 +351,20 @@ function PostCard({ post, canDelete, onDelete, deletingId, canModerate, currentU
         <div style={{ flex: 1, position: 'relative' }}
           onMouseEnter={() => setShowPicker(true)} onMouseLeave={() => setShowPicker(false)}>
           {showPicker && (
-            <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: 6, background: '#1c1f2b', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 100, padding: '5px 8px', display: 'flex', gap: 4, boxShadow: '0 8px 24px rgba(0,0,0,0.5)', zIndex: 20 }}>
-              {REACTIONS.map(r => (
-                <button key={r.emoji} onClick={() => react(r.emoji)} title={r.label}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: 2, transition: 'transform 0.12s', borderRadius: 8 }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.35)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)' }}>
-                  {r.emoji}
-                </button>
-              ))}
+            // paddingBottom (bukan marginBottom) supaya celah di antara tombol "Suka" dan
+            // popup tetap bagian dari kotak div ini — pakai marginBottom sebelumnya membuat
+            // celah kosong yang memicu mouseleave sebelum kursor sampai ke popup.
+            <div style={{ position: 'absolute', bottom: '100%', left: 0, paddingBottom: 6, zIndex: 20 }}>
+              <div style={{ background: '#1c1f2b', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 100, padding: '5px 8px', display: 'flex', gap: 4, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
+                {REACTIONS.map(r => (
+                  <button key={r.emoji} onClick={() => react(r.emoji)} title={r.label}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: 2, transition: 'transform 0.12s', borderRadius: 8 }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.35)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)' }}>
+                    {r.emoji}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           <button onClick={() => react(myReaction ?? '👍')}
