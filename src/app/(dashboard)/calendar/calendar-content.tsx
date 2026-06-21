@@ -33,11 +33,12 @@ interface ProjectRow {
 }
 interface TaskRow {
   id: string; name: string; dueDate: string; status: string; priority: string
-  isOverdue: boolean; projectName: string|null; divisionName: string|null
+  isOverdue: boolean; projectName: string|null; divisionName: string|null; divisionId: string|null
 }
 interface ApprovalRow {
   id: string; projectName: string|null; status: string
   currentStep: number; requesterName: string|null; createdAt: string
+  divisionName: string|null; divisionId: string|null
 }
 interface DisplayEvent {
   key: string; id: string; title: string
@@ -45,7 +46,7 @@ interface DisplayEvent {
   src: 'event'|'project_start'|'project_deadline'|'task'|'approval'
   eventType?: string; priority?: string; status?: string; isOverdue?: boolean
   location?: string; extLink?: string; intLink?: string; notes?: string
-  divisionName?: string; projectName?: string; requesterName?: string; createdBy?: string
+  divisionName?: string; divisionId?: string|null; projectName?: string; requesterName?: string; createdBy?: string
   bg: string; border: string; text: string; dot: string
   icon: string
 }
@@ -59,19 +60,25 @@ interface Props {
   currentUser: { id: string; role: string; divisionId: string|null }
 }
 
-/* ═══════════════════ COLORS ════════════════════════════ */
-const C = {
-  Meeting:          { bg:'rgba(74,158,255,0.2)',  border:'#4A9EFF', text:'#93C5FD', dot:'#4A9EFF'  },
-  Shooting:         { bg:'rgba(168,85,247,0.2)',  border:'#A855F7', text:'#D8B4FE', dot:'#A855F7'  },
-  Visit:            { bg:'rgba(16,185,129,0.2)',  border:'#10B981', text:'#6EE7B7', dot:'#10B981'  },
-  Deadline:         { bg:'rgba(239,68,68,0.2)',   border:'#EF4444', text:'#FCA5A5', dot:'#EF4444'  },
-  Other:            { bg:'rgba(255,106,26,0.2)',  border:'#FF6A1A', text:'#FED7AA', dot:'#FF6A1A'  },
-  project_start:    { bg:'rgba(16,185,129,0.14)', border:'#10B981', text:'#6EE7B7', dot:'#10B981'  },
-  project_deadline: { bg:'rgba(239,68,68,0.14)',  border:'#EF4444', text:'#FCA5A5', dot:'#EF4444'  },
-  task:             { bg:'rgba(245,158,11,0.14)', border:'#F59E0B', text:'#FCD34D', dot:'#F59E0B'  },
-  task_overdue:     { bg:'rgba(239,68,68,0.14)',  border:'#EF4444', text:'#FCA5A5', dot:'#EF4444'  },
-  approval:         { bg:'rgba(124,58,237,0.14)', border:'#7C3AED', text:'#C4B5FD', dot:'#7C3AED'  },
-} as const
+/* ═══════════════════ COLORS — per division (fixed) ═════ */
+// Setiap divisi punya warna tetap supaya kalender langsung kebaca "ini punya siapa".
+const DIVISION_COLORS: Record<string, { bg: string; border: string; text: string; dot: string }> = {
+  'Branding':           { bg:'rgba(236,72,153,0.18)', border:'#EC4899', text:'#F9A8D4', dot:'#EC4899' },
+  'Creative Marketing': { bg:'rgba(74,158,255,0.18)',  border:'#4A9EFF', text:'#93C5FD', dot:'#4A9EFF' },
+  'Retail':              { bg:'rgba(16,185,129,0.18)', border:'#10B981', text:'#6EE7B7', dot:'#10B981' },
+}
+const NO_DIVISION_COLOR = { bg:'rgba(148,163,184,0.16)', border:'#94A3B8', text:'#CBD5E1', dot:'#94A3B8' }
+
+function colorForDivision(name?: string | null) {
+  if (!name) return NO_DIVISION_COLOR
+  return DIVISION_COLORS[name] ?? NO_DIVISION_COLOR
+}
+
+/* Icon per tipe/sumber event — warna sekarang ditentukan oleh divisi, bukan tipe. */
+const ICON: Record<string, string> = {
+  Meeting:'📅', Shooting:'📅', Visit:'📅', Deadline:'📅', Other:'📅',
+  project_start:'🚀', project_deadline:'⚑', task:'✓', task_overdue:'✓', approval:'⏳',
+}
 
 /* ═══════════════════ HELPERS ═══════════════════════════ */
 function sd(a: Date, b: Date) {
@@ -103,14 +110,13 @@ function buildEvents(
 
   if (filters.has('event')) {
     for (const e of cal) {
-      const c = C[e.eventType as keyof typeof C] ?? C.Other
       evs.push({
-        key:`ev-${e.id}`, id:e.id, title:e.title, icon:'📅',
+        key:`ev-${e.id}`, id:e.id, title:e.title, icon:ICON[e.eventType] ?? '📅',
         startAt:new Date(e.startAt), endAt:new Date(e.endAt), allDay:e.allDay,
         src:'event', eventType:e.eventType,
         location:e.location??undefined, extLink:e.link??undefined, notes:e.notes??undefined,
-        divisionName:e.divisionName??undefined, createdBy:e.createdBy,
-        ...c,
+        divisionName:e.divisionName??undefined, divisionId:e.divisionId, createdBy:e.createdBy,
+        ...colorForDivision(e.divisionName),
       })
     }
   }
@@ -120,21 +126,21 @@ function buildEvents(
       if (p.startDate) {
         const d = new Date(p.startDate); d.setHours(8,0,0,0)
         evs.push({
-          key:`ps-${p.id}`, id:p.id, title:p.name, icon:'🚀',
+          key:`ps-${p.id}`, id:p.id, title:p.name, icon:ICON.project_start,
           startAt:d, endAt:new Date(d.getTime()+3_600_000), allDay:true,
           src:'project_start', priority:p.priority, status:p.status,
-          intLink:`/projects/${p.id}`, divisionName:p.divisionName??undefined,
-          ...C.project_start,
+          intLink:`/projects/${p.id}`, divisionName:p.divisionName??undefined, divisionId:p.divisionId,
+          ...colorForDivision(p.divisionName),
         })
       }
       if (p.deadline) {
         const d = new Date(p.deadline); d.setHours(17,0,0,0)
         evs.push({
-          key:`pd-${p.id}`, id:p.id, title:p.name, icon:'⚑',
+          key:`pd-${p.id}`, id:p.id, title:p.name, icon:ICON.project_deadline,
           startAt:d, endAt:new Date(d.getTime()+3_600_000), allDay:true,
           src:'project_deadline', priority:p.priority, status:p.status,
-          intLink:`/projects/${p.id}`, divisionName:p.divisionName??undefined,
-          ...C.project_deadline,
+          intLink:`/projects/${p.id}`, divisionName:p.divisionName??undefined, divisionId:p.divisionId,
+          ...colorForDivision(p.divisionName),
         })
       }
     }
@@ -145,13 +151,12 @@ function buildEvents(
       const d = new Date(t.dueDate)
       const hasTime = d.getUTCHours() !== 0 || d.getUTCMinutes() !== 0
       if (!hasTime) d.setHours(0,0,0,0)
-      const c = t.isOverdue ? C.task_overdue : C.task
       evs.push({
-        key:`tk-${t.id}`, id:t.id, title:t.name, icon:'✓',
+        key:`tk-${t.id}`, id:t.id, title:t.name, icon:ICON.task,
         startAt:d, endAt:new Date(d.getTime()+3_600_000), allDay:!hasTime,
         src:'task', priority:t.priority, status:t.status, isOverdue:t.isOverdue,
-        projectName:t.projectName??undefined, divisionName:t.divisionName??undefined,
-        intLink:'/tasks', ...c,
+        projectName:t.projectName??undefined, divisionName:t.divisionName??undefined, divisionId:t.divisionId,
+        intLink:'/tasks', ...colorForDivision(t.divisionName),
       })
     }
   }
@@ -161,10 +166,11 @@ function buildEvents(
       if (a.status !== 'Pending') continue
       const d = new Date(a.createdAt)
       evs.push({
-        key:`apv-${a.id}`, id:a.id, title:a.projectName??'Approval', icon:'⏳',
+        key:`apv-${a.id}`, id:a.id, title:a.projectName??'Approval', icon:ICON.approval,
         startAt:d, endAt:d, allDay:true, src:'approval', status:a.status,
         projectName:a.projectName??undefined, requesterName:a.requesterName??undefined,
-        intLink:'/approvals', ...C.approval,
+        divisionName:a.divisionName??undefined, divisionId:a.divisionId,
+        intLink:'/approvals', ...colorForDivision(a.divisionName),
       })
     }
   }
@@ -371,11 +377,12 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
             <span style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:'9px', opacity:0.65 }}>{fc.count}</span>
           </button>
         ))}
-        <div style={{ marginLeft:'auto', display:'flex', gap:'8px', flexWrap:'wrap' }}>
-          {Object.entries({ '📅 Event':'#FF8A4C', '🚀 Mulai':'#10B981', '⚑ Deadline':'#EF4444', '✓ Task':'#F59E0B', '⏳ Approval':'#7C3AED' }).map(([label,color]) => (
-            <div key={label} style={{ display:'flex', alignItems:'center', gap:'4px' }}>
-              <div style={{ width:'8px', height:'8px', borderRadius:'50%', background:color, flexShrink:0 }}/>
-              <span style={{ fontSize:'10px', color:'#4a5160' }}>{label}</span>
+        <div style={{ marginLeft:'auto', display:'flex', gap:'10px', flexWrap:'wrap', alignItems:'center' }}>
+          <span style={{ fontSize:'10px', color:'#4a5160', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.05em' }}>DIVISI:</span>
+          {[...Object.entries(DIVISION_COLORS), ['Tanpa divisi', NO_DIVISION_COLOR] as const].map(([name, c]) => (
+            <div key={name} style={{ display:'flex', alignItems:'center', gap:'4px' }}>
+              <div style={{ width:'8px', height:'8px', borderRadius:'50%', background:c.dot, flexShrink:0 }}/>
+              <span style={{ fontSize:'10px', color:'#4a5160' }}>{name}</span>
             </div>
           ))}
         </div>

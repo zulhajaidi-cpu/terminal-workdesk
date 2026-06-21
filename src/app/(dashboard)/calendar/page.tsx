@@ -45,7 +45,7 @@ export default async function CalendarPage() {
     db.select({
       id: tasks.id, name: tasks.name, dueDate: tasks.dueDate,
       status: tasks.status, priority: tasks.priority, isOverdue: tasks.isOverdue,
-      projectName: projects.name, divisionName: divisions.name,
+      projectName: projects.name, divisionName: divisions.name, divisionId: tasks.divisionId,
     })
       .from(tasks)
       .leftJoin(projects, eq(tasks.projectId, projects.id))
@@ -60,10 +60,12 @@ export default async function CalendarPage() {
       createdAt: approvalRequests.createdAt,
       projectName: projects.name,
       requesterName: users.fullName,
+      divisionName: divisions.name, divisionId: projects.divisionId,
     })
       .from(approvalRequests)
       .leftJoin(projects, eq(approvalRequests.relatedEntityId, projects.id))
       .leftJoin(users, eq(approvalRequests.requestedBy, users.id))
+      .leftJoin(divisions, eq(projects.divisionId, divisions.id))
       .orderBy(desc(approvalRequests.createdAt)),
 
     db.select({ id: divisions.id, name: divisions.name })
