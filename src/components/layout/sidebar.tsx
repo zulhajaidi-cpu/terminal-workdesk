@@ -8,6 +8,7 @@ import {
   CalendarRange, CheckSquare, Trophy, ClipboardCheck, Bell,
   FolderOpen, Wallet, Settings, X, ChevronRight
 } from 'lucide-react'
+import { canViewBudget } from '@/lib/roles'
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -20,16 +21,18 @@ const navItems = [
   { href: '/approvals', icon: ClipboardCheck, label: 'Approvals' },
   { href: '/notifications', icon: Bell, label: 'Notifikasi' },
   { href: '/assets', icon: FolderOpen, label: 'Assets' },
-  { href: '/budget', icon: Wallet, label: 'Budget' },
+  { href: '/budget', icon: Wallet, label: 'Budget', requiresBudgetAccess: true },
   { href: '/settings', icon: Settings, label: 'Settings' },
 ]
 
 interface SidebarProps {
   onClose?: () => void
+  role?: string
 }
 
-export function Sidebar({ onClose }: SidebarProps) {
+export function Sidebar({ onClose, role }: SidebarProps) {
   const pathname = usePathname()
+  const items = navItems.filter(item => !item.requiresBudgetAccess || canViewBudget(role ?? ''))
 
   return (
     <aside
@@ -57,7 +60,7 @@ export function Sidebar({ onClose }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-3 px-3 flex flex-col gap-0.5 hide-scroll">
-        {navItems.map(({ href, icon: Icon, label }) => {
+        {items.map(({ href, icon: Icon, label }) => {
           const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
           return (
             <Link

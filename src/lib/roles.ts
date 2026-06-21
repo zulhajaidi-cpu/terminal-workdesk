@@ -46,3 +46,7 @@ export const canViewOthersKpi = (role: string) =>
 // Import/export Excel — SPV, Manager, Direktur (dan Super Admin)
 export const canBulkData = (role: string) =>
   ['super_admin', 'spv_manager', 'head_director', 'leader_divisi'].includes(role)
+
+// Budget hanya terlihat oleh SPV, Manager, Direktur, dan Super Admin (tidak Staff)
+export const canViewBudget = (role: string) =>
+  ['super_admin', 'spv_manager', 'head_director', 'leader_divisi'].includes(role)

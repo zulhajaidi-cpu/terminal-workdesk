@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { budgets, projects, divisions } from '@/lib/db/schema'
 import { isNull, eq, desc } from 'drizzle-orm'
+import { canViewBudget } from '@/lib/roles'
 import { BudgetContent } from './budget-content'
 
 export const metadata = { title: 'Budget — Terminal Workdesk' }
@@ -10,6 +11,7 @@ export const metadata = { title: 'Budget — Terminal Workdesk' }
 export default async function BudgetPage() {
   const session = await getSession()
   if (!session) redirect('/login')
+  if (!canViewBudget(session.role)) redirect('/dashboard')
 
   const [budgetRows, projectRows] = await Promise.all([
     db.select({

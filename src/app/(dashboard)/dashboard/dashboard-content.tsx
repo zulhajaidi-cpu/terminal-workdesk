@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
 import { Card, StatCard } from '@/components/ui/card'
 import { Badge, StatusBadge, PriorityBadge } from '@/components/ui/badge'
@@ -13,6 +14,7 @@ import {
 import { MadingWidget } from './MadingWidget'
 import type { MadingPost } from './MadingWidget'
 import { saveMood } from './mood-actions'
+import { canViewBudget } from '@/lib/roles'
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
   PieChart, Pie, AreaChart, Area, Legend, TooltipProps,
@@ -34,7 +36,8 @@ interface Props {
     taskStatus: { status: string; cnt: number }[]
     trend: { day: string; cnt: number }[]
   }
-  isWideRole: boolean
+  divisions: { id: string; name: string }[]
+  selectedDivision: string
   madingPosts: MadingPost[]
   canPostMading: boolean
   todayMood: { emoji: string; label: string } | null
@@ -86,10 +89,18 @@ function ChartTooltip({ active, payload, label }: any) {
 const CARD = 'rounded-3xl p-5'
 const cardStyle: React.CSSProperties = { background: '#161a23', border: '1px solid rgba(255,255,255,0.06)' }
 
-export function DashboardContent({ profile, stats, recentProjects, myTasks, upcomingEvents, myKpi, leaderboard, myPoints, myRank, monthlyReward, chartData, isWideRole, madingPosts, canPostMading, todayMood }: Props) {
+export function DashboardContent({ profile, stats, recentProjects, myTasks, upcomingEvents, myKpi, leaderboard, myPoints, myRank, monthlyReward, chartData, divisions, selectedDivision, madingPosts, canPostMading, todayMood }: Props) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
   const now = new Date()
   const monthName = now.toLocaleString('id-ID', { month: 'long', timeZone: 'Asia/Jakarta' })
   const year = now.getFullYear()
+  const showBudget = canViewBudget(profile?.role ?? '')
+  const isAllDivisions = selectedDivision === 'all'
+
+  function handleDivisionChange(value: string) {
+    startTransition(() => router.push(`/dashboard?division=${value}`))
+  }
 
   // Chart-ready data from server
   const budgetChartData = chartData.budget.map(b => ({
@@ -121,9 +132,24 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
             {profile?.divisions?.name ?? 'Department Terminal'} · {monthName} {year}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-[#6B7385] font-mono text-[11px]">
-          <span className="w-2 h-2 rounded-full bg-[#3FD08A] animate-pulse-dot" />
-          Live data
+        <div className="flex items-center gap-3">
+          <select
+            value={selectedDivision}
+            onChange={e => handleDivisionChange(e.target.value)}
+            disabled={isPending}
+            style={{
+              background: '#161a23', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px',
+              padding: '8px 12px', color: '#EDF0F5', fontSize: '13px', fontFamily: "'Space Grotesk', sans-serif",
+              cursor: 'pointer',
+            }}
+          >
+            <option value="all">Semua Divisi</option>
+            {divisions.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+          </select>
+          <div className="flex items-center gap-2 text-[#6B7385] font-mono text-[11px]">
+            <span className="w-2 h-2 rounded-full bg-[#3FD08A] animate-pulse-dot" />
+            Live data
+          </div>
         </div>
       </div>
 
@@ -152,28 +178,30 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
       </div>
 
       {/* ── CHARTS (live data) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className={`grid grid-cols-1 gap-4 ${showBudget ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
         {/* Bar: Budget per Project */}
-        <div className={CARD} style={cardStyle}>
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp size={15} className="text-[#3FD08A]" />
-            <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Budget Project</span>
+        {showBudget && (
+          <div className={CARD} style={cardStyle}>
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp size={15} className="text-[#3FD08A]" />
+              <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Budget Project</span>
+            </div>
+            <p className="text-[11px] text-[#6B7385] mb-4">{isAllDivisions ? 'Semua divisi · ' : ''}Rp juta</p>
+            {budgetChartData.length === 0 ? (
+              <div className="flex items-center justify-center h-[210px] text-[#6B7385] text-sm">Belum ada data budget</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={210}>
+                <BarChart data={budgetChartData} margin={{ top: 4, right: 4, left: -12, bottom: 40 }}>
+                  <XAxis dataKey="name" tick={{ fill: '#6B7385', fontSize: 9 }} axisLine={false} tickLine={false}
+                    interval={0} angle={-35} textAnchor="end" />
+                  <YAxis tick={{ fill: '#6B7385', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                  <Bar dataKey="budget" name="Budget (juta)" fill="#FF6A1A" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
-          <p className="text-[11px] text-[#6B7385] mb-4">{isWideRole ? 'Semua divisi · ' : ''}Rp juta</p>
-          {budgetChartData.length === 0 ? (
-            <div className="flex items-center justify-center h-[210px] text-[#6B7385] text-sm">Belum ada data budget</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={210}>
-              <BarChart data={budgetChartData} margin={{ top: 4, right: 4, left: -12, bottom: 40 }}>
-                <XAxis dataKey="name" tick={{ fill: '#6B7385', fontSize: 9 }} axisLine={false} tickLine={false}
-                  interval={0} angle={-35} textAnchor="end" />
-                <YAxis tick={{ fill: '#6B7385', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Bar dataKey="budget" name="Budget (juta)" fill="#FF6A1A" radius={[6, 6, 0, 0]} maxBarSize={28} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </div>
+        )}
 
         {/* Donut: Task status breakdown */}
         <div className={CARD} style={cardStyle}>
@@ -181,7 +209,7 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
             <CheckCircle size={15} className="text-[#4A9EFF]" />
             <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Status Task</span>
           </div>
-          <p className="text-[11px] text-[#6B7385] mb-2">{isWideRole ? 'Semua divisi' : 'Divisi kamu'}</p>
+          <p className="text-[11px] text-[#6B7385] mb-2">{isAllDivisions ? 'Semua divisi' : 'Divisi terpilih'}</p>
           {taskStatusChartData.length === 0 ? (
             <div className="flex items-center justify-center h-[210px] text-[#6B7385] text-sm">Belum ada task</div>
           ) : (

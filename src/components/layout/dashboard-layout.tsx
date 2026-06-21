@@ -18,7 +18,7 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
     <div className="flex h-screen overflow-hidden" style={{ background: '#0C0F16' }}>
       {/* Desktop sidebar */}
       <div className="hidden lg:block flex-shrink-0">
-        <Sidebar />
+        <Sidebar role={user?.role} />
       </div>
 
       {/* Mobile sidebar overlay */}
@@ -30,7 +30,7 @@ export function DashboardLayout({ children, user, title }: DashboardLayoutProps)
             onClick={() => setSidebarOpen(false)}
           />
           <div className="relative h-full animate-slide-in">
-            <Sidebar onClose={() => setSidebarOpen(false)} />
+            <Sidebar onClose={() => setSidebarOpen(false)} role={user?.role} />
           </div>
         </div>
       )}

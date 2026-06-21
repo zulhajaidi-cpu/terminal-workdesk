@@ -5,21 +5,28 @@ import { neon } from '@neondatabase/serverless'
 import { projects, tasks, calendarEvents, kpiItems, pointsLedger, monthlyRewards, taskAssignees, users, divisions, madingPosts, userMoods } from '@/lib/db/schema'
 import { eq, and, ne, isNull, gte, lte, desc, asc, sql } from 'drizzle-orm'
 import { DashboardContent } from './dashboard-content'
+import { canViewBudget } from '@/lib/roles'
 
 const sqlRaw = neon(process.env.DATABASE_URL!)
 
 export const metadata = { title: 'Dashboard — Terminal Workdesk' }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ division?: string }> }) {
   const session = await getSession()
   if (!session) redirect('/login')
 
+  const sp = await searchParams
   const now = new Date()
   const month = now.getMonth() + 1
   const year = now.getFullYear()
   const monthStart = new Date(year, now.getMonth(), 1)
 
+  // Division filter — defaults to the user's own division; 'all' shows every division.
+  const selectedDivision = sp.division ?? session.divisionId ?? 'all'
+  const divId = selectedDivision === 'all' ? null : selectedDivision
+
   const [
+    allDivisions,
     totalProjectsRows,
     overdueProjectsRows,
     activeTasksRows,
@@ -35,21 +42,23 @@ export default async function DashboardPage() {
     madingRows,
     todayMoodRows,
   ] = await Promise.all([
+    db.select({ id: divisions.id, name: divisions.name }).from(divisions).orderBy(asc(divisions.name)),
     db.select({ count: sql<number>`count(*)` }).from(projects)
-      .where(and(isNull(projects.deletedAt), ne(projects.status, 'Cancelled'), ne(projects.status, 'Completed'))),
+      .where(and(isNull(projects.deletedAt), ne(projects.status, 'Cancelled'), ne(projects.status, 'Completed'), ...(divId ? [eq(projects.divisionId, divId)] : []))),
     db.select({ count: sql<number>`count(*)` }).from(projects)
-      .where(and(isNull(projects.deletedAt), eq(projects.isOverdue, true))),
+      .where(and(isNull(projects.deletedAt), eq(projects.isOverdue, true), ...(divId ? [eq(projects.divisionId, divId)] : []))),
     db.select({ count: sql<number>`count(*)` }).from(tasks)
-      .where(and(isNull(tasks.deletedAt), ne(tasks.status, 'Completed'), ne(tasks.status, 'Cancelled'))),
+      .where(and(isNull(tasks.deletedAt), ne(tasks.status, 'Completed'), ne(tasks.status, 'Cancelled'), ...(divId ? [eq(tasks.divisionId, divId)] : []))),
     db.select({ count: sql<number>`count(*)` }).from(tasks)
       .where(and(
         isNull(tasks.deletedAt),
         ne(tasks.status, 'Completed'),
         ne(tasks.status, 'Cancelled'),
         lte(tasks.dueDate, sql`NOW() + INTERVAL '3 days'`),
+        ...(divId ? [eq(tasks.divisionId, divId)] : []),
       )),
     db.select({ count: sql<number>`count(*)` }).from(tasks)
-      .where(and(isNull(tasks.deletedAt), eq(tasks.status, 'Completed'), gte(tasks.completedAt, monthStart))),
+      .where(and(isNull(tasks.deletedAt), eq(tasks.status, 'Completed'), gte(tasks.completedAt, monthStart), ...(divId ? [eq(tasks.divisionId, divId)] : []))),
     db.select({
       id: projects.id, name: projects.name, status: projects.status,
       priority: projects.priority, progress: projects.progress,
@@ -57,7 +66,7 @@ export default async function DashboardPage() {
       divisionName: divisions.name,
     })
       .from(projects).leftJoin(divisions, eq(projects.divisionId, divisions.id))
-      .where(and(isNull(projects.deletedAt), ne(projects.status, 'Cancelled')))
+      .where(and(isNull(projects.deletedAt), ne(projects.status, 'Cancelled'), ...(divId ? [eq(projects.divisionId, divId)] : [])))
       .orderBy(desc(projects.updatedAt)).limit(5),
     db.select({
       id: tasks.id, name: tasks.name, status: tasks.status,
@@ -78,7 +87,7 @@ export default async function DashboardPage() {
     })
       .from(pointsLedger).leftJoin(users, eq(pointsLedger.userId, users.id))
       .leftJoin(divisions, eq(pointsLedger.divisionId, divisions.id))
-      .where(and(eq(pointsLedger.periodMonth, month), eq(pointsLedger.periodYear, year)))
+      .where(and(eq(pointsLedger.periodMonth, month), eq(pointsLedger.periodYear, year), ...(divId ? [eq(pointsLedger.divisionId, divId)] : [])))
       .limit(200),
     db.select({ points: pointsLedger.points })
       .from(pointsLedger)
@@ -107,23 +116,26 @@ export default async function DashboardPage() {
 
   const myTotalPoints = myPointsRaw.reduce((sum, r) => sum + (r.points ?? 0), 0)
 
-  // Chart data — managers/directors/super_admin see all divisions; others see own division
-  const isWideRole = ['super_admin', 'spv_manager', 'head_director'].includes(session.role)
-  const divId = isWideRole ? null : (session.divisionId ?? null)
-
-  let budgetData: { name: string; budget: number }[]
+  const canSeeBudget = canViewBudget(session.role)
+  let budgetData: { name: string; budget: number }[] = []
   let taskStatusData: { status: string; cnt: number }[]
   let trendData: { day: string; cnt: number }[]
 
+  const budgetQuery = canSeeBudget
+    ? (divId
+        ? sqlRaw`SELECT p.name, SUM(b.planned)::bigint AS budget FROM budgets b JOIN projects p ON b.project_id = p.id WHERE b.deleted_at IS NULL AND p.deleted_at IS NULL AND p.division_id = ${divId} GROUP BY p.id, p.name HAVING SUM(b.planned) > 0 ORDER BY budget DESC LIMIT 7`
+        : sqlRaw`SELECT p.name, SUM(b.planned)::bigint AS budget FROM budgets b JOIN projects p ON b.project_id = p.id WHERE b.deleted_at IS NULL AND p.deleted_at IS NULL GROUP BY p.id, p.name HAVING SUM(b.planned) > 0 ORDER BY budget DESC LIMIT 7`)
+    : Promise.resolve([])
+
   if (divId) {
     ;[budgetData, taskStatusData, trendData] = (await Promise.all([
-      sqlRaw`SELECT p.name, SUM(b.planned)::bigint AS budget FROM budgets b JOIN projects p ON b.project_id = p.id WHERE b.deleted_at IS NULL AND p.deleted_at IS NULL AND p.division_id = ${divId} GROUP BY p.id, p.name HAVING SUM(b.planned) > 0 ORDER BY budget DESC LIMIT 7`,
+      budgetQuery,
       sqlRaw`SELECT status, COUNT(*)::int AS cnt FROM tasks WHERE deleted_at IS NULL AND division_id = ${divId} AND status NOT IN ('Cancelled') GROUP BY status ORDER BY cnt DESC`,
       sqlRaw`SELECT TO_CHAR(completed_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') AS day, COUNT(*)::int AS cnt FROM tasks WHERE deleted_at IS NULL AND status = 'Completed' AND completed_at IS NOT NULL AND completed_at >= NOW() - INTERVAL '14 days' AND division_id = ${divId} GROUP BY DATE(completed_at AT TIME ZONE 'Asia/Jakarta'), TO_CHAR(completed_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') ORDER BY DATE(completed_at AT TIME ZONE 'Asia/Jakarta')`,
     ])) as unknown as [typeof budgetData, typeof taskStatusData, typeof trendData]
   } else {
     ;[budgetData, taskStatusData, trendData] = (await Promise.all([
-      sqlRaw`SELECT p.name, SUM(b.planned)::bigint AS budget FROM budgets b JOIN projects p ON b.project_id = p.id WHERE b.deleted_at IS NULL AND p.deleted_at IS NULL GROUP BY p.id, p.name HAVING SUM(b.planned) > 0 ORDER BY budget DESC LIMIT 7`,
+      budgetQuery,
       sqlRaw`SELECT status, COUNT(*)::int AS cnt FROM tasks WHERE deleted_at IS NULL AND status NOT IN ('Cancelled') GROUP BY status ORDER BY cnt DESC`,
       sqlRaw`SELECT TO_CHAR(completed_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') AS day, COUNT(*)::int AS cnt FROM tasks WHERE deleted_at IS NULL AND status = 'Completed' AND completed_at IS NOT NULL AND completed_at >= NOW() - INTERVAL '14 days' GROUP BY DATE(completed_at AT TIME ZONE 'Asia/Jakarta'), TO_CHAR(completed_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon') ORDER BY DATE(completed_at AT TIME ZONE 'Asia/Jakarta')`,
     ])) as unknown as [typeof budgetData, typeof taskStatusData, typeof trendData]
@@ -162,7 +174,8 @@ export default async function DashboardPage() {
       myRank={myRank}
       monthlyReward={monthlyRewardRow[0] as any ?? null}
       chartData={{ budget: budgetData, taskStatus: taskStatusData, trend: trendData }}
-      isWideRole={isWideRole}
+      divisions={allDivisions}
+      selectedDivision={selectedDivision}
       madingPosts={madingRows.map(r => ({
         id: r.id,
         title: r.title,

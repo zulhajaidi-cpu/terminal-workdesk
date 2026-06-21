@@ -9,7 +9,7 @@ import { Badge, StatusBadge, PriorityBadge } from '@/components/ui/badge'
 import { ProgressBar, getProgressColor } from '@/components/ui/progress-bar'
 import { Avatar } from '@/components/ui/avatar'
 import { ArrowLeft, Calendar, Users, DollarSign, ClipboardCheck, Check, Send, CheckCircle2, Clock, MessageSquare, ExternalLink, X as XIcon } from 'lucide-react'
-import { canEditProject } from '@/lib/roles'
+import { canEditProject, canViewBudget } from '@/lib/roles'
 import { ProjectComments } from './project-comments'
 
 interface CommentRow {
@@ -607,7 +607,7 @@ export function ProjectDetailContent({ project, currentUserRole, currentUserId, 
             </CardBody>
           </Card>
 
-          {project.budgetPlanned !== null && (
+          {project.budgetPlanned !== null && canViewBudget(currentUserRole) && (
             <Card>
               <CardBody className="space-y-3">
                 <div className="font-mono text-[10px] text-[#6B7385] tracking-widest uppercase flex items-center gap-1.5 mb-1">

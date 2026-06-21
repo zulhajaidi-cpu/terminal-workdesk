@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { projects, divisions, users, projectMembers, tasks, taskAssignees, approvalRequests, approvalSteps, projectComments } from '@/lib/db/schema'
 import { eq, isNull, asc, desc, and, inArray, ne } from 'drizzle-orm'
 import { ProjectDetailContent } from './project-detail-content'
+import { canViewBudget } from '@/lib/roles'
 
 export const metadata = { title: 'Detail Project — Terminal Workdesk' }
 
@@ -101,8 +102,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const doneTasks = tasksWithAssignees.filter(t => t.status === 'Completed').length
   const derivedProgress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : projectRows.progress
 
+  const canSeeBudget = canViewBudget(session.role)
   const project = {
     ...projectRows,
+    budgetPlanned: canSeeBudget ? projectRows.budgetPlanned : null,
+    budgetApproved: canSeeBudget ? projectRows.budgetApproved : null,
+    budgetActual: canSeeBudget ? projectRows.budgetActual : null,
     members: memberRows,
     tasks: tasksWithAssignees,
     approval,

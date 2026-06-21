@@ -9,6 +9,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const { id } = await params
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!canEditProject(session.role)) return NextResponse.json({ error: 'Tidak punya akses' }, { status: 403 })
 
   const body = await request.json()
   const updates: Record<string, unknown> = { updatedAt: new Date() }
