@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboard, FolderKanban, Target, Calendar,
   CalendarRange, CheckSquare, Trophy, ClipboardCheck, Bell,
-  FolderOpen, Wallet, Settings, X, ChevronRight
+  FolderOpen, Wallet, Settings, X, ChevronRight, Gamepad2
 } from 'lucide-react'
 import { canViewBudget } from '@/lib/roles'
 
@@ -18,6 +18,7 @@ const navItems = [
   { href: '/events', icon: CalendarRange, label: 'Events / Agenda' },
   { href: '/tasks', icon: CheckSquare, label: 'Tasks' },
   { href: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
+  { href: '/arena', icon: Gamepad2, label: 'GODA Arena' },
   { href: '/approvals', icon: ClipboardCheck, label: 'Approvals' },
   { href: '/notifications', icon: Bell, label: 'Notifikasi' },
   { href: '/assets', icon: FolderOpen, label: 'Assets' },

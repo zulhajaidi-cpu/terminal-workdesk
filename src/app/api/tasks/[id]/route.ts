@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { tasks, taskAssignees } from '@/lib/db/schema'
 import { eq, inArray } from 'drizzle-orm'
 import { recalcProjectProgress } from '@/lib/projects'
+import { awardTaskExp } from '@/lib/exp'
 
 const MANAGER_ROLES = ['super_admin', 'spv_manager', 'head_director', 'leader_divisi']
 
@@ -43,6 +44,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const stats = updated.projectId ? await recalcProjectProgress(updated.projectId) : null
+
+    // Auto-award EXP saat task selesai (dedup di dalam helper). Jangan ganggu response inti.
+    if (body.status === 'Completed' || body.checked === true) {
+      try { await awardTaskExp(id, session.id) } catch (e) { console.error('awardTaskExp failed:', e) }
+    }
+
     return NextResponse.json({ ok: true, progress: stats?.progress ?? null })
   } catch (e) {
     console.error('PATCH /api/tasks/[id] error:', e)

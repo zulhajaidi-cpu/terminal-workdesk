@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { approvalRequests, approvalSteps, projects, projectMembers, notifications } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { canApprove } from '@/lib/roles'
+import { awardProjectExp } from '@/lib/exp'
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -138,6 +139,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   if (notifValues.length > 0) await db.insert(notifications).values(notifValues)
+
+  // Auto-award EXP project ke seluruh tim saat project final-approved (dedup di helper).
+  if (newProjectStatus === 'Completed') {
+    try { await awardProjectExp(projectId, session.id) } catch (e) { console.error('awardProjectExp failed:', e) }
+  }
 
   return NextResponse.json({ ok: true })
 }

@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { taskProgressLogs } from '@/lib/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { neon } from '@neondatabase/serverless'
+import { awardProgressExp } from '@/lib/exp'
 
 const sql = neon(process.env.DATABASE_URL!)
 
@@ -36,6 +37,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     userId: session.id,
     note: note.trim(),
   }).returning()
+
+  // Apresiasi konsistensi dokumentasi: +EXP (cap 1×/task/hari, dedup di helper).
+  try {
+    const tr = (await sql`SELECT division_id AS "divisionId" FROM tasks WHERE id = ${id} LIMIT 1`) as { divisionId: string | null }[]
+    await awardProgressExp(id, session.id, tr[0]?.divisionId ?? null)
+  } catch (e) { console.error('awardProgressExp failed:', e) }
 
   return NextResponse.json(log)
 }
