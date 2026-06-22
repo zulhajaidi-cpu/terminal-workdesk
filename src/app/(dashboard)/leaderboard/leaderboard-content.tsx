@@ -150,6 +150,9 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
             {rewards.map(r => (
               <div key={r.rank} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '10px', padding: '10px 14px' }}>
                 <span style={{ fontSize: '18px' }}>{RANK_LABELS[r.rank]}</span>
+                {r.rewardImageLink && (
+                  <img src={r.rewardImageLink} alt={r.rewardName} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', border: '1px solid rgba(245,158,11,0.3)' }} />
+                )}
                 <div>
                   <p style={{ fontSize: '13px', fontWeight: 700, color: '#EDF0F5' }}>{r.rewardName}</p>
                   {r.winnerName && <p style={{ fontSize: '11px', color: '#F59E0B', marginTop: '1px' }}>→ {r.winnerName}</p>}

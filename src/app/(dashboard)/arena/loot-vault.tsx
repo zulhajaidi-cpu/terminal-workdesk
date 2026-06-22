@@ -163,21 +163,57 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
 }
 
 /* ═══════════════════ REWARD BULAN INI (live standing) ═══════════════════ */
+// Crop ke persegi & kompres jadi JPEG base64 (tanpa dependency upload eksternal).
+function fileToSquareDataUrl(file: File, size = 320): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = () => reject(new Error('Gagal membaca file.'))
+    reader.onload = () => {
+      const img = new Image()
+      img.onerror = () => reject(new Error('File bukan gambar yang valid.'))
+      img.onload = () => {
+        const side = Math.min(img.width, img.height)
+        const sx = (img.width - side) / 2
+        const sy = (img.height - side) / 2
+        const canvas = document.createElement('canvas')
+        canvas.width = size; canvas.height = size
+        const ctx = canvas.getContext('2d')
+        if (!ctx) { reject(new Error('Canvas tidak didukung.')); return }
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size)
+        resolve(canvas.toDataURL('image/jpeg', 0.82))
+      }
+      img.src = reader.result as string
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
 function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentMonthRewards; isAdmin: boolean }) {
   const router = useRouter()
   const [editing, setEditing] = useState<number | null>(null) // rank yang sedang diedit, atau -1 utk "tambah baru"
   const [busy, setBusy] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
-  const [form, setForm] = useState({ rank: 1, rewardName: '', notes: '' })
+  const [form, setForm] = useState({ rank: 1, rewardName: '', notes: '', rewardImageLink: '' as string | null })
 
   const { rewards, liveTop, monthLabel } = currentMonth
   if (rewards.length === 0 && liveTop.length === 0 && !isAdmin) return null
 
   function openEdit(row?: MonthlyRewardRow) {
     setErr(null)
-    if (row) setForm({ rank: row.rank, rewardName: row.rewardName, notes: row.notes ?? '' })
-    else setForm({ rank: (rewards[rewards.length - 1]?.rank ?? 0) + 1, rewardName: '', notes: '' })
+    if (row) setForm({ rank: row.rank, rewardName: row.rewardName, notes: row.notes ?? '', rewardImageLink: row.rewardImageLink ?? null })
+    else setForm({ rank: (rewards[rewards.length - 1]?.rank ?? 0) + 1, rewardName: '', notes: '', rewardImageLink: null })
     setEditing(row ? row.rank : -1)
+  }
+
+  async function onPickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) { setErr('File harus berupa gambar.'); return }
+    try {
+      const dataUrl = await fileToSquareDataUrl(file)
+      setForm(f => ({ ...f, rewardImageLink: dataUrl }))
+    } catch (err: any) { setErr(err?.message ?? 'Gagal memproses foto.') }
   }
 
   async function save() {
@@ -186,7 +222,7 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
     try {
       const res = await fetch('/api/monthly-rewards', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rank: form.rank, rewardName: form.rewardName, notes: form.notes }),
+        body: JSON.stringify({ rank: form.rank, rewardName: form.rewardName, notes: form.notes, rewardImageLink: form.rewardImageLink }),
       })
       const data = await res.json()
       if (!res.ok) { setErr(data.error ?? 'Gagal menyimpan.'); return }
@@ -245,6 +281,9 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
               border: '1px solid rgba(245,196,81,0.22)',
             }}>
               <span style={{ fontSize: 20, width: 28, textAlign: 'center', flexShrink: 0 }}>{MEDAL[r.rank - 1] ?? `#${r.rank}`}</span>
+              {r.rewardImageLink && (
+                <img src={r.rewardImageLink} alt={r.rewardName} style={{ width: 44, height: 44, borderRadius: 9, objectFit: 'cover', flexShrink: 0, border: '1px solid rgba(245,196,81,0.3)' }} />
+              )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: '#EDF0F5', fontFamily: "'Space Grotesk',sans-serif" }}>{r.rewardName}</div>
                 {r.notes && <div style={{ fontSize: 11, color: '#6B7385', marginTop: 1 }}>{r.notes}</div>}
@@ -280,6 +319,15 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
               <input style={input} placeholder="Nama hadiah (mis. Kanky Running Shoes)" value={form.rewardName} onChange={e => setForm({ ...form, rewardName: e.target.value })} />
             </div>
             <input style={input} placeholder="Catatan (opsional)" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 48, height: 48, borderRadius: 9, flexShrink: 0, overflow: 'hidden', background: '#10141d', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {form.rewardImageLink ? <img src={form.rewardImageLink} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Gift size={18} color="#6B7385" />}
+              </span>
+              <label style={{ fontSize: 11.5, fontWeight: 700, color: '#F5C451', background: 'rgba(245,196,81,0.1)', border: '1px solid rgba(245,196,81,0.25)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
+                Pilih foto produk (persegi)
+                <input type="file" accept="image/*" onChange={onPickPhoto} style={{ display: 'none' }} />
+              </label>
+            </div>
             <div style={{ display: 'flex', gap: 7 }}>
               <button onClick={save} disabled={busy === 'save'}
                 style={{ fontSize: 12, fontWeight: 700, color: '#10141d', background: 'linear-gradient(90deg,#F5C451,#F0B429)', border: 'none', borderRadius: 8, padding: '7px 14px', cursor: 'pointer', opacity: busy === 'save' ? 0.6 : 1 }}>

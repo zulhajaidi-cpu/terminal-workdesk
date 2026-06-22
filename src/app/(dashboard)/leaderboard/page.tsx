@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { pointsLedger, users, divisions, userBadges, badges, monthlyRewards } from '@/lib/db/schema'
-import { eq, desc, sql, and } from 'drizzle-orm'
+import { eq, desc, sql, and, notInArray } from 'drizzle-orm'
 import { LeaderboardContent } from './leaderboard-content'
 
 export const metadata = { title: 'Leaderboard — Terminal Workdesk' }
@@ -68,7 +68,7 @@ export default async function LeaderboardPage() {
     })
       .from(users)
       .leftJoin(divisions, eq(users.divisionId, divisions.id))
-      .where(eq(users.isActive, true)),
+      .where(and(eq(users.isActive, true), notInArray(users.role, ['super_admin', 'spv_manager', 'head_director']))),
 
     // Monthly rewards
     db.select({
