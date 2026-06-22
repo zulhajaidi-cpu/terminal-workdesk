@@ -50,3 +50,11 @@ export const canBulkData = (role: string) =>
 // Budget hanya terlihat oleh SPV, Manager, Direktur, dan Super Admin (tidak Staff)
 export const canViewBudget = (role: string) =>
   ['super_admin', 'spv_manager', 'head_director', 'leader_divisi'].includes(role)
+
+// Kelola katalog reward & proses serah-terima klaim: hanya Direktur & Super Admin
+export const canManageRewards = (role: string) =>
+  ['super_admin', 'head_director'].includes(role)
+
+// Kelola bank soal kuis (tambah/nonaktifkan): hanya Super Admin
+export const canManageQuiz = (role: string) =>
+  role === 'super_admin'

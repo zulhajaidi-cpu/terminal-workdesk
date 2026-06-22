@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless'
+import { touchStreakAndBadges } from '@/lib/streak'
 
 const sql = neon(process.env.DATABASE_URL!)
 
@@ -11,6 +12,8 @@ export const DEFAULT_RULES: Record<string, number> = {
   task_late_penalty: 10,
   progress_update: 5,
   project_complete: 100,
+  kudos_give: 10,        // EXP yang diterima penerima kudos
+  kudos_daily_cap: 3,    // maksimum kudos yang bisa diberi 1 user per hari
 }
 
 export function levelFromExp(total: number): number {
@@ -122,6 +125,10 @@ export async function awardExp(a: AwardArgs): Promise<AwardResult> {
       VALUES (${a.userId}, ${'Level Up! 🎉'}, ${`Selamat! Kamu naik ke Level ${newLevel} · ${tierTitle(newLevel)}.`}, 'gamification')
     `
   }
+
+  // Hari aktif → update streak + evaluasi auto-badge. Jangan ganggu hasil award bila gagal.
+  try { await touchStreakAndBadges(a.userId) } catch (e) { console.error('touchStreakAndBadges failed:', e) }
+
   return { awarded: true, oldLevel, newLevel, leveledUp, newTotal }
 }
 

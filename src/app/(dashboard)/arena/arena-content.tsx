@@ -5,12 +5,20 @@ import Link from 'next/link'
 import confetti from 'canvas-confetti'
 import { Avatar } from '@/components/ui/avatar'
 import { ProgressBar } from '@/components/ui/progress-bar'
+import { LootVault } from './loot-vault'
+import { DailyGrind } from './daily-grind'
+import { KudosPanel } from './kudos-panel'
+import { DivisionWar } from './division-war'
+import type { MyRewards, CurrentMonthRewards } from '@/lib/rewards'
+import type { TodayQuiz } from '@/lib/quiz'
+import type { KudosStatus } from '@/lib/kudos'
+import type { DivisionWar as DivisionWarData } from '@/lib/division-war'
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip,
 } from 'recharts'
 import {
   Swords, Flame, Trophy, Zap, Clock, CheckSquare, FolderKanban,
-  TrendingUp, Sparkles, Crown,
+  TrendingUp, Sparkles, Crown, Medal, Lock,
 } from 'lucide-react'
 
 /* ═══════════════════ TYPES ═══════════════════ */
@@ -22,6 +30,8 @@ interface Exp {
 interface LeaderRow { userId: string; fullName: string; avatarUrl: string | null; role: string; divisionName: string | null; exp: number }
 interface Quest { id: string; name: string; dueDate: string; priority: string; isOverdue: boolean; projectName: string | null }
 interface Activity { id: string; points: number; reason: string | null; sourceType: string; createdAt: string }
+interface Streak { currentStreak: number; longestStreak: number; lastActiveDate: string | null }
+interface BadgeRow { id: string; name: string; icon: string | null; description: string | null; criteriaKey: string | null; earned: boolean; awardedAt: string | null }
 
 interface Props {
   me: Me
@@ -31,6 +41,19 @@ interface Props {
   trend: { day: string; exp: number }[]
   activity: Activity[]
   currentUserId: string
+  rewards: MyRewards
+  isAdmin: boolean
+  adminClaims: any[]
+  adminCatalog: any[]
+  currentMonth: CurrentMonthRewards
+  streak: Streak
+  badges: BadgeRow[]
+  kudos: KudosStatus
+  teammates: { id: string; fullName: string; avatarUrl: string | null; divisionName: string | null }[]
+  divisionWar: DivisionWarData
+  quiz: TodayQuiz
+  isQuizAdmin: boolean
+  quizQuestions: any[]
 }
 
 const ROLE_LABEL: Record<string, string> = {
@@ -66,7 +89,7 @@ function dueLabel(iso: string, overdue: boolean) {
 }
 
 /* ═══════════════════ MAIN ═══════════════════ */
-export function ArenaContent({ me, exp, leaderboard, quests, trend, activity }: Props) {
+export function ArenaContent({ me, exp, leaderboard, quests, trend, activity, rewards, isAdmin, adminClaims, adminCatalog, currentMonth, streak, badges, kudos, teammates, divisionWar, quiz, isQuizAdmin, quizQuestions }: Props) {
   // Confetti sekali saat level user naik dibanding kunjungan terakhir.
   useEffect(() => {
     try {
@@ -146,11 +169,46 @@ export function ArenaContent({ me, exp, leaderboard, quests, trend, activity }: 
           {/* Stat chips */}
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <StatChip icon={<Zap size={16} color="#F5C451" />} label="Total EXP" value={exp.total.toLocaleString('id-ID')} />
+            <StatChip icon={<Flame size={16} color="#FF6A1A" />} label="Streak" value={streak.currentStreak > 0 ? `${streak.currentStreak} hari` : '—'} />
             <StatChip icon={<TrendingUp size={16} color="#3FD08A" />} label="EXP Bulan Ini" value={exp.thisMonth.toLocaleString('id-ID')} />
             <StatChip icon={<Crown size={16} color="#FF8A4C" />} label="Peringkat" value={exp.rank > 0 ? `#${exp.rank}` : '—'} />
           </div>
         </div>
       </div>
+
+      {/* ── DAILY GRIND (kuis harian) + KUDOS ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+        <DailyGrind quiz={quiz} isAdmin={isQuizAdmin} questions={quizQuestions} />
+        <KudosPanel status={kudos} teammates={teammates} />
+      </div>
+
+      {/* ── LOOT VAULT ── */}
+      <LootVault rewards={rewards} isAdmin={isAdmin} adminClaims={adminClaims} adminCatalog={adminCatalog} currentMonth={currentMonth} />
+
+      {/* ── BADGES ── */}
+      <Panel title="Koleksi Badge" subtitle={`${badges.filter(b => b.earned).length}/${badges.length} terbuka · streak terpanjang ${streak.longestStreak} hari`} icon={<Medal size={15} color="#F5C451" />}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
+          {badges.map(b => (
+            <div key={b.id} title={b.description ?? ''} style={{
+              display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 12,
+              background: b.earned ? 'radial-gradient(120% 120% at 0% 0%, rgba(245,196,81,0.12) 0%, rgba(16,20,29,0) 55%), #10141d' : 'rgba(255,255,255,0.02)',
+              border: `1px solid ${b.earned ? 'rgba(245,196,81,0.3)' : 'rgba(255,255,255,0.06)'}`,
+              boxShadow: b.earned ? '0 0 18px rgba(245,196,81,0.12)' : 'none',
+            }}>
+              <span style={{ fontSize: 24, flexShrink: 0, filter: b.earned ? 'none' : 'grayscale(1)', opacity: b.earned ? 1 : 0.4 }}>{b.icon ?? '🏅'}</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: b.earned ? '#EDF0F5' : '#6B7385', fontFamily: "'Space Grotesk',sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.name}</div>
+                <div style={{ fontSize: 10, color: b.earned ? '#F5C451' : '#4a5160', fontFamily: "'IBM Plex Mono',monospace", display: 'inline-flex', alignItems: 'center', gap: 3, marginTop: 1 }}>
+                  {b.earned ? <><Sparkles size={9} /> Terbuka</> : <><Lock size={9} /> Terkunci</>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Panel>
+
+      {/* ── DIVISI WAR ── */}
+      <DivisionWar data={divisionWar} />
 
       {/* ── LEADERBOARD + QUEST LOG ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

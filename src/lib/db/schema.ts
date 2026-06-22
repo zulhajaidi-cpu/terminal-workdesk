@@ -310,6 +310,70 @@ export const monthlyRewards = pgTable('monthly_rewards', {
   updatedAt:       timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, t => [unique().on(t.periodMonth, t.periodYear, t.rank)])
 
+export const rewardCatalog = pgTable('reward_catalog', {
+  id:          uuid('id').primaryKey().defaultRandom(),
+  unlockType:  text('unlock_type').notNull().default('level'), // 'level' | 'badge' | 'manual'
+  threshold:   integer('threshold'),
+  badgeId:     uuid('badge_id').references(() => badges.id),
+  name:        text('name').notNull(),
+  description: text('description'),
+  imageUrl:    text('image_url'),
+  stock:       integer('stock'),
+  isActive:    boolean('is_active').notNull().default(true),
+  createdBy:   uuid('created_by').references(() => users.id),
+  createdAt:   timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:   timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const rewardClaims = pgTable('reward_claims', {
+  id:              uuid('id').primaryKey().defaultRandom(),
+  userId:          uuid('user_id').notNull().references(() => users.id),
+  source:          text('source').notNull(), // 'monthly' | 'catalog'
+  catalogId:       uuid('catalog_id').references(() => rewardCatalog.id),
+  monthlyRewardId: uuid('monthly_reward_id').references(() => monthlyRewards.id),
+  title:           text('title').notNull(),
+  imageUrl:        text('image_url'),
+  status:          text('status').notNull().default('claimed'), // 'claimed' | 'fulfilled' | 'rejected'
+  periodMonth:     smallint('period_month'),
+  periodYear:      smallint('period_year'),
+  claimedAt:       timestamp('claimed_at', { withTimezone: true }).notNull().defaultNow(),
+  fulfilledAt:     timestamp('fulfilled_at', { withTimezone: true }),
+  fulfilledBy:     uuid('fulfilled_by').references(() => users.id),
+  notes:           text('notes'),
+})
+
+export const quizQuestions = pgTable('quiz_questions', {
+  id:           uuid('id').primaryKey().defaultRandom(),
+  question:     text('question').notNull(),
+  options:      jsonb('options').notNull(),
+  correctIndex: smallint('correct_index').notNull(),
+  explanation:  text('explanation'),
+  category:     text('category').notNull().default('Umum'),
+  difficulty:   text('difficulty').notNull().default('easy'),
+  points:       integer('points').notNull().default(15),
+  isActive:     boolean('is_active').notNull().default(true),
+  createdAt:    timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const quizAttempts = pgTable('quiz_attempts', {
+  id:            uuid('id').primaryKey().defaultRandom(),
+  userId:        uuid('user_id').notNull().references(() => users.id),
+  questionId:    uuid('question_id').notNull().references(() => quizQuestions.id),
+  quizDate:      date('quiz_date').notNull(),
+  selectedIndex: smallint('selected_index').notNull(),
+  isCorrect:     boolean('is_correct').notNull(),
+  expAwarded:    integer('exp_awarded').notNull().default(0),
+  createdAt:     timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, t => [unique().on(t.userId, t.quizDate)])
+
+export const userGameStats = pgTable('user_game_stats', {
+  userId:        uuid('user_id').primaryKey().references(() => users.id),
+  currentStreak: integer('current_streak').notNull().default(0),
+  longestStreak: integer('longest_streak').notNull().default(0),
+  lastActiveDate: date('last_active_date'),
+  updatedAt:     timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
 export const activityLogs = pgTable('activity_logs', {
   id:         uuid('id').primaryKey().defaultRandom(),
   userId:     uuid('user_id').notNull().references(() => users.id),
