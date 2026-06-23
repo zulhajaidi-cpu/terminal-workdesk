@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import confetti from 'canvas-confetti'
 import { Avatar } from '@/components/ui/avatar'
 import { Gift, Lock, CheckCircle2, Clock3, Package, Plus, Sparkles, Trophy, Pencil, Trash2, Crown } from 'lucide-react'
+import { uploadSquareImage } from '@/lib/upload-image'
 import type { MyRewards, EligibleReward, LockedReward, ClaimedReward, CurrentMonthRewards, MonthlyRewardRow } from '@/lib/rewards'
 
 interface AdminClaim {
@@ -24,6 +25,7 @@ interface Props {
   adminClaims: AdminClaim[]
   adminCatalog: AdminCatalog[]
   currentMonth: CurrentMonthRewards
+  readOnly?: boolean
 }
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
@@ -39,7 +41,7 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Jakarta' })
 }
 
-export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, currentMonth }: Props) {
+export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, currentMonth, readOnly }: Props) {
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
@@ -101,15 +103,15 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
                 </span>
                 <button
                   onClick={() => claim(r)}
-                  disabled={busy === r.key || r.soldOut}
+                  disabled={busy === r.key || r.soldOut || readOnly}
                   style={{
-                    marginTop: 10, width: '100%', padding: '8px 0', borderRadius: 10, border: 'none', cursor: r.soldOut ? 'not-allowed' : 'pointer',
+                    marginTop: 10, width: '100%', padding: '8px 0', borderRadius: 10, border: 'none', cursor: r.soldOut || readOnly ? 'not-allowed' : 'pointer',
                     fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 13,
-                    background: r.soldOut ? 'rgba(255,255,255,0.06)' : 'linear-gradient(90deg,#FF6A1A,#FF8A4C)',
-                    color: r.soldOut ? '#6B7385' : '#fff', opacity: busy === r.key ? 0.6 : 1,
-                    boxShadow: r.soldOut ? 'none' : '0 0 18px rgba(255,106,26,0.4)',
+                    background: r.soldOut || readOnly ? 'rgba(255,255,255,0.06)' : 'linear-gradient(90deg,#FF6A1A,#FF8A4C)',
+                    color: r.soldOut || readOnly ? '#6B7385' : '#fff', opacity: busy === r.key ? 0.6 : 1,
+                    boxShadow: r.soldOut || readOnly ? 'none' : '0 0 18px rgba(255,106,26,0.4)',
                   }}>
-                  {r.soldOut ? 'Stok habis' : busy === r.key ? 'Mengklaim…' : 'Klaim Reward'}
+                  {readOnly ? '👁️ Lihat saja' : r.soldOut ? 'Stok habis' : busy === r.key ? 'Mengklaim…' : 'Klaim Reward'}
                 </button>
               </RewardCard>
             ))}
@@ -163,31 +165,6 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
 }
 
 /* ═══════════════════ REWARD BULAN INI (live standing) ═══════════════════ */
-// Crop ke persegi & kompres jadi JPEG base64 (tanpa dependency upload eksternal).
-function fileToSquareDataUrl(file: File, size = 320): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onerror = () => reject(new Error('Gagal membaca file.'))
-    reader.onload = () => {
-      const img = new Image()
-      img.onerror = () => reject(new Error('File bukan gambar yang valid.'))
-      img.onload = () => {
-        const side = Math.min(img.width, img.height)
-        const sx = (img.width - side) / 2
-        const sy = (img.height - side) / 2
-        const canvas = document.createElement('canvas')
-        canvas.width = size; canvas.height = size
-        const ctx = canvas.getContext('2d')
-        if (!ctx) { reject(new Error('Canvas tidak didukung.')); return }
-        ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size)
-        resolve(canvas.toDataURL('image/jpeg', 0.82))
-      }
-      img.src = reader.result as string
-    }
-    reader.readAsDataURL(file)
-  })
-}
-
 function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentMonthRewards; isAdmin: boolean }) {
   const router = useRouter()
   const [editing, setEditing] = useState<number | null>(null) // rank yang sedang diedit, atau -1 utk "tambah baru"
@@ -210,10 +187,15 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
     e.target.value = ''
     if (!file) return
     if (!file.type.startsWith('image/')) { setErr('File harus berupa gambar.'); return }
+    setBusy('photo'); setErr(null)
     try {
-      const dataUrl = await fileToSquareDataUrl(file)
-      setForm(f => ({ ...f, rewardImageLink: dataUrl }))
-    } catch (err: any) { setErr(err?.message ?? 'Gagal memproses foto.') }
+      const url = await uploadSquareImage(file, 'rewards', 320)
+      setForm(f => ({ ...f, rewardImageLink: url }))
+    } catch (err: any) {
+      setErr(err?.message ?? 'Gagal mengunggah foto.')
+    } finally {
+      setBusy(null)
+    }
   }
 
   async function save() {
@@ -323,9 +305,9 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
               <span style={{ width: 48, height: 48, borderRadius: 9, flexShrink: 0, overflow: 'hidden', background: '#10141d', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {form.rewardImageLink ? <img src={form.rewardImageLink} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Gift size={18} color="#6B7385" />}
               </span>
-              <label style={{ fontSize: 11.5, fontWeight: 700, color: '#F5C451', background: 'rgba(245,196,81,0.1)', border: '1px solid rgba(245,196,81,0.25)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
-                Pilih foto produk (persegi)
-                <input type="file" accept="image/*" onChange={onPickPhoto} style={{ display: 'none' }} />
+              <label style={{ fontSize: 11.5, fontWeight: 700, color: '#F5C451', background: 'rgba(245,196,81,0.1)', border: '1px solid rgba(245,196,81,0.25)', borderRadius: 8, padding: '7px 12px', cursor: busy === 'photo' ? 'wait' : 'pointer', opacity: busy === 'photo' ? 0.6 : 1 }}>
+                {busy === 'photo' ? 'Mengunggah…' : 'Pilih foto produk (persegi)'}
+                <input type="file" accept="image/*" onChange={onPickPhoto} disabled={busy === 'photo'} style={{ display: 'none' }} />
               </label>
             </div>
             <div style={{ display: 'flex', gap: 7 }}>

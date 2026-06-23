@@ -13,7 +13,7 @@ export default async function SettingsPage() {
 
   const [me, divisionRows, userRows] = await Promise.all([
     db.select({
-      id: users.id, email: users.email, fullName: users.fullName,
+      id: users.id, email: users.email, username: users.username, fullName: users.fullName,
       avatarUrl: users.avatarUrl, bio: users.bio, role: users.role,
       divisionId: users.divisionId,
     }).from(users).where(eq(users.id, session.id)).limit(1),
@@ -24,7 +24,7 @@ export default async function SettingsPage() {
     // hanya super_admin yang butuh daftar semua user
     session.role === 'super_admin'
       ? db.select({
-          id: users.id, email: users.email, fullName: users.fullName,
+          id: users.id, email: users.email, username: users.username, fullName: users.fullName,
           role: users.role, isActive: users.isActive, avatarUrl: users.avatarUrl,
           divisionId: users.divisionId, createdAt: users.createdAt,
           divisionName: divisions.name,

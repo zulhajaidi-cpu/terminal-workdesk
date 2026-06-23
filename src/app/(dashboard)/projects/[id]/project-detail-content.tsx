@@ -311,6 +311,7 @@ export function ProjectDetailContent({ project, currentUserRole, currentUserId, 
   const canSubmitResults = (isPic || isLeaderPlus || currentUserRole === 'head_director') && !isCompleted && !hasActivePendingApproval
 
   function canCheckTask(t: TaskItem) {
+    if (currentUserRole === 'spectator') return false
     return isLeaderPlus || isPic || t.assignees.some(a => a.id === currentUserId)
   }
 

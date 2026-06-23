@@ -12,13 +12,24 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { fullName, email, role, divisionId, password, isActive } = body
+  const { fullName, role, divisionId, password, isActive } = body
+  const username = (body.username ?? '').toLowerCase().trim()
+  const emailInput = (body.email ?? '').toLowerCase().trim()
 
-  if (!fullName || !email || !password) {
-    return NextResponse.json({ error: 'Nama, email, dan password wajib diisi' }, { status: 400 })
+  if (!fullName || !username || !password) {
+    return NextResponse.json({ error: 'Nama, username, dan password wajib diisi' }, { status: 400 })
+  }
+  if (!/^[a-z0-9._]{3,20}$/.test(username)) {
+    return NextResponse.json({ error: 'Username 3-20 karakter: huruf kecil, angka, titik, underscore' }, { status: 400 })
   }
 
-  const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email.toLowerCase())).limit(1)
+  const dupUsername = await db.select({ id: users.id }).from(users).where(eq(users.username, username)).limit(1)
+  if (dupUsername.length > 0) {
+    return NextResponse.json({ error: 'Username sudah dipakai' }, { status: 409 })
+  }
+
+  const email = emailInput || `${username}@internal.goda`
+  const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1)
   if (existing.length > 0) {
     return NextResponse.json({ error: 'Email sudah terdaftar' }, { status: 409 })
   }
@@ -26,7 +37,8 @@ export async function POST(request: NextRequest) {
   const passwordHash = await bcrypt.hash(password, 12)
 
   const [newUser] = await db.insert(users).values({
-    email: email.toLowerCase(),
+    email,
+    username,
     fullName,
     role: role ?? 'staff',
     divisionId: divisionId || null,
@@ -40,7 +52,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     user: {
-      id: newUser.id, email: newUser.email, fullName: newUser.fullName,
+      id: newUser.id, email: newUser.email, username: newUser.username, fullName: newUser.fullName,
       role: newUser.role, isActive: newUser.isActive, avatarUrl: newUser.avatarUrl,
       divisionId: newUser.divisionId, createdAt: newUser.createdAt.toISOString(),
       divisionName: divRow[0]?.name ?? null,

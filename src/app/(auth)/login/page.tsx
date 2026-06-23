@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -18,12 +18,12 @@ export default function LoginPage() {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ identifier, password }),
     })
 
     if (!res.ok) {
       const data = await res.json()
-      setError(data.error ?? 'Email atau password salah. Coba lagi.')
+      setError(data.error ?? 'Username/email atau password salah. Coba lagi.')
       setLoading(false)
       return
     }
@@ -61,14 +61,15 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', letterSpacing: '0.06em', color: '#6B7385', textTransform: 'uppercase' }}>
-                Email
+                Username atau Email
               </label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
-                placeholder="nama@goda.id"
+                autoComplete="username"
+                placeholder="username atau nama@goda.id"
                 style={{
                   background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '11px',
                   padding: '12px 14px', color: '#EDF0F5', fontSize: '14px', outline: 'none', width: '100%',

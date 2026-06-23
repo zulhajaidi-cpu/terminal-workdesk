@@ -178,12 +178,12 @@ export function ArenaContent({ me, exp, leaderboard, quests, trend, activity, re
 
       {/* ── DAILY GRIND (kuis harian) + KUDOS ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
-        <DailyGrind quiz={quiz} isAdmin={isQuizAdmin} questions={quizQuestions} />
-        <KudosPanel status={kudos} teammates={teammates} />
+        <DailyGrind quiz={quiz} isAdmin={isQuizAdmin} questions={quizQuestions} readOnly={me.role === 'spectator'} />
+        <KudosPanel status={kudos} teammates={teammates} readOnly={me.role === 'spectator'} />
       </div>
 
       {/* ── LOOT VAULT ── */}
-      <LootVault rewards={rewards} isAdmin={isAdmin} adminClaims={adminClaims} adminCatalog={adminCatalog} currentMonth={currentMonth} />
+      <LootVault rewards={rewards} isAdmin={isAdmin} adminClaims={adminClaims} adminCatalog={adminCatalog} currentMonth={currentMonth} readOnly={me.role === 'spectator'} />
 
       {/* ── BADGES ── */}
       <Panel title="Koleksi Badge" subtitle={`${badges.filter(b => b.earned).length}/${badges.length} terbuka · streak terpanjang ${streak.longestStreak} hari`} icon={<Medal size={15} color="#F5C451" />}>

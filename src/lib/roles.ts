@@ -1,4 +1,5 @@
 export const ROLE_LABELS: Record<string, string> = {
+  spectator:     'Spectator',
   staff:         'Staff',
   leader_divisi: 'SPV',
   spv_manager:   'Manager',
@@ -7,6 +8,7 @@ export const ROLE_LABELS: Record<string, string> = {
 }
 
 export const ROLE_COLORS: Record<string, string> = {
+  spectator:     '#8B93A6',
   staff:         '#6B7385',
   leader_divisi: '#A78BFA',
   spv_manager:   '#4A9EFF',
@@ -16,12 +18,16 @@ export const ROLE_COLORS: Record<string, string> = {
 
 // Urutan hierarki untuk dropdown (terendah ke tertinggi)
 export const ROLE_OPTIONS = [
+  { value: 'spectator',     label: 'Spectator' },
   { value: 'staff',         label: 'Staff' },
   { value: 'leader_divisi', label: 'SPV' },
   { value: 'spv_manager',   label: 'Manager' },
   { value: 'head_director', label: 'Direktur' },
   { value: 'super_admin',   label: 'Super Admin' },
 ]
+
+// Akun read-only — bisa lihat semua data tapi semua mutasi diblokir oleh middleware (src/middleware.ts)
+export const isSpectator = (role: string) => role === 'spectator'
 
 export const canManageUsers = (role: string) =>
   role === 'super_admin'
@@ -39,15 +45,15 @@ export const canApprove = (role: string) =>
 export const canManageKpi = (role: string) =>
   ['super_admin', 'spv_manager', 'head_director', 'leader_divisi'].includes(role)
 
-// Siapa yang bisa melihat KPI orang lain
+// Siapa yang bisa melihat KPI orang lain (spectator ikut, krn ini hanya hak LIHAT)
 export const canViewOthersKpi = (role: string) =>
-  ['super_admin', 'spv_manager', 'head_director', 'leader_divisi'].includes(role)
+  ['super_admin', 'spv_manager', 'head_director', 'leader_divisi', 'spectator'].includes(role)
 
 // Import/export Excel — SPV, Manager, Direktur (dan Super Admin)
 export const canBulkData = (role: string) =>
   ['super_admin', 'spv_manager', 'head_director', 'leader_divisi'].includes(role)
 
-// Budget hanya terlihat oleh SPV, Manager, Direktur, dan Super Admin (tidak Staff)
+// Budget hanya terlihat oleh SPV, Manager, Direktur, Super Admin (tidak Staff, tidak Spectator)
 export const canViewBudget = (role: string) =>
   ['super_admin', 'spv_manager', 'head_director', 'leader_divisi'].includes(role)
 

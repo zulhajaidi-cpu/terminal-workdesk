@@ -6,7 +6,7 @@ import confetti from 'canvas-confetti'
 import { Brain, CheckCircle2, XCircle, Lightbulb, Zap, Lock, Plus, Settings2, Eye, EyeOff } from 'lucide-react'
 import type { TodayQuiz, QuizAttemptResult, AdminQuestion } from '@/lib/quiz'
 
-export function DailyGrind({ quiz, isAdmin = false, questions = [] }: { quiz: TodayQuiz; isAdmin?: boolean; questions?: AdminQuestion[] }) {
+export function DailyGrind({ quiz, isAdmin = false, questions = [], readOnly = false }: { quiz: TodayQuiz; isAdmin?: boolean; questions?: AdminQuestion[]; readOnly?: boolean }) {
   const router = useRouter()
   const [selected, setSelected] = useState<number | null>(null)
   const [busy, setBusy] = useState(false)
@@ -77,11 +77,11 @@ export function DailyGrind({ quiz, isAdmin = false, questions = [] }: { quiz: To
                 bg = 'rgba(167,139,250,0.14)'; border = 'rgba(167,139,250,0.6)'; color = '#fff'
               }
               return (
-                <button key={i} disabled={answered || busy} onClick={() => !answered && setSelected(i)}
+                <button key={i} disabled={answered || busy || readOnly} onClick={() => !answered && !readOnly && setSelected(i)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left', width: '100%',
                     padding: '11px 13px', borderRadius: 11, border: `1px solid ${border}`, background: bg, color,
-                    cursor: answered ? 'default' : 'pointer', fontSize: 13.5, fontFamily: "'Space Grotesk',sans-serif",
+                    cursor: answered || readOnly ? 'default' : 'pointer', fontSize: 13.5, fontFamily: "'Space Grotesk',sans-serif",
                   }}>
                   <span style={{
                     width: 22, height: 22, borderRadius: 7, flexShrink: 0, fontSize: 11, fontWeight: 800,
@@ -96,7 +96,11 @@ export function DailyGrind({ quiz, isAdmin = false, questions = [] }: { quiz: To
           </div>
 
           {/* Aksi / hasil */}
-          {!answered ? (
+          {readOnly ? (
+            <div style={{ marginTop: 12, textAlign: 'center', color: '#6B7385', fontSize: 12, padding: '10px 0', background: 'rgba(255,255,255,0.02)', borderRadius: 10 }}>
+              👁️ Mode spectator: lihat saja, tidak bisa jawab kuis.
+            </div>
+          ) : !answered ? (
             <button onClick={submit} disabled={selected == null || busy}
               style={{
                 marginTop: 14, width: '100%', padding: '10px 0', borderRadius: 11, border: 'none',

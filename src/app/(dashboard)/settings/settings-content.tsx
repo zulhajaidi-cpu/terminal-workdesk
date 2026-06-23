@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation'
 import { Avatar } from '@/components/ui/avatar'
 import { Plus, Pencil, ToggleLeft, ToggleRight, Eye, EyeOff, Camera, User, Users, Globe, Moon } from 'lucide-react'
 import { ROLE_LABELS, ROLE_COLORS, ROLE_OPTIONS } from '@/lib/roles'
+import { uploadSquareImage } from '@/lib/upload-image'
 
 interface UserRow {
-  id: string; email: string; fullName: string; role: string
+  id: string; email: string; username: string | null; fullName: string; role: string
   isActive: boolean; avatarUrl: string | null; divisionId: string | null
   createdAt: string; divisionName: string | null
 }
@@ -119,6 +120,33 @@ function ProfileSection({ me, divisions, onSaved }: { me: Me; divisions: { id: s
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(me.avatarUrl)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [avatarErr, setAvatarErr] = useState<string | null>(null)
+
+  async function onPickAvatar(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setUploadingAvatar(true); setAvatarErr(null)
+    try {
+      const url = await uploadSquareImage(file, 'avatars', 256)
+      const res = await fetch(`/api/users/${me.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatarUrl: url }),
+      })
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error ?? 'Gagal menyimpan foto.') }
+      setAvatarUrl(url)
+      onSaved()
+    } catch (err: any) {
+      setAvatarErr(err?.message ?? 'Gagal mengunggah foto.')
+    } finally {
+      setUploadingAvatar(false)
+    }
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!form.fullName.trim()) { setError('Nama tidak boleh kosong'); return }
@@ -139,18 +167,27 @@ function ProfileSection({ me, divisions, onSaved }: { me: Me; divisions: { id: s
       <div style={sectionCard}>
         <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-4">Foto Profil</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative' }}>
-            <Avatar name={me.fullName} imageUrl={me.avatarUrl} size="xl" />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#FF6A1A', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid #0C0F16' }}>
+          <button type="button" onClick={() => !uploadingAvatar && fileRef.current?.click()}
+            title="Ganti foto profil"
+            style={{ position: 'relative', background: 'none', border: 'none', padding: 0, cursor: uploadingAvatar ? 'wait' : 'pointer' }}>
+            <Avatar name={me.fullName} imageUrl={avatarUrl} size="xl" />
+            <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#FF6A1A', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0C0F16' }}>
               <Camera size={13} style={{ color: '#0C0F16' }} />
             </div>
-          </div>
+          </button>
+          <input ref={fileRef} type="file" accept="image/*" onChange={onPickAvatar} style={{ display: 'none' }} />
           <div>
             <p style={{ fontSize: '14px', fontWeight: 600, color: '#EDF0F5', fontFamily: "'Space Grotesk', sans-serif" }}>{me.fullName}</p>
             <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '2px' }}>{ROLE_LABELS[me.role] ?? me.role}</p>
-            <p style={{ fontSize: '12px', color: '#4a5160', marginTop: '8px' }}>
-              Upload foto profil akan tersedia segera. Untuk sementara gunakan inisial nama.
-            </p>
+            {uploadingAvatar ? (
+              <p style={{ fontSize: '12px', color: '#FF8A4C', marginTop: '8px' }}>Mengunggah foto…</p>
+            ) : avatarErr ? (
+              <p style={{ fontSize: '12px', color: '#FF6B6B', marginTop: '8px' }}>{avatarErr}</p>
+            ) : (
+              <p style={{ fontSize: '12px', color: '#4a5160', marginTop: '8px' }}>
+                Klik foto untuk mengganti. Otomatis dipotong persegi · maks 5MB.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -199,6 +236,65 @@ function ProfileSection({ me, divisions, onSaved }: { me: Me; divisions: { id: s
           </div>
         </form>
       </div>
+
+      <ChangePasswordSection />
+    </div>
+  )
+}
+
+/* ── Ganti Password Sendiri ──────────────────────────── */
+function ChangePasswordSection() {
+  const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault()
+    if (form.newPassword.length < 8) { setError('Password baru minimal 8 karakter'); return }
+    if (form.newPassword !== form.confirmPassword) { setError('Konfirmasi password baru tidak cocok'); return }
+    setSaving(true); setError(null)
+    const res = await fetch('/api/auth/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPassword: form.currentPassword, newPassword: form.newPassword }),
+    })
+    setSaving(false)
+    if (res.ok) {
+      setSaved(true); setTimeout(() => setSaved(false), 2500)
+      setForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+    } else {
+      const d = await res.json(); setError(d.error ?? 'Gagal mengubah password')
+    }
+  }
+
+  return (
+    <div style={sectionCard}>
+      <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-1">Ubah Password</h2>
+      <p style={{ fontSize: '12px', color: '#6B7385', marginBottom: '16px' }}>Ganti password akunmu sendiri kapan saja</p>
+      <form onSubmit={handleSave} className="space-y-4">
+        {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+        <div>
+          <label style={labelStyle}>Password Lama *</label>
+          <input style={inputStyle} type="password" value={form.currentPassword} onChange={e => setForm(f => ({ ...f, currentPassword: e.target.value }))} required />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label style={labelStyle}>Password Baru *</label>
+            <input style={inputStyle} type="password" value={form.newPassword} onChange={e => setForm(f => ({ ...f, newPassword: e.target.value }))} placeholder="Min. 8 karakter" required />
+          </div>
+          <div>
+            <label style={labelStyle}>Konfirmasi Password Baru *</label>
+            <input style={inputStyle} type="password" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))} required />
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button type="submit" disabled={saving}
+            style={{ background: saved ? 'rgba(74,222,128,0.2)' : saving ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: saved ? '1px solid rgba(74,222,128,0.4)' : 'none', color: saved ? '#4ADE80' : '#0C0F16', borderRadius: '10px', padding: '10px 24px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+            {saved ? '✓ Password diganti' : saving ? 'Menyimpan...' : 'Ganti Password'}
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
@@ -214,7 +310,8 @@ function UserManagementSection({ users, divisions, currentUser, onToggleActive, 
   const [search, setSearch] = useState('')
   const filtered = users.filter(u =>
     u.fullName.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+    u.email.toLowerCase().includes(search.toLowerCase()) ||
+    (u.username ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -253,7 +350,7 @@ function UserManagementSection({ users, divisions, currentUser, onToggleActive, 
                       <Avatar name={u.fullName} imageUrl={u.avatarUrl} size="sm" />
                       <div>
                         <p style={{ fontSize: '13px', fontWeight: 600, color: '#EDF0F5' }}>{u.fullName}</p>
-                        <p style={{ fontSize: '11px', color: '#6B7385' }}>{u.email}</p>
+                        <p style={{ fontSize: '11px', color: '#6B7385' }}>{u.username ? `@${u.username}` : u.email}</p>
                       </div>
                     </div>
                   </td>
@@ -343,20 +440,31 @@ function UserModal({ user, divisions, onClose, onSaved }: {
 }) {
   const isNew = !user
   const [form, setForm] = useState({
-    fullName: user?.fullName ?? '', email: user?.email ?? '',
+    fullName: user?.fullName ?? '', email: user?.email ?? '', username: user?.username ?? '',
     role: user?.role ?? 'staff', divisionId: user?.divisionId ?? '',
     password: '', isActive: user?.isActive ?? true,
   })
+  const [usernameTouched, setUsernameTouched] = useState(!isNew)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPw, setShowPw] = useState(false)
 
+  function slugify(name: string) {
+    return name.toLowerCase().trim().replace(/[^a-z0-9\s.]/g, '').replace(/\s+/g, '.').slice(0, 20)
+  }
+
+  function onNameChange(value: string) {
+    setForm(f => ({ ...f, fullName: value, username: usernameTouched ? f.username : slugify(value) }))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.fullName || !form.email) { setError('Nama dan email wajib diisi'); return }
+    if (!form.fullName || !form.username) { setError('Nama dan username wajib diisi'); return }
+    if (!/^[a-z0-9._]{3,20}$/.test(form.username)) { setError('Username 3-20 karakter: huruf kecil, angka, titik, underscore'); return }
     if (isNew && !form.password) { setError('Password wajib diisi untuk user baru'); return }
     setLoading(true); setError(null)
-    const body: Record<string, unknown> = { fullName: form.fullName, email: form.email, role: form.role, divisionId: form.divisionId || null, isActive: form.isActive }
+    const body: Record<string, unknown> = { fullName: form.fullName, username: form.username, role: form.role, divisionId: form.divisionId || null, isActive: form.isActive }
+    if (form.email.trim()) body.email = form.email
     if (form.password) body.password = form.password
     const url = isNew ? '/api/users' : `/api/users/${user!.id}`
     const res = await fetch(url, { method: isNew ? 'POST' : 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -376,11 +484,17 @@ function UserModal({ user, divisions, onClose, onSaved }: {
           {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
           <div>
             <label style={labelStyle}>Nama Lengkap *</label>
-            <input style={inputStyle} value={form.fullName} onChange={e => setForm(f => ({ ...f, fullName: e.target.value }))} required />
+            <input style={inputStyle} value={form.fullName} onChange={e => onNameChange(e.target.value)} required />
           </div>
           <div>
-            <label style={labelStyle}>Email *</label>
-            <input style={inputStyle} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
+            <label style={labelStyle}>Username *</label>
+            <input style={inputStyle} value={form.username}
+              onChange={e => { setUsernameTouched(true); setForm(f => ({ ...f, username: e.target.value.toLowerCase() })) }}
+              placeholder="huruf kecil, angka, titik/underscore" required />
+          </div>
+          <div>
+            <label style={labelStyle}>Email (opsional)</label>
+            <input style={inputStyle} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="Kosongkan jika tidak ada" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>

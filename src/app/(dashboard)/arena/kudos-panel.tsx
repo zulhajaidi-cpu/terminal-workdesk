@@ -9,7 +9,7 @@ import type { KudosStatus, KudosFeedItem } from '@/lib/kudos'
 
 interface Teammate { id: string; fullName: string; avatarUrl: string | null; divisionName: string | null }
 
-export function KudosPanel({ status, teammates }: { status: KudosStatus; teammates: Teammate[] }) {
+export function KudosPanel({ status, teammates, readOnly }: { status: KudosStatus; teammates: Teammate[]; readOnly?: boolean }) {
   const router = useRouter()
   const [recipientId, setRecipientId] = useState('')
   const [message, setMessage] = useState('')
@@ -59,7 +59,11 @@ export function KudosPanel({ status, teammates }: { status: KudosStatus; teammat
       {err && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: '#FF9B9B', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 10 }}>{err}</div>}
       {okMsg && <div style={{ background: 'rgba(63,208,138,0.1)', border: '1px solid rgba(63,208,138,0.3)', color: '#9BE8C2', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 10 }}>{okMsg}</div>}
 
-      {noQuota ? (
+      {readOnly ? (
+        <div style={{ textAlign: 'center', color: '#6B7385', fontSize: 12.5, padding: '12px 0', background: 'rgba(255,255,255,0.02)', borderRadius: 10, marginBottom: 14 }}>
+          👁️ Mode spectator: lihat saja, tidak bisa kirim kudos.
+        </div>
+      ) : noQuota ? (
         <div style={{ textAlign: 'center', color: '#6B7385', fontSize: 12.5, padding: '12px 0', background: 'rgba(255,255,255,0.02)', borderRadius: 10, marginBottom: 14 }}>
           Kuota kudos harianmu sudah habis. Kembali besok ya! 🌙
         </div>

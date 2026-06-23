@@ -5,7 +5,7 @@ import {
 import { relations } from 'drizzle-orm'
 
 // ── Enums ──────────────────────────────────────────────────────────────
-export const userRoleEnum = pgEnum('user_role', ['super_admin','spv_manager','leader_divisi','staff','head_director'])
+export const userRoleEnum = pgEnum('user_role', ['super_admin','spv_manager','leader_divisi','staff','head_director','spectator'])
 export const projectStatusEnum = pgEnum('project_status', ['Draft','Waiting Approval','Not Started','In Progress','Need Review','Revision','Completed','On Hold','Cancelled'])
 export const taskStatusEnum = pgEnum('task_status', ['To Do','In Progress','Need Review','Revision','Completed','On Hold','Cancelled'])
 export const priorityEnum = pgEnum('priority_level', ['Low','Medium','High','Urgent'])
@@ -34,6 +34,7 @@ export const divisions = pgTable('divisions', {
 export const users = pgTable('users', {
   id:         uuid('id').primaryKey().defaultRandom(),
   email:      text('email').notNull().unique(),
+  username:   text('username').unique(),
   fullName:   text('full_name').notNull(),
   avatarUrl:  text('avatar_url'),
   bio:        text('bio'),

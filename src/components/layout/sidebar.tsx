@@ -8,7 +8,7 @@ import {
   CalendarRange, CheckSquare, Trophy, ClipboardCheck, Bell,
   FolderOpen, Wallet, Settings, X, ChevronRight, Gamepad2
 } from 'lucide-react'
-import { canViewBudget } from '@/lib/roles'
+import { canViewBudget, isSpectator } from '@/lib/roles'
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -85,6 +85,11 @@ export function Sidebar({ onClose, role }: SidebarProps) {
 
       {/* Bottom accent */}
       <div className="px-5 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        {isSpectator(role ?? '') && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '10.5px', fontWeight: 700, color: '#8B93A6', background: 'rgba(139,147,166,0.12)', border: '1px solid rgba(139,147,166,0.3)', borderRadius: '100px', padding: '3px 10px', marginBottom: '8px' }}>
+            👁️ Mode Spectator · Lihat Saja
+          </div>
+        )}
         <div className="font-mono text-[9.5px] text-[#4a5160] tracking-wider uppercase">
           Dept Terminal GODA · v2.1
         </div>
