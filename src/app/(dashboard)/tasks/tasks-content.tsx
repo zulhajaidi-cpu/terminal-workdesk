@@ -150,8 +150,8 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5]">Tasks</h1>
-          <p className="text-[#6B7385] text-sm mt-1">
+          <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">Tasks</h1>
+          <p className="text-[var(--text-muted)] text-sm mt-1">
             {counts.inProgress} in progress · <span style={{ color: '#F59E0B' }}>{counts.deadlineAlert} deadline alert</span>
           </p>
         </div>
@@ -159,7 +159,7 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
           {canBulkData(currentUser.role) && sectionTab !== 'Tasks Individu' && <ExcelToolbar type="tasks" label="Tasks Project" />}
           {canCreate(currentUser.role) && sectionTab !== 'Tasks Individu' && (
             <button onClick={() => { setEditTask(null); setShowProjectModal(true) }}
-              style={{ background: '#FF6A1A', color: '#0C0F16', border: 'none', borderRadius: '11px', padding: '9px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              style={{ background: '#FF6A1A', color: 'var(--on-accent)', border: 'none', borderRadius: '11px', padding: '9px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Plus size={15} /> Buat Task
             </button>
           )}
@@ -169,15 +169,15 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
         {[
-          { label: 'To Do', val: counts.todo, color: '#6B7385' },
-          { label: 'In Progress', val: counts.inProgress, color: '#4A9EFF' },
+          { label: 'To Do', val: counts.todo, color: 'var(--text-muted)' },
+          { label: 'In Progress', val: counts.inProgress, color: 'var(--blue)' },
           { label: 'Review', val: counts.review, color: '#F59E0B' },
-          { label: 'Deadline Alert', val: counts.deadlineAlert, color: '#FF6B6B' },
+          { label: 'Deadline Alert', val: counts.deadlineAlert, color: 'var(--red)' },
           { label: 'Selesai', val: counts.done, color: '#4ADE80' },
         ].map(s => (
-          <div key={s.label} style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px 16px', cursor: 'pointer' }}
+          <div key={s.label} style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 16px', cursor: 'pointer' }}
             onClick={() => setStatusFilter(s.label === 'Selesai' ? 'Completed' : s.label === 'Review' ? 'Need Review' : s.label)}>
-            <p style={{ fontSize: '11px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '4px' }}>{s.label}</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '4px' }}>{s.label}</p>
             <p style={{ fontSize: '22px', fontWeight: 700, color: s.color, fontFamily: "'Space Grotesk', sans-serif" }}>{s.val}</p>
           </div>
         ))}
@@ -186,25 +186,25 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
       {/* Section tabs + search + status filter */}
       <div className="flex flex-col gap-3">
         {/* Section tabs */}
-        <div style={{ display: 'flex', gap: '4px', background: '#141925', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
+        <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-card)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
           {SECTION_TABS.map(tab => (
             <button key={tab} onClick={() => setSectionTab(tab)}
-              style={{ padding: '7px 16px', borderRadius: '9px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: "'Space Grotesk', sans-serif", transition: 'all 0.15s', background: sectionTab === tab ? '#FF6A1A' : 'transparent', color: sectionTab === tab ? '#0C0F16' : '#6B7385' }}>
+              style={{ padding: '7px 16px', borderRadius: '9px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: "'Space Grotesk', sans-serif", transition: 'all 0.15s', background: sectionTab === tab ? '#FF6A1A' : 'transparent', color: sectionTab === tab ? 'var(--bg-base)' : 'var(--text-muted)' }}>
               {tab}
             </button>
           ))}
         </div>
         {/* Search + status chips */}
         <div className="flex gap-3 flex-wrap">
-          <div style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', gap: '8px', background: '#141925', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '11px', padding: '9px 12px' }}>
-            <Search size={14} style={{ color: '#6B7385', flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '11px', padding: '9px 12px' }}>
+            <Search size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari task, project, atau PIC..."
-              style={{ background: 'transparent', border: 'none', outline: 'none', color: '#EDF0F5', fontSize: '13px', width: '100%' }} />
+              style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontSize: '13px', width: '100%' }} />
           </div>
           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {STATUS_CHIPS.map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
-                style={{ padding: '8px 12px', borderRadius: '9px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', border: `1px solid ${statusFilter === s ? 'rgba(255,106,26,0.4)' : 'rgba(255,255,255,0.07)'}`, background: statusFilter === s ? 'rgba(255,106,26,0.12)' : 'transparent', color: statusFilter === s ? '#FF8A4C' : '#A5AEC0' }}>
+                style={{ padding: '8px 12px', borderRadius: '9px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', border: `1px solid ${statusFilter === s ? 'rgba(255,106,26,0.4)' : 'var(--border)'}`, background: statusFilter === s ? 'rgba(255,106,26,0.12)' : 'transparent', color: statusFilter === s ? '#FF8A4C' : 'var(--text-secondary)' }}>
                 {s}
               </button>
             ))}
@@ -239,10 +239,10 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
           {/* Individu header with Add button for ALL roles */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
             <div>
-              <p className="font-grotesk font-semibold text-[15px] text-[#EDF0F5]">
-                Tasks Individu <span style={{ fontSize: '12px', fontWeight: 400, color: '#6B7385' }}>({individualTasks.length})</span>
+              <p className="font-grotesk font-semibold text-[15px] text-[var(--text-primary)]">
+                Tasks Individu <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>({individualTasks.length})</span>
               </p>
-              <p style={{ fontSize: '11px', color: '#4a5160', marginTop: '1px' }}>To-do list pribadi yang tidak terkait project</p>
+              <p style={{ fontSize: '11px', color: 'var(--text-faint)', marginTop: '1px' }}>To-do list pribadi yang tidak terkait project</p>
             </div>
             <button onClick={() => { setEditTask(null); setShowTodoModal(true) }}
               style={{ background: 'rgba(74,158,255,0.12)', border: '1px solid rgba(74,158,255,0.3)', color: '#93C5FD', borderRadius: '11px', padding: '8px 16px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -316,9 +316,9 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
 
 function EmptyState({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div style={{ background: '#10141d', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px', padding: '50px 24px', textAlign: 'center' }}>
-      <div style={{ color: '#4a5160', marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>{icon}</div>
-      <p style={{ color: '#6B7385', fontSize: '14px' }}>{text}</p>
+    <div style={{ background: 'var(--bg-elevated)', border: '1px dashed var(--border-strong)', borderRadius: '16px', padding: '50px 24px', textAlign: 'center' }}>
+      <div style={{ color: 'var(--text-faint)', marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>{icon}</div>
+      <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>{text}</p>
     </div>
   )
 }
@@ -346,16 +346,16 @@ function TaskSection({ title, subtitle, tasks, showProject, currentUser, canEdit
       : ['Task', 'PIC', 'Status', 'Due Date', '']
 
   return (
-    <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', overflow: 'hidden' }}>
+    <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden' }}>
       {title && (
-        <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
-          <p className="font-grotesk font-bold text-[14px] text-[#EDF0F5]">{title} <span style={{ fontSize: '12px', fontWeight: 400, color: '#6B7385', marginLeft: '4px' }}>({tasks.length})</span></p>
-          {subtitle && <p style={{ fontSize: '11px', color: '#4a5160', marginTop: '1px' }}>{subtitle}</p>}
+        <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid var(--border)', background: 'var(--surface-subtle)' }}>
+          <p className="font-grotesk font-bold text-[14px] text-[var(--text-primary)]">{title} <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)', marginLeft: '4px' }}>({tasks.length})</span></p>
+          {subtitle && <p style={{ fontSize: '11px', color: 'var(--text-faint)', marginTop: '1px' }}>{subtitle}</p>}
         </div>
       )}
-      <div className="hidden md:grid" style={{ gridTemplateColumns: cols, padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div className="hidden md:grid" style={{ gridTemplateColumns: cols, padding: '8px 16px', borderBottom: '1px solid var(--surface-hover)' }}>
         {headers.map(h => (
-          <div key={h} style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</div>
+          <div key={h} style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</div>
         ))}
       </div>
       <div>
@@ -365,28 +365,28 @@ function TaskSection({ title, subtitle, tasks, showProject, currentUser, canEdit
           const canE = canEditFn(t)
           const canD = canDeleteFn(t)
           return (
-            <div key={t.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+            <div key={t.id} style={{ borderBottom: '1px solid var(--surface-hover)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-subtle)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
               {/* Desktop */}
               <div className="hidden md:grid" style={{ gridTemplateColumns: cols, padding: '10px 16px', alignItems: 'center', cursor: 'pointer' }}
                 onClick={() => onDetail(t)}>
                 {/* Task name */}
                 <div style={{ minWidth: 0, paddingRight: '10px' }}>
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: isDeadlineAlert(t) ? '#FF6B6B' : '#EDF0F5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</p>
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: isDeadlineAlert(t) ? 'var(--red)' : 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</p>
                   {t.description && (
-                    <p style={{ fontSize: '11px', color: '#6B7385', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {t.description.split('\n')[0]}
                     </p>
                   )}
                   {showTodoFields && t.category && (
-                    <span style={{ fontSize: '10px', background: 'rgba(74,158,255,0.1)', color: '#4A9EFF', borderRadius: '4px', padding: '1px 6px', marginTop: '3px', display: 'inline-block' }}>{t.category}</span>
+                    <span style={{ fontSize: '10px', background: 'rgba(74,158,255,0.1)', color: 'var(--blue)', borderRadius: '4px', padding: '1px 6px', marginTop: '3px', display: 'inline-block' }}>{t.category}</span>
                   )}
                 </div>
                 {/* Project column */}
                 {showProject && !showTodoFields && (
                   <div style={{ minWidth: 0, paddingRight: '8px' }}>
-                    <p style={{ fontSize: '11px', color: '#A5AEC0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.projectName ?? '—'}</p>
+                    <p style={{ fontSize: '11px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.projectName ?? '—'}</p>
                   </div>
                 )}
                 {/* PIC */}
@@ -398,23 +398,23 @@ function TaskSection({ title, subtitle, tasks, showProject, currentUser, canEdit
                           <AvatarChip name={a.fullName} url={a.avatarUrl} size={22} />
                         </span>
                       ))}
-                      {t.assignees.length > 2 && <span style={{ fontSize: '10px', color: '#6B7385', marginLeft: '3px' }}>+{t.assignees.length - 2}</span>}
+                      {t.assignees.length > 2 && <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '3px' }}>+{t.assignees.length - 2}</span>}
                     </div>
                   ) : t.picName ? (
-                    <p style={{ fontSize: '11px', color: '#A5AEC0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.picName}</p>
-                  ) : <span style={{ color: '#4a5160', fontSize: '11px' }}>—</span>}
+                    <p style={{ fontSize: '11px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.picName}</p>
+                  ) : <span style={{ color: 'var(--text-faint)', fontSize: '11px' }}>—</span>}
                 </div>
                 {/* Status */}
                 <div style={{ minWidth: 0, paddingRight: '8px' }}><StatusBadge status={isDeadlineAlert(t) ? 'Deadline Alert' : t.status} /></div>
                 {/* Progress % (todo only) */}
                 {showTodoFields && (
                   <div style={{ minWidth: 0, paddingRight: '8px' }}>
-                    <span style={{ fontSize: '12px', color: '#A5AEC0', fontFamily: "'IBM Plex Mono', monospace" }}>{t.progressPct ?? 0}%</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: "'IBM Plex Mono', monospace" }}>{t.progressPct ?? 0}%</span>
                   </div>
                 )}
                 {/* Due date */}
                 <div style={{ minWidth: 0, paddingRight: '8px' }}>
-                  <span style={{ fontSize: '11px', color: isDeadlineAlert(t) ? '#FF6B6B' : '#A5AEC0', fontFamily: "'IBM Plex Mono', monospace", whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: '11px', color: isDeadlineAlert(t) ? 'var(--red)' : 'var(--text-secondary)', fontFamily: "'IBM Plex Mono', monospace", whiteSpace: 'nowrap' }}>
                     {t.dueDate ? formatDate(t.dueDate, { day: 'numeric', month: 'short' }) : '—'}
                     {hasSpecificTime(t.dueDate) && (
                       <span style={{ marginLeft: '4px', opacity: 0.8 }}>{getTaskTime(t.dueDate)}</span>
@@ -431,13 +431,13 @@ function TaskSection({ title, subtitle, tasks, showProject, currentUser, canEdit
                   )}
                   {canE && (
                     <button onClick={() => onEdit(t)}
-                      style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '6px', padding: '4px 5px', cursor: 'pointer', color: '#A5AEC0', display: 'flex' }}>
+                      style={{ background: 'var(--border)', border: 'none', borderRadius: '6px', padding: '4px 5px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex' }}>
                       <Pencil size={10} />
                     </button>
                   )}
                   {canD && (
                     <button onClick={() => onDelete(t.id)}
-                      style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '6px', padding: '4px 5px', cursor: 'pointer', color: '#FF6B6B', display: 'flex' }}>
+                      style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '6px', padding: '4px 5px', cursor: 'pointer', color: 'var(--red)', display: 'flex' }}>
                       <Trash2 size={10} />
                     </button>
                   )}
@@ -448,17 +448,17 @@ function TaskSection({ title, subtitle, tasks, showProject, currentUser, canEdit
               <div className="md:hidden" style={{ padding: '12px 16px', cursor: 'pointer' }} onClick={() => onDetail(t)}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: '13px', fontWeight: 600, color: isDeadlineAlert(t) ? '#FF6B6B' : '#EDF0F5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</p>
-                    <p style={{ fontSize: '11px', color: '#6B7385', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ fontSize: '13px', fontWeight: 600, color: isDeadlineAlert(t) ? 'var(--red)' : 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</p>
+                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {t.projectName ?? t.category ?? t.divisionName ?? '—'}
-                      {t.picName && <> · <span style={{ color: '#A5AEC0' }}>{t.picName}</span></>}
+                      {t.picName && <> · <span style={{ color: 'var(--text-secondary)' }}>{t.picName}</span></>}
                     </p>
                   </div>
                   <StatusBadge status={isDeadlineAlert(t) ? 'Deadline Alert' : t.status} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
                   <PriorityBadge priority={t.priority} />
-                  <span style={{ fontSize: '11px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace" }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace" }}>
                     {t.dueDate ? formatDate(t.dueDate, { day: 'numeric', month: 'short' }) : '—'}
                   </span>
                 </div>
@@ -476,7 +476,7 @@ function renderLogNote(text: string): React.ReactNode[] {
   return text.split(URL_RE).map((part, i) =>
     /^https?:\/\//.test(part) ? (
       <a key={i} href={part} target="_blank" rel="noopener noreferrer"
-        style={{ color: '#4A9EFF', textDecoration: 'underline', wordBreak: 'break-all' }}>
+        style={{ color: 'var(--blue)', textDecoration: 'underline', wordBreak: 'break-all' }}>
         {part}
       </a>
     ) : (
@@ -559,19 +559,19 @@ function TaskDetailPanel({ task, currentUser, canEditTask, canDeleteTask, onClos
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={onClose}>
-      <div style={{ width: '100%', maxWidth: '440px', background: '#10141d', borderLeft: '1px solid rgba(255,255,255,0.08)', height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
+      <div style={{ width: '100%', maxWidth: '440px', background: 'var(--bg-elevated)', borderLeft: '1px solid var(--border)', height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
         onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div style={{ padding: '20px 24px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+        <div style={{ padding: '20px 24px 14px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
             <div style={{ flex: 1 }}>
               {isTodo && task.category && (
-                <span style={{ fontSize: '10px', background: 'rgba(74,158,255,0.1)', color: '#4A9EFF', borderRadius: '4px', padding: '2px 7px', display: 'inline-block', marginBottom: '6px', fontFamily: "'IBM Plex Mono', monospace" }}>{task.category}</span>
+                <span style={{ fontSize: '10px', background: 'rgba(74,158,255,0.1)', color: 'var(--blue)', borderRadius: '4px', padding: '2px 7px', display: 'inline-block', marginBottom: '6px', fontFamily: "'IBM Plex Mono', monospace" }}>{task.category}</span>
               )}
-              <h2 className="font-grotesk font-bold text-[15px]" style={{ color: isOverdue ? '#FF6B6B' : '#EDF0F5', lineHeight: 1.35 }}>{task.name}</h2>
-              {task.projectName && <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '4px' }}>📁 {task.projectName}</p>}
+              <h2 className="font-grotesk font-bold text-[15px]" style={{ color: isOverdue ? 'var(--red)' : 'var(--text-primary)', lineHeight: 1.35 }}>{task.name}</h2>
+              {task.projectName && <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>📁 {task.projectName}</p>}
             </div>
-            <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '8px', padding: '6px 8px', cursor: 'pointer', color: '#6B7385', display: 'flex', flexShrink: 0 }}>
+            <button onClick={onClose} style={{ background: 'var(--border)', border: 'none', borderRadius: '8px', padding: '6px 8px', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', flexShrink: 0 }}>
               <X size={15} />
             </button>
           </div>
@@ -582,64 +582,64 @@ function TaskDetailPanel({ task, currentUser, canEditTask, canDeleteTask, onClos
           {/* Info grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             {/* Status */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '10px 12px' }}>
-              <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Status</p>
+            <div style={{ background: 'var(--surface-subtle)', borderRadius: '10px', padding: '10px 12px' }}>
+              <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Status</p>
               {statusEdit ? (
                 <select autoFocus value={task.status} onChange={e => changeStatus(e.target.value)} onBlur={() => setStatusEdit(false)}
-                  style={{ background: '#141925', border: '1px solid rgba(255,106,26,0.4)', borderRadius: '7px', color: '#EDF0F5', fontSize: '12px', padding: '3px 6px', outline: 'none', width: '100%' }}>
+                  style={{ background: 'var(--bg-card)', border: '1px solid rgba(255,106,26,0.4)', borderRadius: '7px', color: 'var(--text-primary)', fontSize: '12px', padding: '3px 6px', outline: 'none', width: '100%' }}>
                   {statusList.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: canEditStatus(currentUser.role) ? 'pointer' : 'default' }}
                   onClick={() => canEditStatus(currentUser.role) && setStatusEdit(true)}>
                   <StatusBadge status={isOverdue ? 'Overdue' : task.status} />
-                  {canEditStatus(currentUser.role) && <Pencil size={10} style={{ color: '#4a5160' }} />}
+                  {canEditStatus(currentUser.role) && <Pencil size={10} style={{ color: 'var(--text-faint)' }} />}
                 </div>
               )}
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '10px 12px' }}>
-              <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Prioritas</p>
+            <div style={{ background: 'var(--surface-subtle)', borderRadius: '10px', padding: '10px 12px' }}>
+              <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Prioritas</p>
               <PriorityBadge priority={task.priority} />
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '10px 12px' }}>
-              <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Due Date</p>
-              <p style={{ fontSize: '12px', color: isOverdue ? '#FF6B6B' : '#A5AEC0', fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div style={{ background: 'var(--surface-subtle)', borderRadius: '10px', padding: '10px 12px' }}>
+              <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Due Date</p>
+              <p style={{ fontSize: '12px', color: isOverdue ? 'var(--red)' : 'var(--text-secondary)', fontFamily: "'IBM Plex Mono', monospace" }}>
                 {task.dueDate ? formatDate(task.dueDate, { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
               </p>
             </div>
             {isTodo ? (
-              <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '10px 12px' }}>
-                <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Progress</p>
+              <div style={{ background: 'var(--surface-subtle)', borderRadius: '10px', padding: '10px 12px' }}>
+                <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Progress</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: '100px', height: '6px', overflow: 'hidden' }}>
+                  <div style={{ flex: 1, background: 'var(--border)', borderRadius: '100px', height: '6px', overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${task.progressPct ?? 0}%`, background: '#FF6A1A', borderRadius: '100px' }} />
                   </div>
                   <span style={{ fontSize: '12px', color: '#FF8A4C', fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>{task.progressPct ?? 0}%</span>
                 </div>
               </div>
             ) : (
-              <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '10px 12px' }}>
-                <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Assignee</p>
+              <div style={{ background: 'var(--surface-subtle)', borderRadius: '10px', padding: '10px 12px' }}>
+                <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Assignee</p>
                 {task.assignees?.length > 0 ? (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
-                    {task.assignees.map(a => <span key={a.id} style={{ fontSize: '11px', color: '#A5AEC0', background: 'rgba(255,255,255,0.06)', borderRadius: '5px', padding: '2px 6px' }}>{a.fullName}</span>)}
+                    {task.assignees.map(a => <span key={a.id} style={{ fontSize: '11px', color: 'var(--text-secondary)', background: 'var(--border)', borderRadius: '5px', padding: '2px 6px' }}>{a.fullName}</span>)}
                   </div>
-                ) : <p style={{ fontSize: '12px', color: task.picName ? '#A5AEC0' : '#4a5160' }}>{task.picName ?? '—'}</p>}
+                ) : <p style={{ fontSize: '12px', color: task.picName ? 'var(--text-secondary)' : 'var(--text-faint)' }}>{task.picName ?? '—'}</p>}
               </div>
             )}
           </div>
 
           {/* Description */}
           {task.description && (
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '12px' }}>
-              <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '6px' }}>Deskripsi</p>
-              <p style={{ fontSize: '13px', color: '#A5AEC0', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{task.description}</p>
+            <div style={{ background: 'var(--surface-subtle)', borderRadius: '10px', padding: '12px' }}>
+              <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '6px' }}>Deskripsi</p>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{task.description}</p>
             </div>
           )}
 
           {task.outputUrl && (
             <a href={task.outputUrl} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(74,158,255,0.08)', border: '1px solid rgba(74,158,255,0.2)', borderRadius: '10px', padding: '10px 14px', color: '#4A9EFF', fontSize: '13px', textDecoration: 'none' }}>
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(74,158,255,0.08)', border: '1px solid rgba(74,158,255,0.2)', borderRadius: '10px', padding: '10px 14px', color: 'var(--blue)', fontSize: '13px', textDecoration: 'none' }}>
               <ExternalLink size={13} /> Lihat Output / Hasil
             </a>
           )}
@@ -657,13 +657,13 @@ function TaskDetailPanel({ task, currentUser, canEditTask, canDeleteTask, onClos
             <div style={{ display: 'grid', gridTemplateColumns: canEditTask && canDeleteTask ? '1fr 1fr' : '1fr', gap: '8px' }}>
               {canEditTask && (
                 <button onClick={onEdit}
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '11px', padding: '9px', cursor: 'pointer', color: '#A5AEC0', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                  style={{ background: 'var(--border)', border: '1px solid var(--border-strong)', borderRadius: '11px', padding: '9px', cursor: 'pointer', color: 'var(--text-secondary)', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
                   <Pencil size={13} /> Edit
                 </button>
               )}
               {canDeleteTask && (
                 <button onClick={onDelete}
-                  style={{ background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.2)', borderRadius: '11px', padding: '9px', cursor: 'pointer', color: '#FF6B6B', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                  style={{ background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.2)', borderRadius: '11px', padding: '9px', cursor: 'pointer', color: 'var(--red)', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
                   <Trash2 size={13} /> Hapus
                 </button>
               )}
@@ -672,37 +672,37 @@ function TaskDetailPanel({ task, currentUser, canEditTask, canDeleteTask, onClos
 
           {/* Progress log */}
           <div>
-            <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <MessageSquare size={12} /> Update Progress ({logs.length})
             </p>
             {logs.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '10px' }}>
                 {logs.map(log => (
-                  <div key={log.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '10px 12px' }}>
+                  <div key={log.id} style={{ background: 'var(--surface-subtle)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
                       <AvatarChip name={log.user_name} url={log.avatar_url} size={20} />
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#EDF0F5' }}>{log.user_name}</span>
-                      <span style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace", marginLeft: 'auto' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{log.user_name}</span>
+                      <span style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace", marginLeft: 'auto' }}>
                         {fmtLog(log.created_at)}
                       </span>
                     </div>
-                    <p style={{ fontSize: '13px', color: '#A5AEC0', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{renderLogNote(log.note)}</p>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{renderLogNote(log.note)}</p>
                   </div>
                 ))}
               </div>
             )}
             <div style={{ position: 'relative' }}>
               {showMentions && mentionMatches.length > 0 && (
-                <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: '#1a2030', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', overflow: 'hidden', zIndex: 20, marginBottom: '4px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
-                  <div style={{ padding: '5px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <span style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.06em' }}>Sebut anggota</span>
+                <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: 'var(--bg-hover)', border: '1px solid var(--border-strong)', borderRadius: '12px', overflow: 'hidden', zIndex: 20, marginBottom: '4px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                  <div style={{ padding: '5px 10px', borderBottom: '1px solid var(--border)' }}>
+                    <span style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.06em' }}>Sebut anggota</span>
                   </div>
                   {mentionMatches.map(u => (
                     <button key={u.id} onMouseDown={e => { e.preventDefault(); insertMention(u.fullName) }}
                       style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '8px 12px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                       onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,106,26,0.08)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                      <span style={{ fontSize: '13px', color: '#EDF0F5', fontWeight: 600 }}>{u.fullName}</span>
+                      <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{u.fullName}</span>
                     </button>
                   ))}
                 </div>
@@ -710,15 +710,15 @@ function TaskDetailPanel({ task, currentUser, canEditTask, canDeleteTask, onClos
               <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
                 <textarea ref={noteRef} value={note} onChange={handleNoteChange} placeholder="Tulis update progress… ketik @ untuk sebut user"
                   onKeyDown={e => { if (e.key === 'Escape') setShowMentions(false); if (e.key === 'Enter' && !e.shiftKey && !showMentions) { e.preventDefault(); submitProgress() } }}
-                  style={{ flex: 1, background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '9px 12px', color: '#EDF0F5', fontSize: '13px', outline: 'none', resize: 'none', minHeight: '60px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', resize: 'none', minHeight: '60px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 />
                 <button onClick={submitProgress} disabled={posting || !note.trim()}
-                  style={{ background: note.trim() ? '#FF6A1A' : 'rgba(255,106,26,0.2)', border: 'none', borderRadius: '10px', padding: '10px 12px', cursor: note.trim() ? 'pointer' : 'default', color: note.trim() ? '#0C0F16' : '#4a5160', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                  style={{ background: note.trim() ? '#FF6A1A' : 'rgba(255,106,26,0.2)', border: 'none', borderRadius: '10px', padding: '10px 12px', cursor: note.trim() ? 'pointer' : 'default', color: note.trim() ? 'var(--bg-base)' : 'var(--text-faint)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                   <Send size={14} />
                 </button>
               </div>
             </div>
-            <p style={{ fontSize: '10px', color: '#4a5160', marginTop: '4px' }}>Enter untuk kirim · Shift+Enter baris baru</p>
+            <p style={{ fontSize: '10px', color: 'var(--text-faint)', marginTop: '4px' }}>Enter untuk kirim · Shift+Enter baris baru</p>
           </div>
         </div>
       </div>
@@ -757,8 +757,8 @@ function TodoModal({ task, divisions, users, currentUser, onClose, onSaved }: {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const inp: React.CSSProperties = { background: '#141925', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 14px', color: '#EDF0F5', fontSize: '14px', outline: 'none', width: '100%', fontFamily: "'Plus Jakarta Sans', sans-serif" }
-  const lbl: React.CSSProperties = { fontSize: '12px', color: '#EDF0F5', fontWeight: 600, display: 'block', marginBottom: '6px', fontFamily: "'Space Grotesk', sans-serif" }
+  const inp: React.CSSProperties = { background: 'var(--bg-card)', border: '1px solid var(--border-strong)', borderRadius: '10px', padding: '10px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', width: '100%', fontFamily: "'Plus Jakarta Sans', sans-serif" }
+  const lbl: React.CSSProperties = { fontSize: '12px', color: 'var(--text-primary)', fontWeight: 600, display: 'block', marginBottom: '6px', fontFamily: "'Space Grotesk', sans-serif" }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -809,21 +809,21 @@ function TodoModal({ task, divisions, users, currentUser, onClose, onSaved }: {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 py-8" style={{ background: 'rgba(0,0,0,0.75)' }}>
-      <div className="w-full max-w-xl rounded-2xl" style={{ background: '#0f1219', border: '1px solid rgba(255,255,255,0.1)' }}>
+      <div className="w-full max-w-xl rounded-2xl" style={{ background: '#0f1219', border: '1px solid var(--border-strong)' }}>
         {/* Header */}
-        <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 className="font-grotesk font-bold text-[18px] text-[#EDF0F5]">{isNew ? 'Tambah To Do' : 'Edit To Do'}</h2>
-            <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '3px' }}>Isi detail to do agar task harian lebih jelas dan mudah dipantau.</p>
+            <h2 className="font-grotesk font-bold text-[18px] text-[var(--text-primary)]">{isNew ? 'Tambah To Do' : 'Edit To Do'}</h2>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '3px' }}>Isi detail to do agar task harian lebih jelas dan mudah dipantau.</p>
           </div>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '9px', padding: '7px 9px', cursor: 'pointer', color: '#6B7385', display: 'flex' }}>
+          <button onClick={onClose} style={{ background: 'var(--border)', border: 'none', borderRadius: '9px', padding: '7px 9px', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex' }}>
             <X size={16} />
           </button>
         </div>
 
         {/* Body */}
         <form onSubmit={handleSubmit} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: 'var(--red)' }}>{error}</div>}
 
           {/* Judul */}
           <div>
@@ -839,7 +839,7 @@ function TodoModal({ task, divisions, users, currentUser, onClose, onSaved }: {
               <input style={inp} type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} />
             </div>
             <div>
-              <label style={lbl}>Jam <span style={{ color: '#4a5160', fontWeight: 400 }}>(opsional)</span></label>
+              <label style={lbl}>Jam <span style={{ color: 'var(--text-faint)', fontWeight: 400 }}>(opsional)</span></label>
               <input style={inp} type="time" value={form.dueTime} onChange={e => setForm(f => ({ ...f, dueTime: e.target.value }))} />
             </div>
             <div>
@@ -879,11 +879,11 @@ function TodoModal({ task, divisions, users, currentUser, onClose, onSaved }: {
                 onBlur={() => setTimeout(() => setShowRequesterDrop(false), 150)}
               />
               {showRequesterDrop && filteredUsers.length > 0 && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#1a2030', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', zIndex: 50, maxHeight: '160px', overflowY: 'auto', marginTop: '4px' }}>
+                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-hover)', border: '1px solid var(--border-strong)', borderRadius: '10px', zIndex: 50, maxHeight: '160px', overflowY: 'auto', marginTop: '4px' }}>
                   {filteredUsers.map(u => (
                     <div key={u.id}
                       onMouseDown={() => { setForm(f => ({ ...f, requester: u.fullName })); setShowRequesterDrop(false) }}
-                      style={{ padding: '8px 12px', cursor: 'pointer', fontSize: '13px', color: '#EDF0F5', display: 'flex', alignItems: 'center', gap: '8px' }}
+                      style={{ padding: '8px 12px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}
                       onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,106,26,0.1)')}
                       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                       <AvatarChip name={u.fullName} url={u.avatarUrl} size={20} />
@@ -911,11 +911,11 @@ function TodoModal({ task, divisions, users, currentUser, onClose, onSaved }: {
           {/* Buttons */}
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', paddingTop: '4px' }}>
             <button type="button" onClick={onClose}
-              style={{ padding: '10px 24px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: '#A5AEC0', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>
+              style={{ padding: '10px 24px', borderRadius: '10px', border: '1px solid var(--border-strong)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>
               Batal
             </button>
             <button type="submit" disabled={loading}
-              style={{ padding: '10px 24px', borderRadius: '10px', border: 'none', background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', color: '#0C0F16', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+              style={{ padding: '10px 24px', borderRadius: '10px', border: 'none', background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', color: 'var(--on-accent)', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
               {loading ? 'Menyimpan...' : isNew ? 'Simpan To Do' : 'Simpan'}
             </button>
           </div>
@@ -947,8 +947,8 @@ function ProjectTaskModal({ task, projects, divisions, users, currentUser, onClo
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const inputS: React.CSSProperties = { background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '10px 12px', color: '#EDF0F5', fontSize: '13px', outline: 'none', width: '100%', fontFamily: "'Plus Jakarta Sans', sans-serif" }
-  const labelS: React.CSSProperties = { fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: '5px' }
+  const inputS: React.CSSProperties = { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', width: '100%', fontFamily: "'Plus Jakarta Sans', sans-serif" }
+  const labelS: React.CSSProperties = { fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: '5px' }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -987,13 +987,13 @@ function ProjectTaskModal({ task, projects, divisions, users, currentUser, onClo
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 py-8" style={{ background: 'rgba(0,0,0,0.75)' }}>
-      <div className="w-full max-w-lg rounded-2xl flex flex-col" style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="font-grotesk font-bold text-[16px] text-[#EDF0F5]">{isNew ? 'Buat Task' : 'Edit Task'}</h2>
-          <button onClick={onClose} style={{ color: '#6B7385', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
+      <div className="w-full max-w-lg rounded-2xl flex flex-col" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }}>
+        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <h2 className="font-grotesk font-bold text-[16px] text-[var(--text-primary)]">{isNew ? 'Buat Task' : 'Edit Task'}</h2>
+          <button onClick={onClose} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: 'var(--red)' }}>{error}</div>}
           <div>
             <label style={labelS}>Nama Task *</label>
             <input style={inputS} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Deskripsi singkat task" required />
@@ -1058,9 +1058,9 @@ function ProjectTaskModal({ task, projects, divisions, users, currentUser, onClo
                 {assignees.map(uid => {
                   const u = users.find(x => x.id === uid)
                   return u ? (
-                    <span key={uid} style={{ fontSize: '12px', background: 'rgba(74,158,255,0.1)', border: '1px solid rgba(74,158,255,0.25)', color: '#4A9EFF', padding: '2px 10px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span key={uid} style={{ fontSize: '12px', background: 'rgba(74,158,255,0.1)', border: '1px solid rgba(74,158,255,0.25)', color: 'var(--blue)', padding: '2px 10px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                       {u.fullName}
-                      <button type="button" onClick={() => setAssignees(a => a.filter(x => x !== uid))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4A9EFF', padding: 0, display: 'flex' }}><X size={10} /></button>
+                      <button type="button" onClick={() => setAssignees(a => a.filter(x => x !== uid))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--blue)', padding: 0, display: 'flex' }}><X size={10} /></button>
                     </span>
                   ) : null
                 })}
@@ -1068,8 +1068,8 @@ function ProjectTaskModal({ task, projects, divisions, users, currentUser, onClo
             )}
           </div>
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#A5AEC0', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>Batal</button>
-            <button type="submit" disabled={loading} style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: '#0C0F16', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, background: 'var(--border)', border: '1px solid var(--border-strong)', color: 'var(--text-secondary)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>Batal</button>
+            <button type="submit" disabled={loading} style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: 'var(--on-accent)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
               {loading ? 'Menyimpan...' : isNew ? 'Buat Task' : 'Simpan'}
             </button>
           </div>

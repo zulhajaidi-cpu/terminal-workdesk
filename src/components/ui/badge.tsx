@@ -3,13 +3,13 @@ import { cn } from '@/lib/utils'
 type BadgeVariant = 'default' | 'orange' | 'green' | 'red' | 'blue' | 'yellow' | 'ghost'
 
 const variants: Record<BadgeVariant, string> = {
-  default: 'bg-white/8 text-[#A5AEC0] border border-white/10',
-  orange: 'bg-[rgba(255,106,26,0.12)] text-[#FFB489] border border-[rgba(255,106,26,0.3)]',
-  green: 'bg-[rgba(63,208,138,0.12)] text-[#3FD08A] border border-[rgba(63,208,138,0.25)]',
-  red: 'bg-[rgba(255,107,107,0.12)] text-[#FF6B6B] border border-[rgba(255,107,107,0.25)]',
-  blue: 'bg-[rgba(86,169,232,0.12)] text-[#56A9E8] border border-[rgba(86,169,232,0.25)]',
-  yellow: 'bg-[rgba(255,180,137,0.12)] text-[#FFB489] border border-[rgba(255,180,137,0.25)]',
-  ghost: 'text-[#6B7385] border border-white/8',
+  default: 'bg-white/8 text-[var(--text-secondary)] border border-white/10',
+  orange: 'bg-[rgba(255,106,26,0.12)] text-[var(--peach)] border border-[rgba(255,106,26,0.3)]',
+  green: 'bg-[rgba(63,208,138,0.12)] text-[var(--green)] border border-[rgba(63,208,138,0.25)]',
+  red: 'bg-[rgba(255,107,107,0.12)] text-[var(--red)] border border-[rgba(255,107,107,0.25)]',
+  blue: 'bg-[rgba(86,169,232,0.12)] text-[var(--blue)] border border-[rgba(86,169,232,0.25)]',
+  yellow: 'bg-[rgba(255,180,137,0.12)] text-[var(--peach)] border border-[rgba(255,180,137,0.25)]',
+  ghost: 'text-[var(--text-muted)] border border-white/8',
 }
 
 interface BadgeProps {

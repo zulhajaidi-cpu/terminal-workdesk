@@ -19,13 +19,13 @@ interface Props {
 }
 
 const PAYMENT_COLORS: Record<string, { bg: string; color: string }> = {
-  'Draft':            { bg: 'rgba(107,115,133,0.15)', color: '#6B7385' },
+  'Draft':            { bg: 'rgba(107,115,133,0.15)', color: 'var(--text-muted)' },
   'Waiting Approval': { bg: 'rgba(245,158,11,0.15)',  color: '#F59E0B' },
-  'Approved':         { bg: 'rgba(74,158,255,0.15)',  color: '#4A9EFF' },
+  'Approved':         { bg: 'rgba(74,158,255,0.15)',  color: 'var(--blue)' },
   'Used':             { bg: 'rgba(139,92,246,0.15)',  color: '#8B5CF6' },
   'Partially Paid':   { bg: 'rgba(255,106,26,0.15)',  color: '#FF8A4C' },
   'Paid':             { bg: 'rgba(74,222,128,0.15)',  color: '#4ADE80' },
-  'Rejected':         { bg: 'rgba(255,107,107,0.15)', color: '#FF6B6B' },
+  'Rejected':         { bg: 'rgba(255,107,107,0.15)', color: 'var(--red)' },
 }
 
 const PAYMENT_STATUSES = Object.keys(PAYMENT_COLORS)
@@ -83,12 +83,12 @@ export function BudgetContent({ budgets: initialBudgets, projects, currentUser }
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5]">Budget</h1>
-          <p className="text-[#6B7385] text-sm mt-1">{budgets.length} item budget terdaftar</p>
+          <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">Budget</h1>
+          <p className="text-[var(--text-muted)] text-sm mt-1">{budgets.length} item budget terdaftar</p>
         </div>
         {canEdit && (
           <button onClick={() => { setEditItem(null); setShowModal(true) }}
-            style={{ background: '#FF6A1A', color: '#0C0F16', border: 'none', borderRadius: '11px', padding: '9px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            style={{ background: '#FF6A1A', color: 'var(--on-accent)', border: 'none', borderRadius: '11px', padding: '9px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Plus size={15} /> Tambah Budget
           </button>
         )}
@@ -97,13 +97,13 @@ export function BudgetContent({ budgets: initialBudgets, projects, currentUser }
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total Planned', val: formatRp(totalPlanned), color: '#4A9EFF' },
+          { label: 'Total Planned', val: formatRp(totalPlanned), color: 'var(--blue)' },
           { label: 'Total Approved', val: formatRp(totalApproved), color: '#4ADE80' },
           { label: 'Total Aktual', val: formatRp(totalActual), color: '#F59E0B' },
-          { label: 'Pemakaian', val: `${pctUsed}%`, color: pctUsed > 90 ? '#FF6B6B' : pctUsed > 70 ? '#F59E0B' : '#4ADE80' },
+          { label: 'Pemakaian', val: `${pctUsed}%`, color: pctUsed > 90 ? 'var(--red)' : pctUsed > 70 ? '#F59E0B' : '#4ADE80' },
         ].map(s => (
-          <div key={s.label} style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '5px' }}>{s.label}</p>
+          <div key={s.label} style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '5px' }}>{s.label}</p>
             <p style={{ fontSize: '20px', fontWeight: 700, color: s.color, fontFamily: "'Space Grotesk', sans-serif" }}>{s.val}</p>
           </div>
         ))}
@@ -111,28 +111,28 @@ export function BudgetContent({ budgets: initialBudgets, projects, currentUser }
 
       {/* Progress bar overall */}
       {totalPlanned > 0 && (
-        <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 18px' }}>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '12px', padding: '14px 18px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', color: '#A5AEC0', fontWeight: 600 }}>Realisasi Budget Keseluruhan</span>
-            <span style={{ fontSize: '12px', color: pctUsed > 90 ? '#FF6B6B' : '#4ADE80', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700 }}>{pctUsed}%</span>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>Realisasi Budget Keseluruhan</span>
+            <span style={{ fontSize: '12px', color: pctUsed > 90 ? 'var(--red)' : '#4ADE80', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700 }}>{pctUsed}%</span>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '100px', height: '8px', overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${pctUsed}%`, background: pctUsed > 90 ? '#FF6B6B' : pctUsed > 70 ? '#F59E0B' : '#4ADE80', borderRadius: '100px', transition: 'width 0.6s ease' }} />
+          <div style={{ background: 'var(--border)', borderRadius: '100px', height: '8px', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${pctUsed}%`, background: pctUsed > 90 ? 'var(--red)' : pctUsed > 70 ? '#F59E0B' : '#4ADE80', borderRadius: '100px', transition: 'width 0.6s ease' }} />
           </div>
         </div>
       )}
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
-        <div style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', gap: '8px', background: '#141925', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '11px', padding: '9px 12px' }}>
-          <Search size={14} style={{ color: '#6B7385', flexShrink: 0 }} />
+        <div style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '11px', padding: '9px 12px' }}>
+          <Search size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari kategori, project, atau vendor..."
-            style={{ background: 'transparent', border: 'none', outline: 'none', color: '#EDF0F5', fontSize: '13px', width: '100%' }} />
+            style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontSize: '13px', width: '100%' }} />
         </div>
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {['Semua', ...PAYMENT_STATUSES].map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              style={{ padding: '8px 12px', borderRadius: '9px', fontSize: '11px', fontWeight: 500, cursor: 'pointer', border: `1px solid ${statusFilter === s ? 'rgba(255,106,26,0.4)' : 'rgba(255,255,255,0.07)'}`, background: statusFilter === s ? 'rgba(255,106,26,0.12)' : 'transparent', color: statusFilter === s ? '#FF8A4C' : '#A5AEC0' }}>
+              style={{ padding: '8px 12px', borderRadius: '9px', fontSize: '11px', fontWeight: 500, cursor: 'pointer', border: `1px solid ${statusFilter === s ? 'rgba(255,106,26,0.4)' : 'var(--border)'}`, background: statusFilter === s ? 'rgba(255,106,26,0.12)' : 'transparent', color: statusFilter === s ? '#FF8A4C' : 'var(--text-secondary)' }}>
               {s}
             </button>
           ))}
@@ -141,48 +141,48 @@ export function BudgetContent({ budgets: initialBudgets, projects, currentUser }
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <div style={{ background: '#10141d', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
-          <Wallet size={36} style={{ color: '#4a5160', margin: '0 auto 12px' }} />
-          <p style={{ color: '#6B7385', fontSize: '14px' }}>Tidak ada item budget</p>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px dashed var(--border-strong)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
+          <Wallet size={36} style={{ color: 'var(--text-faint)', margin: '0 auto 12px' }} />
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Tidak ada item budget</p>
           {canEdit && <button onClick={() => { setEditItem(null); setShowModal(true) }}
             style={{ marginTop: '16px', background: 'rgba(255,106,26,0.1)', border: '1px solid rgba(255,106,26,0.3)', color: '#FF8A4C', borderRadius: '10px', padding: '10px 20px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
             + Tambah Budget Pertama
           </button>}
         </div>
       ) : (
-        <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden' }}>
           {/* Desktop header */}
-          <div className="hidden md:grid" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr 1fr 80px', gap: '12px', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+          <div className="hidden md:grid" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr 1fr 80px', gap: '12px', padding: '10px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-subtle)' }}>
             {['Kategori / Project', 'Planned', 'Approved', 'Aktual', 'Vendor', 'Status', ''].map(h => (
-              <div key={h} style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</div>
+              <div key={h} style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</div>
             ))}
           </div>
 
           {filtered.map(b => {
             const pct = b.planned > 0 ? Math.min(100, Math.round((b.actual / b.planned) * 100)) : 0
             return (
-              <div key={b.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+              <div key={b.id} style={{ borderBottom: '1px solid var(--surface-hover)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-subtle)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                 {/* Desktop */}
                 <div className="hidden md:grid" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr 1fr 80px', gap: '12px', padding: '12px 16px', alignItems: 'center' }}>
                   <div>
-                    <p style={{ fontSize: '13px', fontWeight: 600, color: '#EDF0F5' }}>{b.category}</p>
-                    {b.projectName && <p style={{ fontSize: '11px', color: '#6B7385', marginTop: '2px' }}>{b.projectCode} · {b.projectName}</p>}
-                    {b.divisionName && <p style={{ fontSize: '10px', color: '#4a5160', marginTop: '1px' }}>{b.divisionName}</p>}
+                    <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{b.category}</p>
+                    {b.projectName && <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{b.projectCode} · {b.projectName}</p>}
+                    {b.divisionName && <p style={{ fontSize: '10px', color: 'var(--text-faint)', marginTop: '1px' }}>{b.divisionName}</p>}
                   </div>
                   <div>
-                    <p style={{ fontSize: '12px', color: '#A5AEC0', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.planned)}</p>
-                    <div style={{ marginTop: '4px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', height: '4px', overflow: 'hidden', width: '80px' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, background: pct > 90 ? '#FF6B6B' : '#4ADE80', borderRadius: '100px' }} />
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.planned)}</p>
+                    <div style={{ marginTop: '4px', background: 'var(--border)', borderRadius: '100px', height: '4px', overflow: 'hidden', width: '80px' }}>
+                      <div style={{ height: '100%', width: `${pct}%`, background: pct > 90 ? 'var(--red)' : '#4ADE80', borderRadius: '100px' }} />
                     </div>
                   </div>
-                  <p style={{ fontSize: '12px', color: b.approved != null ? '#4ADE80' : '#4a5160', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.approved)}</p>
-                  <p style={{ fontSize: '12px', color: '#A5AEC0', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.actual)}</p>
+                  <p style={{ fontSize: '12px', color: b.approved != null ? '#4ADE80' : 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.approved)}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.actual)}</p>
                   <div>
-                    <p style={{ fontSize: '12px', color: '#A5AEC0' }}>{b.vendor ?? <span style={{ color: '#4a5160' }}>—</span>}</p>
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{b.vendor ?? <span style={{ color: 'var(--text-faint)' }}>—</span>}</p>
                     <div style={{ display: 'flex', gap: '5px', marginTop: '4px' }}>
-                      {b.invoiceLink && <a href={b.invoiceLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: '10px', color: '#4A9EFF', display: 'flex', alignItems: 'center', gap: '2px' }}><ExternalLink size={9} /> Invoice</a>}
+                      {b.invoiceLink && <a href={b.invoiceLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: '10px', color: 'var(--blue)', display: 'flex', alignItems: 'center', gap: '2px' }}><ExternalLink size={9} /> Invoice</a>}
                       {b.reimburseLink && <a href={b.reimburseLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: '10px', color: '#8B5CF6', display: 'flex', alignItems: 'center', gap: '2px' }}><ExternalLink size={9} /> Reimburse</a>}
                     </div>
                   </div>
@@ -191,11 +191,11 @@ export function BudgetContent({ budgets: initialBudgets, projects, currentUser }
                     {canEdit && (
                       <>
                         <button onClick={() => { setEditItem(b); setShowModal(true) }}
-                          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '7px', padding: '4px 6px', cursor: 'pointer', color: '#A5AEC0', display: 'flex' }}>
+                          style={{ background: 'var(--border)', border: 'none', borderRadius: '7px', padding: '4px 6px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex' }}>
                           <Pencil size={11} />
                         </button>
                         <button onClick={() => handleDelete(b.id)}
-                          style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '7px', padding: '4px 6px', cursor: 'pointer', color: '#FF6B6B', display: 'flex' }}>
+                          style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '7px', padding: '4px 6px', cursor: 'pointer', color: 'var(--red)', display: 'flex' }}>
                           <Trash2 size={11} />
                         </button>
                       </>
@@ -207,22 +207,22 @@ export function BudgetContent({ budgets: initialBudgets, projects, currentUser }
                 <div className="md:hidden p-4">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
                     <div>
-                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#EDF0F5' }}>{b.category}</p>
-                      {b.projectName && <p style={{ fontSize: '11px', color: '#6B7385', marginTop: '2px' }}>{b.projectName}</p>}
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{b.category}</p>
+                      {b.projectName && <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{b.projectName}</p>}
                     </div>
                     <PaymentBadge status={b.paymentStatus} />
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', fontSize: '11px' }}>
-                    <div><p style={{ color: '#6B7385' }}>Planned</p><p style={{ color: '#A5AEC0', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.planned)}</p></div>
-                    <div><p style={{ color: '#6B7385' }}>Approved</p><p style={{ color: '#4ADE80', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.approved)}</p></div>
-                    <div><p style={{ color: '#6B7385' }}>Aktual</p><p style={{ color: '#A5AEC0', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.actual)}</p></div>
+                    <div><p style={{ color: 'var(--text-muted)' }}>Planned</p><p style={{ color: 'var(--text-secondary)', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.planned)}</p></div>
+                    <div><p style={{ color: 'var(--text-muted)' }}>Approved</p><p style={{ color: '#4ADE80', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.approved)}</p></div>
+                    <div><p style={{ color: 'var(--text-muted)' }}>Aktual</p><p style={{ color: 'var(--text-secondary)', fontFamily: "'IBM Plex Mono', monospace" }}>{formatRp(b.actual)}</p></div>
                   </div>
                   {canEdit && (
                     <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
                       <button onClick={() => { setEditItem(b); setShowModal(true) }}
-                        style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '9px', padding: '8px', cursor: 'pointer', color: '#A5AEC0', fontSize: '12px', fontWeight: 600 }}>Edit</button>
+                        style={{ flex: 1, background: 'var(--border)', border: 'none', borderRadius: '9px', padding: '8px', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600 }}>Edit</button>
                       <button onClick={() => handleDelete(b.id)}
-                        style={{ flex: 1, background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '9px', padding: '8px', cursor: 'pointer', color: '#FF6B6B', fontSize: '12px', fontWeight: 600 }}>Hapus</button>
+                        style={{ flex: 1, background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '9px', padding: '8px', cursor: 'pointer', color: 'var(--red)', fontSize: '12px', fontWeight: 600 }}>Hapus</button>
                     </div>
                   )}
                 </div>
@@ -268,12 +268,12 @@ function BudgetModal({ item, projects, onClose, onSaved }: {
   const [error, setError] = useState<string | null>(null)
 
   const inputS: React.CSSProperties = {
-    background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px',
-    padding: '10px 12px', color: '#EDF0F5', fontSize: '13px', outline: 'none', width: '100%',
+    background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px',
+    padding: '10px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', width: '100%',
     fontFamily: "'Plus Jakarta Sans', sans-serif",
   }
   const labelS: React.CSSProperties = {
-    fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace",
+    fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace",
     letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: '5px',
   }
 
@@ -319,13 +319,13 @@ function BudgetModal({ item, projects, onClose, onSaved }: {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 py-8" style={{ background: 'rgba(0,0,0,0.75)' }}>
-      <div className="w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh]" style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="font-grotesk font-bold text-[16px] text-[#EDF0F5]">{isNew ? 'Tambah Budget' : 'Edit Budget'}</h2>
-          <button onClick={onClose} style={{ color: '#6B7385', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
+      <div className="w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh]" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }}>
+        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <h2 className="font-grotesk font-bold text-[16px] text-[var(--text-primary)]">{isNew ? 'Tambah Budget' : 'Edit Budget'}</h2>
+          <button onClick={onClose} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4 flex-1 overflow-y-auto">
-          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: 'var(--red)' }}>{error}</div>}
 
           {isNew && (
             <div>
@@ -387,8 +387,8 @@ function BudgetModal({ item, projects, onClose, onSaved }: {
           </div>
 
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#A5AEC0', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>Batal</button>
-            <button type="submit" disabled={loading} style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: '#0C0F16', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, background: 'var(--border)', border: '1px solid var(--border-strong)', color: 'var(--text-secondary)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>Batal</button>
+            <button type="submit" disabled={loading} style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: 'var(--on-accent)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
               {loading ? 'Menyimpan...' : isNew ? 'Tambah' : 'Simpan'}
             </button>
           </div>

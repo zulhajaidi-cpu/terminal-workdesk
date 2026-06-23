@@ -64,10 +64,10 @@ interface Props {
 // Setiap divisi punya warna tetap supaya kalender langsung kebaca "ini punya siapa".
 const DIVISION_COLORS: Record<string, { bg: string; border: string; text: string; dot: string }> = {
   'Branding':           { bg:'rgba(236,72,153,0.18)', border:'#EC4899', text:'#F9A8D4', dot:'#EC4899' },
-  'Creative Marketing': { bg:'rgba(74,158,255,0.18)',  border:'#4A9EFF', text:'#93C5FD', dot:'#4A9EFF' },
+  'Creative Marketing': { bg:'rgba(74,158,255,0.18)',  border:'var(--blue)', text:'#93C5FD', dot:'var(--blue)' },
   'Retail':              { bg:'rgba(16,185,129,0.18)', border:'#10B981', text:'#6EE7B7', dot:'#10B981' },
 }
-const NO_DIVISION_COLOR = { bg:'rgba(148,163,184,0.16)', border:'#94A3B8', text:'#CBD5E1', dot:'#94A3B8' }
+const NO_DIVISION_COLOR = { bg:'rgba(148,163,184,0.16)', border:'var(--text-faint)', text:'#CBD5E1', dot:'var(--text-faint)' }
 
 function colorForDivision(name?: string | null) {
   if (!name) return NO_DIVISION_COLOR
@@ -343,24 +343,24 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
       {/* ── HEADER ── */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex" style={{ background:'#141925', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'10px', padding:'3px' }}>
+          <div className="flex" style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:'10px', padding:'3px' }}>
             <button onClick={() => navigate(-1)} style={navBtn}><ChevronLeft size={14}/></button>
             <button onClick={() => navigate(1)}  style={navBtn}><ChevronRight size={14}/></button>
           </div>
-          <h1 className="font-grotesk font-bold text-[18px] text-[#EDF0F5]" style={{ minWidth:'220px' }}>{periodLabel}</h1>
-          <button onClick={goToday} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', padding:'5px 13px', cursor:'pointer', color:'#A5AEC0', fontSize:'12px', fontWeight:600 }}>Hari ini</button>
+          <h1 className="font-grotesk font-bold text-[18px] text-[var(--text-primary)]" style={{ minWidth:'220px' }}>{periodLabel}</h1>
+          <button onClick={goToday} style={{ background:'var(--surface-hover)', border:'1px solid var(--border-strong)', borderRadius:'8px', padding:'5px 13px', cursor:'pointer', color:'var(--text-secondary)', fontSize:'12px', fontWeight:600 }}>Hari ini</button>
         </div>
         <div className="flex items-center gap-2">
-          <div style={{ display:'flex', background:'#141925', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'10px', padding:'3px', gap:'2px' }}>
+          <div style={{ display:'flex', background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:'10px', padding:'3px', gap:'2px' }}>
             {(['month','week'] as const).map(v => (
               <button key={v} onClick={() => switchView(v)}
-                style={{ padding:'5px 16px', borderRadius:'7px', border:'none', cursor:'pointer', fontSize:'12px', fontWeight:700, background:view===v?'#FF6A1A':'transparent', color:view===v?'#0C0F16':'#6B7385', fontFamily:"'Space Grotesk',sans-serif", transition:'all 0.15s' }}>
+                style={{ padding:'5px 16px', borderRadius:'7px', border:'none', cursor:'pointer', fontSize:'12px', fontWeight:700, background:view===v?'#FF6A1A':'transparent', color:view===v?'var(--bg-base)':'var(--text-muted)', fontFamily:"'Space Grotesk',sans-serif", transition:'all 0.15s' }}>
                 {v==='month'?'Bulan':'Minggu'}
               </button>
             ))}
           </div>
           <button onClick={() => openCreate()}
-            style={{ background:'#FF6A1A', color:'#0C0F16', border:'none', borderRadius:'10px', padding:'8px 16px', cursor:'pointer', fontFamily:"'Space Grotesk',sans-serif", fontWeight:700, fontSize:'13px', display:'flex', alignItems:'center', gap:'5px' }}>
+            style={{ background:'#FF6A1A', color: 'var(--on-accent)', border:'none', borderRadius:'10px', padding:'8px 16px', cursor:'pointer', fontFamily:"'Space Grotesk',sans-serif", fontWeight:700, fontSize:'13px', display:'flex', alignItems:'center', gap:'5px' }}>
             <Plus size={14}/> Tambah Event
           </button>
         </div>
@@ -368,21 +368,21 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
 
       {/* ── SOURCE FILTERS ── */}
       <div className="flex flex-wrap gap-2 items-center">
-        <span style={{ fontSize:'11px', color:'#4a5160', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.05em' }}>TAMPILKAN:</span>
+        <span style={{ fontSize:'11px', color:'var(--text-faint)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.05em' }}>TAMPILKAN:</span>
         {CHIPS.map(fc => (
           <button key={fc.key} onClick={() => toggleFilter(fc.key)}
-            style={{ display:'flex', alignItems:'center', gap:'5px', padding:'5px 12px', borderRadius:'100px', border:`1px solid ${filters.has(fc.key)?fc.color+'55':'rgba(255,255,255,0.07)'}`, background:filters.has(fc.key)?`${fc.color}18`:'transparent', color:filters.has(fc.key)?fc.color:'#4a5160', cursor:'pointer', fontSize:'11px', fontWeight:600, transition:'all 0.15s' }}>
+            style={{ display:'flex', alignItems:'center', gap:'5px', padding:'5px 12px', borderRadius:'100px', border:`1px solid ${filters.has(fc.key)?fc.color+'55':'var(--border)'}`, background:filters.has(fc.key)?`${fc.color}18`:'transparent', color:filters.has(fc.key)?fc.color:'var(--text-faint)', cursor:'pointer', fontSize:'11px', fontWeight:600, transition:'all 0.15s' }}>
             <span style={{ opacity:filters.has(fc.key)?1:0.4 }}>{fc.icon}</span>
             {fc.label}
             <span style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:'9px', opacity:0.65 }}>{fc.count}</span>
           </button>
         ))}
         <div style={{ marginLeft:'auto', display:'flex', gap:'10px', flexWrap:'wrap', alignItems:'center' }}>
-          <span style={{ fontSize:'10px', color:'#4a5160', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.05em' }}>DIVISI:</span>
+          <span style={{ fontSize:'10px', color:'var(--text-faint)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.05em' }}>DIVISI:</span>
           {[...Object.entries(DIVISION_COLORS), ['Tanpa divisi', NO_DIVISION_COLOR] as const].map(([name, c]) => (
             <div key={name} style={{ display:'flex', alignItems:'center', gap:'4px' }}>
               <div style={{ width:'8px', height:'8px', borderRadius:'50%', background:c.dot, flexShrink:0 }}/>
-              <span style={{ fontSize:'10px', color:'#4a5160' }}>{name}</span>
+              <span style={{ fontSize:'10px', color:'var(--text-faint)' }}>{name}</span>
             </div>
           ))}
         </div>
@@ -392,7 +392,7 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
       <div className="flex flex-col lg:flex-row gap-4" style={{ alignItems:'flex-start' }}>
 
         {/* Calendar */}
-        <div style={{ flex:1, minWidth:0, background:'#10141d', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'16px', overflow:'hidden' }}>
+        <div style={{ flex:1, minWidth:0, background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:'16px', overflow:'hidden' }}>
           {view==='month'
             ? <MonthView days={monthDays} anchor={anchor} today={today} selDay={selDay}
                 evOn={evOn} onSelDay={d=>{setSelDay(d);setSelEvent(null)}} onSelEvent={setSelEvent} onAdd={d=>openCreate(d)} />
@@ -406,14 +406,14 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
         <div className="flex flex-col gap-3 lg:w-[260px] w-full" style={{ flexShrink:0 }}>
 
           {/* Selected day */}
-          <div style={{ background:'#10141d', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'14px', padding:'16px' }}>
+          <div style={{ background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:'14px', padding:'16px' }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'12px' }}>
               <div>
-                <p style={{ fontSize:'10px', color:sd(selDay,today)?'#FF8A4C':'#6B7385', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'2px' }}>
+                <p style={{ fontSize:'10px', color:sd(selDay,today)?'#FF8A4C':'var(--text-muted)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'2px' }}>
                   {sd(selDay,today)?'HARI INI':'TERPILIH'}
                 </p>
-                <p className="font-grotesk font-bold text-[15px] text-[#EDF0F5]">{fmtShortDate(selDay)}</p>
-                <p style={{ fontSize:'11px', color:'#6B7385', marginTop:'1px' }}>{DAYS_FULL[(selDay.getDay()+6)%7]}</p>
+                <p className="font-grotesk font-bold text-[15px] text-[var(--text-primary)]">{fmtShortDate(selDay)}</p>
+                <p style={{ fontSize:'11px', color:'var(--text-muted)', marginTop:'1px' }}>{DAYS_FULL[(selDay.getDay()+6)%7]}</p>
               </div>
               <button onClick={() => openCreate(selDay)}
                 style={{ background:'rgba(255,106,26,0.12)', border:'1px solid rgba(255,106,26,0.3)', borderRadius:'9px', padding:'6px 10px', cursor:'pointer', color:'#FF8A4C', fontSize:'11px', fontWeight:700, display:'flex', alignItems:'center', gap:'4px' }}>
@@ -421,7 +421,7 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
               </button>
             </div>
             {selDayEvs.length===0 ? (
-              <p style={{ fontSize:'12px', color:'#4a5160', textAlign:'center', padding:'16px 0' }}>Tidak ada agenda</p>
+              <p style={{ fontSize:'12px', color:'var(--text-faint)', textAlign:'center', padding:'16px 0' }}>Tidak ada agenda</p>
             ) : (
               <div style={{ display:'flex', flexDirection:'column', gap:'6px' }}>
                 {selDayEvs.map(ev => <SidebarEventItem key={ev.key} ev={ev} onClick={() => setSelEvent(ev)} />)}
@@ -430,12 +430,12 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
           </div>
 
           {/* Upcoming */}
-          <div style={{ background:'#10141d', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'14px', padding:'16px', maxHeight:'400px', overflowY:'auto' }}>
-            <p style={{ fontSize:'10px', color:'#6B7385', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'10px' }}>
+          <div style={{ background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:'14px', padding:'16px', maxHeight:'400px', overflowY:'auto' }}>
+            <p style={{ fontSize:'10px', color:'var(--text-muted)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'10px' }}>
               Upcoming · 14 Hari
             </p>
             {upcoming.length===0 ? (
-              <p style={{ fontSize:'12px', color:'#4a5160', textAlign:'center', padding:'16px 0' }}>Tidak ada agenda mendatang</p>
+              <p style={{ fontSize:'12px', color:'var(--text-faint)', textAlign:'center', padding:'16px 0' }}>Tidak ada agenda mendatang</p>
             ) : (
               <div style={{ display:'flex', flexDirection:'column', gap:'4px' }}>
                 {upcoming.map((ev, i) => {
@@ -444,7 +444,7 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
                   return (
                     <div key={ev.key}>
                       {showDate && (
-                        <p style={{ fontSize:'10px', color:'#6B7385', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.05em', marginTop: i>0?'10px':'0', marginBottom:'4px' }}>
+                        <p style={{ fontSize:'10px', color:'var(--text-muted)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.05em', marginTop: i>0?'10px':'0', marginBottom:'4px' }}>
                           {sd(ev.startAt,today)?'Hari ini':fmtShortDate(ev.startAt)}
                         </p>
                       )}
@@ -499,9 +499,9 @@ function MonthView({ days, anchor, today, selDay, evOn, onSelDay, onSelEvent, on
   return (
     <div>
       {/* Day headers */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(255,255,255,0.02)' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', borderBottom:'1px solid var(--border)', background:'var(--surface-subtle)' }}>
         {DAYS_SHORT.map(d => (
-          <div key={d} style={{ padding:'10px 0', textAlign:'center', fontSize:'10px', color:'#4a5160', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.08em', textTransform:'uppercase' }}>{d}</div>
+          <div key={d} style={{ padding:'10px 0', textAlign:'center', fontSize:'10px', color:'var(--text-faint)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.08em', textTransform:'uppercase' }}>{d}</div>
         ))}
       </div>
       {/* Grid */}
@@ -515,12 +515,12 @@ function MonthView({ days, anchor, today, selDay, evOn, onSelDay, onSelEvent, on
           return (
             <div key={i}
               onClick={() => onSelDay(day)}
-              style={{ minHeight:'70px', padding:'6px', cursor:'pointer', transition:'background 0.1s', borderRight: i%7!==6?'1px solid rgba(255,255,255,0.04)':'none', borderBottom:'1px solid rgba(255,255,255,0.04)', background: isSel?'rgba(255,106,26,0.06)': isToday?'rgba(255,106,26,0.03)':'transparent' }}
-              onMouseEnter={e => { if(!isToday&&!isSel) e.currentTarget.style.background='rgba(255,255,255,0.025)' }}
+              style={{ minHeight:'70px', padding:'6px', cursor:'pointer', transition:'background 0.1s', borderRight: i%7!==6?'1px solid var(--surface-hover)':'none', borderBottom:'1px solid var(--surface-hover)', background: isSel?'rgba(255,106,26,0.06)': isToday?'rgba(255,106,26,0.03)':'transparent' }}
+              onMouseEnter={e => { if(!isToday&&!isSel) e.currentTarget.style.background='var(--surface-subtle)' }}
               onMouseLeave={e => { e.currentTarget.style.background=isSel?'rgba(255,106,26,0.06)':isToday?'rgba(255,106,26,0.03)':'transparent' }}>
               {/* Date number */}
               <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:'4px' }}>
-                <span style={{ width:'26px', height:'26px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'12px', fontWeight: isToday?700:isSel?600:400, color: isToday?'#0C0F16': isSel?'#FF8A4C': isCurMonth?'#A5AEC0':'#4a5160', background: isToday?'#FF6A1A': isSel?'rgba(255,106,26,0.15)':'transparent' }}>
+                <span style={{ width:'26px', height:'26px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'12px', fontWeight: isToday?700:isSel?600:400, color: isToday?'var(--bg-base)': isSel?'#FF8A4C': isCurMonth?'var(--text-secondary)':'var(--text-faint)', background: isToday?'#FF6A1A': isSel?'rgba(255,106,26,0.15)':'transparent' }}>
                   {day.getDate()}
                 </span>
               </div>
@@ -535,7 +535,7 @@ function MonthView({ days, anchor, today, selDay, evOn, onSelDay, onSelEvent, on
                   </span>
                 ))}
                 {dayEvs.length > 6 && (
-                  <span style={{ width:'18px', height:'18px', borderRadius:'5px', background:'rgba(255,255,255,0.06)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'8px', color:'#6B7385', fontFamily:"'IBM Plex Mono',monospace" }}>
+                  <span style={{ width:'18px', height:'18px', borderRadius:'5px', background:'var(--border)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'8px', color:'var(--text-muted)', fontFamily:"'IBM Plex Mono',monospace" }}>
                     +{dayEvs.length-6}
                   </span>
                 )}
@@ -560,19 +560,19 @@ function WeekView({ days, today, selDay, timedOn, allDayOn, nowLine, onSelDay, o
   return (
     <div style={{ display:'flex', flexDirection:'column' }}>
       {/* Week header */}
-      <div style={{ display:'grid', gridTemplateColumns:'52px repeat(7,1fr)', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(255,255,255,0.02)', flexShrink:0 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'52px repeat(7,1fr)', borderBottom:'1px solid var(--border)', background:'var(--surface-subtle)', flexShrink:0 }}>
         <div/>
         {days.map((day, i) => {
           const tod = isToday(day); const sel = sd(day, selDay)
           return (
-            <div key={i} onClick={() => onSelDay(day)} style={{ padding:'10px 6px', textAlign:'center', borderLeft:'1px solid rgba(255,255,255,0.04)', cursor:'pointer' }}>
-              <div style={{ fontSize:'10px', color: tod?'#FF8A4C':'#4a5160', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'4px' }}>
+            <div key={i} onClick={() => onSelDay(day)} style={{ padding:'10px 6px', textAlign:'center', borderLeft:'1px solid var(--surface-hover)', cursor:'pointer' }}>
+              <div style={{ fontSize:'10px', color: tod?'#FF8A4C':'var(--text-faint)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'4px' }}>
                 {DAYS_SHORT[i]}
               </div>
-              <div style={{ width:'30px', height:'30px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto', background: tod?'#FF6A1A':sel?'rgba(255,106,26,0.15)':'transparent', fontSize:'16px', fontWeight: tod||sel?700:400, color: tod?'#0C0F16':sel?'#FF8A4C':'#EDF0F5' }}>
+              <div style={{ width:'30px', height:'30px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto', background: tod?'#FF6A1A':sel?'rgba(255,106,26,0.15)':'transparent', fontSize:'16px', fontWeight: tod||sel?700:400, color: tod?'var(--bg-base)':sel?'#FF8A4C':'var(--text-primary)' }}>
                 {day.getDate()}
               </div>
-              <div style={{ fontSize:'9px', color:'#4a5160', marginTop:'2px' }}>{MONTHS[day.getMonth()].slice(0,3)}</div>
+              <div style={{ fontSize:'9px', color:'var(--text-faint)', marginTop:'2px' }}>{MONTHS[day.getMonth()].slice(0,3)}</div>
             </div>
           )
         })}
@@ -580,14 +580,14 @@ function WeekView({ days, today, selDay, timedOn, allDayOn, nowLine, onSelDay, o
 
       {/* All-day row */}
       {days.some(d => allDayOn(d).length > 0) && (
-        <div style={{ display:'grid', gridTemplateColumns:'52px repeat(7,1fr)', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(255,255,255,0.01)', flexShrink:0, minHeight:'28px' }}>
-          <div style={{ padding:'4px 6px', fontSize:'9px', color:'#4a5160', fontFamily:"'IBM Plex Mono',monospace", textTransform:'uppercase', letterSpacing:'0.06em', display:'flex', alignItems:'flex-start', paddingTop:'6px' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'52px repeat(7,1fr)', borderBottom:'1px solid var(--border)', background:'var(--surface-subtle)', flexShrink:0, minHeight:'28px' }}>
+          <div style={{ padding:'4px 6px', fontSize:'9px', color:'var(--text-faint)', fontFamily:"'IBM Plex Mono',monospace", textTransform:'uppercase', letterSpacing:'0.06em', display:'flex', alignItems:'flex-start', paddingTop:'6px' }}>
             All day
           </div>
           {days.map((day, i) => {
             const evs = allDayOn(day)
             return (
-              <div key={i} style={{ borderLeft:'1px solid rgba(255,255,255,0.04)', padding:'3px 3px', display:'flex', flexDirection:'column', gap:'2px' }}>
+              <div key={i} style={{ borderLeft:'1px solid var(--surface-hover)', padding:'3px 3px', display:'flex', flexDirection:'column', gap:'2px' }}>
                 {evs.slice(0,3).map(ev => (
                   <div key={ev.key} onClick={() => onSelEvent(ev)}
                     style={{ background:ev.bg, borderLeft:`2px solid ${ev.border}`, borderRadius:'3px', padding:'2px 5px', cursor:'pointer', display:'flex', alignItems:'flex-start', gap:'3px', overflow:'hidden', minWidth:0 }}>
@@ -595,7 +595,7 @@ function WeekView({ days, today, selDay, timedOn, allDayOn, nowLine, onSelDay, o
                     <span style={{ fontSize:'10px', color:ev.text, fontWeight:600, overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', wordBreak:'break-word', overflowWrap:'anywhere', lineHeight:1.25, minWidth:0 }}>{ev.title}</span>
                   </div>
                 ))}
-                {evs.length > 3 && <div style={{ fontSize:'9px', color:'#6B7385', paddingLeft:'4px' }}>+{evs.length-3}</div>}
+                {evs.length > 3 && <div style={{ fontSize:'9px', color:'var(--text-muted)', paddingLeft:'4px' }}>+{evs.length-3}</div>}
               </div>
             )
           })}
@@ -608,7 +608,7 @@ function WeekView({ days, today, selDay, timedOn, allDayOn, nowLine, onSelDay, o
           {/* Time labels */}
           <div style={{ width:'52px', flexShrink:0 }}>
             {HOURS.map(h => (
-              <div key={h} style={{ height:`${HOUR_H}px`, display:'flex', alignItems:'flex-start', paddingTop:'4px', paddingRight:'8px', justifyContent:'flex-end', fontSize:'10px', color:'#4a5160', fontFamily:"'IBM Plex Mono',monospace", userSelect:'none' }}>
+              <div key={h} style={{ height:`${HOUR_H}px`, display:'flex', alignItems:'flex-start', paddingTop:'4px', paddingRight:'8px', justifyContent:'flex-end', fontSize:'10px', color:'var(--text-faint)', fontFamily:"'IBM Plex Mono',monospace", userSelect:'none' }}>
                 {String(h).padStart(2,'0')}:00
               </div>
             ))}
@@ -627,7 +627,7 @@ function WeekView({ days, today, selDay, timedOn, allDayOn, nowLine, onSelDay, o
               return (
                 <div key={di}
                   onClick={() => onSelDay(day)}
-                  style={{ flex:1, position:'relative', borderLeft:'1px solid rgba(255,255,255,0.04)', height:`${HOURS.length*HOUR_H}px`, cursor:'pointer', background:tod?'rgba(255,106,26,0.025)':'transparent', minWidth:0 }}>
+                  style={{ flex:1, position:'relative', borderLeft:'1px solid var(--surface-hover)', height:`${HOURS.length*HOUR_H}px`, cursor:'pointer', background:tod?'rgba(255,106,26,0.025)':'transparent', minWidth:0 }}>
                   {/* Hover overlay for click to add */}
                   <div style={{ position:'absolute', inset:0, zIndex:1 }}
                     onDoubleClick={e => { e.stopPropagation(); onAdd(day) }}/>
@@ -673,9 +673,9 @@ function WeekView({ days, today, selDay, timedOn, allDayOn, nowLine, onSelDay, o
 function SidebarEventItem({ ev, onClick, compact=false }: { ev: DisplayEvent; onClick: () => void; compact?: boolean }) {
   return (
     <div onClick={onClick}
-      style={{ display:'flex', alignItems:'flex-start', gap:'8px', padding: compact?'5px 8px':'8px 10px', borderRadius:'9px', cursor:'pointer', background:'rgba(255,255,255,0.03)', border:`1px solid ${ev.border}22`, transition:'background 0.1s' }}
-      onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.06)'}
-      onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.03)'}>
+      style={{ display:'flex', alignItems:'flex-start', gap:'8px', padding: compact?'5px 8px':'8px 10px', borderRadius:'9px', cursor:'pointer', background:'var(--surface-subtle)', border:`1px solid ${ev.border}22`, transition:'background 0.1s' }}
+      onMouseEnter={e => e.currentTarget.style.background='var(--border)'}
+      onMouseLeave={e => e.currentTarget.style.background='var(--surface-subtle)'}>
       <div style={{ width:'3px', alignSelf:'stretch', borderRadius:'2px', background:ev.border, flexShrink:0 }}/>
       <div style={{ flex:1, minWidth:0 }}>
         <div style={{ display:'flex', alignItems:'center', gap:'4px' }}>
@@ -683,13 +683,13 @@ function SidebarEventItem({ ev, onClick, compact=false }: { ev: DisplayEvent; on
           <p style={{ fontSize:'12px', fontWeight:600, color:ev.isOverdue?'#EF4444':ev.text, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{ev.title}</p>
         </div>
         {!compact && (
-          <p style={{ fontSize:'10px', color:'#6B7385', marginTop:'2px' }}>
+          <p style={{ fontSize:'10px', color:'var(--text-muted)', marginTop:'2px' }}>
             {ev.allDay ? fmtShortDate(ev.startAt) : `${fmtTime(ev.startAt)} – ${fmtTime(ev.endAt)}`}
             {ev.divisionName && ` · ${ev.divisionName}`}
           </p>
         )}
         {compact && (
-          <p style={{ fontSize:'10px', color:'#4a5160', marginTop:'1px' }}>
+          <p style={{ fontSize:'10px', color:'var(--text-faint)', marginTop:'1px' }}>
             {ev.allDay ? '' : `${fmtTime(ev.startAt)} `}
             {ev.divisionName ?? ev.projectName ?? ''}
           </p>
@@ -713,7 +713,7 @@ function EventDetailPanel({ ev, currentUser, onClose, onEdit, onDelete }: {
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end" style={{ background:'rgba(0,0,0,0.6)' }} onClick={onClose}>
-      <div style={{ width:'100%', maxWidth:'380px', background:'#10141d', borderLeft:'1px solid rgba(255,255,255,0.1)', height:'100%', overflowY:'auto', padding:'24px' }}
+      <div style={{ width:'100%', maxWidth:'380px', background:'var(--bg-elevated)', borderLeft:'1px solid var(--border-strong)', height:'100%', overflowY:'auto', padding:'24px' }}
         onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'20px' }}>
@@ -723,26 +723,26 @@ function EventDetailPanel({ ev, currentUser, onClose, onEdit, onDelete }: {
               <span style={{ fontSize:'10px', color:ev.text, fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', fontWeight:600 }}>
                 {SRC_LABEL[ev.src]}
               </span>
-              {ev.isOverdue && <span style={{ fontSize:'9px', background:'rgba(239,68,68,0.2)', color:'#FCA5A5', padding:'1px 6px', borderRadius:'100px', fontWeight:700 }}>OVERDUE</span>}
+              {ev.isOverdue && <span style={{ fontSize:'9px', background:'rgba(239,68,68,0.2)', color:'var(--red)', padding:'1px 6px', borderRadius:'100px', fontWeight:700 }}>OVERDUE</span>}
             </div>
-            <h2 className="font-grotesk font-bold text-[17px] text-[#EDF0F5]" style={{ lineHeight:1.3 }}>{ev.title}</h2>
+            <h2 className="font-grotesk font-bold text-[17px] text-[var(--text-primary)]" style={{ lineHeight:1.3 }}>{ev.title}</h2>
           </div>
-          <button onClick={onClose} style={{ background:'rgba(255,255,255,0.06)', border:'none', borderRadius:'8px', padding:'6px 8px', cursor:'pointer', color:'#6B7385', display:'flex', flexShrink:0 }}><X size={15}/></button>
+          <button onClick={onClose} style={{ background:'var(--border)', border:'none', borderRadius:'8px', padding:'6px 8px', cursor:'pointer', color:'var(--text-muted)', display:'flex', flexShrink:0 }}><X size={15}/></button>
         </div>
 
         <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
           {/* Time */}
-          <div style={{ background:'rgba(255,255,255,0.03)', borderRadius:'10px', padding:'12px 14px', display:'flex', alignItems:'center', gap:'8px' }}>
-            <Clock size={14} style={{ color:'#6B7385', flexShrink:0 }}/>
+          <div style={{ background:'var(--surface-subtle)', borderRadius:'10px', padding:'12px 14px', display:'flex', alignItems:'center', gap:'8px' }}>
+            <Clock size={14} style={{ color:'var(--text-muted)', flexShrink:0 }}/>
             <div>
-              <p style={{ fontSize:'12px', color:'#EDF0F5', fontWeight:600 }}>
+              <p style={{ fontSize:'12px', color:'var(--text-primary)', fontWeight:600 }}>
                 {ev.allDay
                   ? fmtFullDate(ev.startAt)
                   : `${fmtFullDate(ev.startAt)}`
                 }
               </p>
               {!ev.allDay && (
-                <p style={{ fontSize:'11px', color:'#6B7385', marginTop:'2px', fontFamily:"'IBM Plex Mono',monospace" }}>
+                <p style={{ fontSize:'11px', color:'var(--text-muted)', marginTop:'2px', fontFamily:"'IBM Plex Mono',monospace" }}>
                   {fmtTime(ev.startAt)} – {fmtTime(ev.endAt)}
                 </p>
               )}
@@ -761,30 +761,30 @@ function EventDetailPanel({ ev, currentUser, onClose, onEdit, onDelete }: {
 
           {/* Location */}
           {ev.location && (
-            <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'10px 14px', background:'rgba(255,255,255,0.03)', borderRadius:'10px' }}>
-              <MapPin size={13} style={{ color:'#6B7385', flexShrink:0 }}/>
-              <p style={{ fontSize:'13px', color:'#A5AEC0' }}>{ev.location}</p>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'10px 14px', background:'var(--surface-subtle)', borderRadius:'10px' }}>
+              <MapPin size={13} style={{ color:'var(--text-muted)', flexShrink:0 }}/>
+              <p style={{ fontSize:'13px', color:'var(--text-secondary)' }}>{ev.location}</p>
             </div>
           )}
 
           {/* Notes */}
           {ev.notes && (
-            <div style={{ background:'rgba(255,255,255,0.03)', borderRadius:'10px', padding:'12px 14px' }}>
-              <p style={{ fontSize:'10px', color:'#6B7385', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'6px' }}>Catatan</p>
-              <p style={{ fontSize:'13px', color:'#A5AEC0', lineHeight:1.6 }}>{ev.notes}</p>
+            <div style={{ background:'var(--surface-subtle)', borderRadius:'10px', padding:'12px 14px' }}>
+              <p style={{ fontSize:'10px', color:'var(--text-muted)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'6px' }}>Catatan</p>
+              <p style={{ fontSize:'13px', color:'var(--text-secondary)', lineHeight:1.6 }}>{ev.notes}</p>
             </div>
           )}
 
           {/* Links */}
           {ev.extLink && (
             <a href={ev.extLink} target="_blank" rel="noopener noreferrer"
-              style={{ display:'flex', alignItems:'center', gap:'7px', background:'rgba(74,158,255,0.08)', border:'1px solid rgba(74,158,255,0.2)', borderRadius:'10px', padding:'11px 14px', color:'#4A9EFF', fontSize:'13px', textDecoration:'none', fontWeight:600 }}>
+              style={{ display:'flex', alignItems:'center', gap:'7px', background:'rgba(74,158,255,0.08)', border:'1px solid rgba(74,158,255,0.2)', borderRadius:'10px', padding:'11px 14px', color:'var(--blue)', fontSize:'13px', textDecoration:'none', fontWeight:600 }}>
               <ExternalLink size={14}/> Buka Link
             </a>
           )}
           {ev.intLink && (
             <Link href={ev.intLink}
-              style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'10px', padding:'11px 14px', color:'#A5AEC0', fontSize:'13px', textDecoration:'none', fontWeight:600 }}>
+              style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'var(--surface-hover)', border:'1px solid var(--border-strong)', borderRadius:'10px', padding:'11px 14px', color:'var(--text-secondary)', fontSize:'13px', textDecoration:'none', fontWeight:600 }}>
               <span style={{ display:'flex', alignItems:'center', gap:'7px' }}>
                 {ev.src==='task' ? <CheckSquare size={14}/> : ev.src==='approval' ? <ClipboardCheck size={14}/> : <FolderKanban size={14}/>}
                 Lihat {SRC_LABEL[ev.src]}
@@ -797,11 +797,11 @@ function EventDetailPanel({ ev, currentUser, onClose, onEdit, onDelete }: {
           {canEdit && (
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginTop:'4px' }}>
               <button onClick={onEdit}
-                style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'10px', padding:'10px', cursor:'pointer', color:'#A5AEC0', fontFamily:"'Space Grotesk',sans-serif", fontWeight:600, fontSize:'13px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
+                style={{ background:'var(--border)', border:'1px solid var(--border-strong)', borderRadius:'10px', padding:'10px', cursor:'pointer', color:'var(--text-secondary)', fontFamily:"'Space Grotesk',sans-serif", fontWeight:600, fontSize:'13px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
                 <Pencil size={13}/> Edit
               </button>
               <button onClick={onDelete}
-                style={{ background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:'10px', padding:'10px', cursor:'pointer', color:'#FCA5A5', fontFamily:"'Space Grotesk',sans-serif", fontWeight:600, fontSize:'13px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
+                style={{ background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:'10px', padding:'10px', cursor:'pointer', color:'var(--red)', fontFamily:"'Space Grotesk',sans-serif", fontWeight:600, fontSize:'13px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
                 <Trash2 size={13}/> Hapus
               </button>
             </div>
@@ -814,9 +814,9 @@ function EventDetailPanel({ ev, currentUser, onClose, onEdit, onDelete }: {
 
 function MetaBox({ label, val }: { label: string; val: string }) {
   return (
-    <div style={{ background:'rgba(255,255,255,0.03)', borderRadius:'9px', padding:'9px 12px' }}>
-      <p style={{ fontSize:'10px', color:'#6B7385', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'3px' }}>{label}</p>
-      <p style={{ fontSize:'12px', color:'#A5AEC0', fontWeight:500 }}>{val}</p>
+    <div style={{ background:'var(--surface-subtle)', borderRadius:'9px', padding:'9px 12px' }}>
+      <p style={{ fontSize:'10px', color:'var(--text-muted)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'3px' }}>{label}</p>
+      <p style={{ fontSize:'12px', color:'var(--text-secondary)', fontWeight:500 }}>{val}</p>
     </div>
   )
 }
@@ -849,8 +849,8 @@ function EventModal({ event, defaultDate, divisions, projects, currentUser, onCl
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState<string|null>(null)
 
-  const inp: React.CSSProperties = { background:'#141925', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'10px', padding:'10px 12px', color:'#EDF0F5', fontSize:'13px', outline:'none', width:'100%', fontFamily:"'Plus Jakarta Sans',sans-serif" }
-  const lbl: React.CSSProperties = { fontSize:'10px', color:'#6B7385', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', display:'block', marginBottom:'5px' }
+  const inp: React.CSSProperties = { background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:'10px', padding:'10px 12px', color:'var(--text-primary)', fontSize:'13px', outline:'none', width:'100%', fontFamily:"'Plus Jakarta Sans',sans-serif" }
+  const lbl: React.CSSProperties = { fontSize:'10px', color:'var(--text-muted)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.06em', textTransform:'uppercase', display:'block', marginBottom:'5px' }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -886,18 +886,18 @@ function EventModal({ event, defaultDate, divisions, projects, currentUser, onCl
     onSaved(saved, isNew)
   }
 
-  const TYPE_COLORS: Record<string, string> = { Meeting:'#4A9EFF', Shooting:'#A855F7', Visit:'#10B981', Deadline:'#EF4444', Other:'#FF8A4C' }
+  const TYPE_COLORS: Record<string, string> = { Meeting:'var(--blue)', Shooting:'#A855F7', Visit:'#10B981', Deadline:'#EF4444', Other:'#FF8A4C' }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background:'rgba(0,0,0,0.8)' }}>
-      <div className="w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh]" style={{ background:'#10141d', border:'1px solid rgba(255,255,255,0.12)' }}>
-        <div style={{ padding:'16px 24px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', justifyContent:'space-between', alignItems:'center', flexShrink:0 }}>
-          <h2 className="font-grotesk font-bold text-[16px] text-[#EDF0F5]">{isNew?'Tambah Event':'Edit Event'}</h2>
-          <button onClick={onClose} style={{ color:'#6B7385', background:'none', border:'none', cursor:'pointer', fontSize:'20px', lineHeight:1 }}>&times;</button>
+      <div className="w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh]" style={{ background:'var(--bg-elevated)', border:'1px solid var(--border-strong)' }}>
+        <div style={{ padding:'16px 24px', borderBottom:'1px solid var(--border)', display:'flex', justifyContent:'space-between', alignItems:'center', flexShrink:0 }}>
+          <h2 className="font-grotesk font-bold text-[16px] text-[var(--text-primary)]">{isNew?'Tambah Event':'Edit Event'}</h2>
+          <button onClick={onClose} style={{ color:'var(--text-muted)', background:'none', border:'none', cursor:'pointer', fontSize:'20px', lineHeight:1 }}>&times;</button>
         </div>
 
         <form onSubmit={submit} style={{ padding:'20px 24px', display:'flex', flexDirection:'column', gap:'14px', flex:1, overflowY:'auto' }}>
-          {error && <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:'9px', padding:'10px 14px', fontSize:'13px', color:'#FCA5A5' }}>{error}</div>}
+          {error && <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:'9px', padding:'10px 14px', fontSize:'13px', color:'var(--red)' }}>{error}</div>}
 
           <div>
             <label style={lbl}>Judul Event *</label>
@@ -910,7 +910,7 @@ function EventModal({ event, defaultDate, divisions, projects, currentUser, onCl
             <div style={{ display:'flex', gap:'6px', flexWrap:'wrap' }}>
               {EVENT_TYPES.map(t => (
                 <button type="button" key={t} onClick={() => setForm(f=>({...f,eventType:t}))}
-                  style={{ padding:'5px 12px', borderRadius:'8px', fontSize:'12px', fontWeight:600, cursor:'pointer', border:`1px solid ${form.eventType===t?TYPE_COLORS[t]+'66':'rgba(255,255,255,0.08)'}`, background:form.eventType===t?`${TYPE_COLORS[t]}22`:'transparent', color:form.eventType===t?TYPE_COLORS[t]:'#6B7385' }}>
+                  style={{ padding:'5px 12px', borderRadius:'8px', fontSize:'12px', fontWeight:600, cursor:'pointer', border:`1px solid ${form.eventType===t?TYPE_COLORS[t]+'66':'var(--border)'}`, background:form.eventType===t?`${TYPE_COLORS[t]}22`:'transparent', color:form.eventType===t?TYPE_COLORS[t]:'var(--text-muted)' }}>
                   {t}
                 </button>
               ))}
@@ -976,8 +976,8 @@ function EventModal({ event, defaultDate, divisions, projects, currentUser, onCl
           </div>
 
           <div style={{ display:'flex', gap:'10px', paddingTop:'4px' }}>
-            <button type="button" onClick={onClose} style={{ flex:1, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', color:'#A5AEC0', borderRadius:'10px', padding:'11px', cursor:'pointer', fontFamily:"'Space Grotesk',sans-serif", fontWeight:600, fontSize:'14px' }}>Batal</button>
-            <button type="submit" disabled={loading} style={{ flex:2, background:loading?'rgba(255,106,26,0.5)':'#FF6A1A', border:'none', color:'#0C0F16', borderRadius:'10px', padding:'11px', cursor:'pointer', fontFamily:"'Space Grotesk',sans-serif", fontWeight:700, fontSize:'14px' }}>
+            <button type="button" onClick={onClose} style={{ flex:1, background:'var(--border)', border:'1px solid var(--border-strong)', color:'var(--text-secondary)', borderRadius:'10px', padding:'11px', cursor:'pointer', fontFamily:"'Space Grotesk',sans-serif", fontWeight:600, fontSize:'14px' }}>Batal</button>
+            <button type="submit" disabled={loading} style={{ flex:2, background:loading?'rgba(255,106,26,0.5)':'#FF6A1A', border:'none', color: 'var(--on-accent)', borderRadius:'10px', padding:'11px', cursor:'pointer', fontFamily:"'Space Grotesk',sans-serif", fontWeight:700, fontSize:'14px' }}>
               {loading?'Menyimpan...':isNew?'Buat Event':'Simpan Perubahan'}
             </button>
           </div>
@@ -990,5 +990,5 @@ function EventModal({ event, defaultDate, divisions, projects, currentUser, onCl
 /* ═══════════════════ BUTTON STYLES ═════════════════════ */
 const navBtn: React.CSSProperties = {
   background:'transparent', border:'none', borderRadius:'7px', padding:'6px 8px',
-  cursor:'pointer', color:'#A5AEC0', display:'flex', alignItems:'center',
+  cursor:'pointer', color:'var(--text-secondary)', display:'flex', alignItems:'center',
 }

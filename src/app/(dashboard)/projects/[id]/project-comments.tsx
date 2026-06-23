@@ -28,7 +28,7 @@ const ROLE_LABELS: Record<string, string> = {
 }
 const ROLE_COLORS: Record<string, string> = {
   super_admin: '#F59E0B', spv_manager: '#EF4444', head_director: '#A855F7',
-  leader_divisi: '#4A9EFF', staff: '#6B7385',
+  leader_divisi: 'var(--blue)', staff: 'var(--text-muted)',
 }
 
 function fmtTime(iso: string | Date) {
@@ -67,7 +67,7 @@ function CommentContent({ text }: { text: string }) {
         if (/^https?:\/\//.test(part)) {
           return (
             <a key={i} href={part} target="_blank" rel="noopener noreferrer"
-              style={{ color: '#4A9EFF', textDecoration: 'underline', wordBreak: 'break-all' }}>
+              style={{ color: 'var(--blue)', textDecoration: 'underline', wordBreak: 'break-all' }}>
               {part}
             </a>
           )
@@ -191,8 +191,8 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
 
   return (
     <div style={{
-      background: '#10141d',
-      border: '1px solid rgba(255,255,255,0.07)',
+      background: 'var(--bg-elevated)',
+      border: '1px solid var(--border)',
       borderRadius: '20px',
       overflow: 'hidden',
       display: 'flex',
@@ -201,11 +201,11 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
       {/* Header */}
       <div style={{
         padding: '14px 20px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', gap: '8px',
       }}>
         <MessageSquare size={15} style={{ color: '#FF8A4C' }} />
-        <span style={{ fontSize: '14px', fontWeight: 700, color: '#EDF0F5', fontFamily: "'Space Grotesk', sans-serif" }}>
+        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Space Grotesk', sans-serif" }}>
           Diskusi
         </span>
         <span style={{
@@ -216,7 +216,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
           {optimisticComments.length}
         </span>
         <div style={{ marginLeft: 'auto' }}>
-          <span style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace" }}>
+          <span style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace" }}>
             Gunakan @nama untuk sebut anggota
           </span>
         </div>
@@ -230,8 +230,8 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
       }}>
         {optimisticComments.length === 0 ? (
           <div style={{ padding: '40px 24px', textAlign: 'center' }}>
-            <MessageSquare size={32} style={{ color: '#4a5160', margin: '0 auto 10px' }} />
-            <p style={{ color: '#6B7385', fontSize: '13px' }}>Belum ada diskusi. Jadilah yang pertama berkomentar!</p>
+            <MessageSquare size={32} style={{ color: 'var(--text-faint)', margin: '0 auto 10px' }} />
+            <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Belum ada diskusi. Jadilah yang pertama berkomentar!</p>
           </div>
         ) : (
           optimisticComments.map((c, i) => {
@@ -254,7 +254,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                     {!grouped && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace" }}>
+                        <span style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace" }}>
                           {fmtTime(c.createdAt)}
                         </span>
                         <span style={{ fontSize: '12px', fontWeight: 700, color: '#FF8A4C' }}>Kamu</span>
@@ -264,7 +264,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
                       {canDelete(c) && !c.isOptimistic && (
                         <button onClick={() => handleDelete(c.id)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4a5160', padding: '2px', display: 'flex', opacity: 0, transition: 'opacity 0.15s' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: '2px', display: 'flex', opacity: 0, transition: 'opacity 0.15s' }}
                           className="comment-delete-btn">
                           <Trash2 size={12} />
                         </button>
@@ -276,7 +276,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
                         padding: '8px 14px',
                         maxWidth: '75%',
                       }}>
-                        <p style={{ fontSize: '13px', color: '#EDF0F5', lineHeight: 1.6, wordBreak: 'break-word', whiteSpace: 'pre-wrap', margin: 0 }}>
+                        <p style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: 1.6, wordBreak: 'break-word', whiteSpace: 'pre-wrap', margin: 0 }}>
                           <CommentContent text={c.content} />
                         </p>
                       </div>
@@ -292,26 +292,26 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
                     <div style={{ flex: 1, minWidth: 0 }}>
                       {!grouped && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 700, color: ROLE_COLORS[c.userRole] ?? '#A5AEC0' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 700, color: ROLE_COLORS[c.userRole] ?? 'var(--text-secondary)' }}>
                             {c.userName}
                           </span>
                           <span style={{
                             fontSize: '9px', fontWeight: 600,
-                            color: ROLE_COLORS[c.userRole] ?? '#6B7385',
-                            background: `${ROLE_COLORS[c.userRole] ?? '#6B7385'}22`,
+                            color: ROLE_COLORS[c.userRole] ?? 'var(--text-muted)',
+                            background: `${ROLE_COLORS[c.userRole] ?? 'var(--text-muted)'}22`,
                             borderRadius: '100px', padding: '1px 6px',
                           }}>
                             {ROLE_LABELS[c.userRole] ?? c.userRole}
                           </span>
-                          <span style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace" }}>
+                          <span style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace" }}>
                             {fmtTime(c.createdAt)}
                           </span>
                         </div>
                       )}
                       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
                         <div style={{
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.08)',
+                          background: 'var(--surface-hover)',
+                          border: '1px solid var(--border)',
                           borderRadius: '4px 16px 16px 16px',
                           padding: '8px 14px',
                           maxWidth: '75%',
@@ -322,7 +322,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
                         </div>
                         {canDelete(c) && !c.isOptimistic && (
                           <button onClick={() => handleDelete(c.id)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4a5160', padding: '2px', display: 'flex', opacity: 0, transition: 'opacity 0.15s' }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: '2px', display: 'flex', opacity: 0, transition: 'opacity 0.15s' }}
                             className="comment-delete-btn">
                             <Trash2 size={12} />
                           </button>
@@ -340,7 +340,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
 
       {/* Error */}
       {error && (
-        <div style={{ margin: '0 16px', padding: '8px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '9px', fontSize: '12px', color: '#FCA5A5' }}>
+        <div style={{ margin: '0 16px', padding: '8px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '9px', fontSize: '12px', color: 'var(--red)' }}>
           {error}
         </div>
       )}
@@ -348,19 +348,19 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
       {/* Input area */}
       <div style={{
         padding: '12px 16px',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        borderTop: '1px solid var(--border)',
         position: 'relative',
       }}>
         {/* Mention dropdown */}
         {showMentions && mentionMatches.length > 0 && (
           <div style={{
             position: 'absolute', bottom: '100%', left: '16px', right: '16px',
-            background: '#1a2030', border: '1px solid rgba(255,255,255,0.1)',
+            background: 'var(--bg-hover)', border: '1px solid var(--border-strong)',
             borderRadius: '12px', overflow: 'hidden', zIndex: 20, marginBottom: '4px',
             boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
           }}>
-            <div style={{ padding: '6px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <span style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <div style={{ padding: '6px 10px', borderBottom: '1px solid var(--border)' }}>
+              <span style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Sebut anggota
               </span>
             </div>
@@ -370,7 +370,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,106,26,0.08)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'none'}>
                 <AtSign size={13} style={{ color: '#FF8A4C', flexShrink: 0 }} />
-                <span style={{ fontSize: '13px', color: '#EDF0F5', fontWeight: 600 }}>{m.fullName}</span>
+                <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>{m.fullName}</span>
               </button>
             ))}
           </div>
@@ -378,8 +378,8 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
 
         <div style={{
           display: 'flex', alignItems: 'flex-end', gap: '10px',
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.09)',
+          background: 'var(--surface-hover)',
+          border: '1px solid var(--border)',
           borderRadius: '14px',
           padding: '10px 12px',
         }}>
@@ -393,7 +393,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
             rows={1}
             style={{
               flex: 1, background: 'none', border: 'none', outline: 'none',
-              color: '#EDF0F5', fontSize: '13px', resize: 'none',
+              color: 'var(--text-primary)', fontSize: '13px', resize: 'none',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               lineHeight: 1.6, maxHeight: '120px', minHeight: '20px',
             }}
@@ -402,10 +402,10 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
             onClick={submit}
             disabled={!input.trim() || isPending}
             style={{
-              background: input.trim() && !isPending ? '#FF6A1A' : 'rgba(255,255,255,0.08)',
+              background: input.trim() && !isPending ? '#FF6A1A' : 'var(--border)',
               border: 'none', borderRadius: '10px', padding: '8px 14px',
               cursor: input.trim() && !isPending ? 'pointer' : 'default',
-              color: input.trim() && !isPending ? '#fff' : '#4a5160',
+              color: input.trim() && !isPending ? '#fff' : 'var(--text-faint)',
               display: 'flex', alignItems: 'center', gap: '6px',
               fontSize: '13px', fontWeight: 700, flexShrink: 0,
               transition: 'background 0.15s',
@@ -416,7 +416,7 @@ export function ProjectComments({ projectId, initialComments, currentUser, allUs
             {isPending ? 'Mengirim…' : 'Kirim'}
           </button>
         </div>
-        <p style={{ fontSize: '10px', color: '#4a5160', marginTop: '4px', paddingLeft: '4px' }}>
+        <p style={{ fontSize: '10px', color: 'var(--text-faint)', marginTop: '4px', paddingLeft: '4px' }}>
           Enter kirim · Shift+Enter baris baru
         </p>
       </div>

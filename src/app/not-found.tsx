@@ -3,7 +3,7 @@ import Link from 'next/link'
 export default function NotFound() {
   return (
     <div style={{
-      minHeight: '100vh', background: '#0C0F16',
+      minHeight: '100vh', background: 'var(--bg-base)',
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
       padding: '32px', textAlign: 'center',
@@ -20,10 +20,10 @@ export default function NotFound() {
       <p style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, letterSpacing: '0.14em', color: '#FF6A1A', textTransform: 'uppercase', marginBottom: 12 }}>
         404 — Halaman Tidak Ditemukan
       </p>
-      <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 28, color: '#EDF0F5', margin: '0 0 12px' }}>
+      <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 28, color: 'var(--text-primary)', margin: '0 0 12px' }}>
         Halaman ini tidak ada
       </h1>
-      <p style={{ color: '#6B7385', fontSize: 14, maxWidth: 360, lineHeight: 1.6, marginBottom: 32 }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: 360, lineHeight: 1.6, marginBottom: 32 }}>
         URL yang kamu akses tidak ditemukan atau sudah dipindahkan.
       </p>
       <Link href="/dashboard" style={{

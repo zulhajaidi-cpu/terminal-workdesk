@@ -16,7 +16,7 @@ export function DashboardLayout({ children, user, title, unreadCount }: Dashboar
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#0C0F16' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       {/* Desktop sidebar */}
       <div className="hidden lg:block flex-shrink-0">
         <Sidebar role={user?.role} />

@@ -19,17 +19,17 @@ const TYPE_CONFIG: Record<string, { icon: React.ReactNode; color: string; bg: st
   overdue:             { icon: <AlertCircle size={14}/>, color: '#EF4444', bg: 'rgba(239,68,68,0.12)',   label: 'Overdue'                           },
   approval_request:    { icon: <ClipboardCheck size={14}/>, color:'#7C3AED', bg:'rgba(124,58,237,0.12)', label: 'Approval',  link: '/approvals'    },
   approval_result:     { icon: <ClipboardCheck size={14}/>, color:'#10B981', bg:'rgba(16,185,129,0.12)', label: 'Approval'                          },
-  mention:             { icon: <Megaphone size={14}/>,    color: '#4A9EFF', bg: 'rgba(74,158,255,0.12)', label: 'Mention'                           },
+  mention:             { icon: <Megaphone size={14}/>,    color: 'var(--blue)', bg: 'rgba(74,158,255,0.12)', label: 'Mention'                           },
   kpi_reminder:        { icon: <Target size={14}/>,       color: '#FF8A4C', bg: 'rgba(255,106,26,0.12)', label: 'KPI',       link: '/kpi'           },
   asset_new:           { icon: <FileText size={14}/>,     color: '#A855F7', bg: 'rgba(168,85,247,0.12)', label: 'Asset',     link: '/assets'       },
   project_done:        { icon: <FolderKanban size={14}/>, color: '#10B981', bg: 'rgba(16,185,129,0.12)', label: 'Project'                           },
   revision_requested:  { icon: <ClipboardCheck size={14}/>, color:'#F59E0B', bg:'rgba(245,158,11,0.12)', label: 'Revision',  link: '/approvals'    },
   budget_exceeded:     { icon: <AlertCircle size={14}/>, color: '#EF4444', bg: 'rgba(239,68,68,0.12)',   label: 'Budget',    link: '/budget'       },
-  event_assigned:      { icon: <Calendar size={14}/>,    color: '#4A9EFF', bg: 'rgba(74,158,255,0.12)', label: 'Event',     link: '/events'       },
+  event_assigned:      { icon: <Calendar size={14}/>,    color: 'var(--blue)', bg: 'rgba(74,158,255,0.12)', label: 'Event',     link: '/events'       },
   gamification:        { icon: <Star size={14}/>,         color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', label: 'Reward',    link: '/leaderboard'  },
 }
 
-const DEFAULT_TYPE = { icon: <Bell size={14}/>, color: '#6B7385', bg: 'rgba(107,115,133,0.12)', label: 'Info' }
+const DEFAULT_TYPE = { icon: <Bell size={14}/>, color: 'var(--text-muted)', bg: 'rgba(107,115,133,0.12)', label: 'Info' }
 
 function fmtAge(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -98,14 +98,14 @@ export function NotificationsContent({ notifications: init }: { notifications: N
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5]">Notifikasi</h1>
+            <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">Notifikasi</h1>
             {unreadCount > 0 && (
               <span style={{ background: '#EF4444', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '100px', fontFamily: "'IBM Plex Mono', monospace" }}>
                 {unreadCount} baru
               </span>
             )}
           </div>
-          <p className="text-[#6B7385] text-sm mt-1">{notifs.length} total notifikasi</p>
+          <p className="text-[var(--text-muted)] text-sm mt-1">{notifs.length} total notifikasi</p>
         </div>
         {unreadCount > 0 && (
           <button onClick={markAllRead}
@@ -120,31 +120,31 @@ export function NotificationsContent({ notifications: init }: { notifications: N
         <div className="flex gap-2 flex-wrap">
           {['Semua', ...typeLabels].filter((v,i,a) => a.indexOf(v)===i).slice(0,8).map(t => (
             <button key={t} onClick={() => setTypeFilter(t)}
-              style={{ padding: '5px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: `1px solid ${typeFilter===t ? 'rgba(255,106,26,0.4)' : 'rgba(255,255,255,0.07)'}`, background: typeFilter===t ? 'rgba(255,106,26,0.12)' : 'transparent', color: typeFilter===t ? '#FF8A4C' : '#6B7385' }}>
+              style={{ padding: '5px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: `1px solid ${typeFilter===t ? 'rgba(255,106,26,0.4)' : 'var(--border)'}`, background: typeFilter===t ? 'rgba(255,106,26,0.12)' : 'transparent', color: typeFilter===t ? '#FF8A4C' : 'var(--text-muted)' }}>
               {t}
             </button>
           ))}
         </div>
         <button onClick={() => setShowUnread(p => !p)}
-          style={{ marginLeft: 'auto', padding: '5px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: `1px solid ${showUnread ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.07)'}`, background: showUnread ? 'rgba(239,68,68,0.1)' : 'transparent', color: showUnread ? '#FCA5A5' : '#6B7385' }}>
+          style={{ marginLeft: 'auto', padding: '5px 12px', borderRadius: '100px', fontSize: '11px', fontWeight: 600, cursor: 'pointer', border: `1px solid ${showUnread ? 'rgba(239,68,68,0.4)' : 'var(--border)'}`, background: showUnread ? 'rgba(239,68,68,0.1)' : 'transparent', color: showUnread ? 'var(--red)' : 'var(--text-muted)' }}>
           {showUnread ? '● Belum dibaca' : '○ Belum dibaca'}
         </button>
       </div>
 
       {/* Content */}
       {filtered.length === 0 ? (
-        <div style={{ background: '#10141d', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
-          <Bell size={36} style={{ color: '#4a5160', margin: '0 auto 12px' }}/>
-          <p style={{ color: '#6B7385', fontSize: '14px' }}>Tidak ada notifikasi</p>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px dashed var(--border-strong)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
+          <Bell size={36} style={{ color: 'var(--text-faint)', margin: '0 auto 12px' }}/>
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Tidak ada notifikasi</p>
         </div>
       ) : (
         <div className="space-y-6">
           {groups.map(group => (
             <div key={group.label}>
-              <p style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px', paddingLeft: '4px' }}>
+              <p style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px', paddingLeft: '4px' }}>
                 {group.label}
               </p>
-              <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', overflow: 'hidden' }}>
+              <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '14px', overflow: 'hidden' }}>
                 {group.items.map((n, i) => {
                   const cfg = TYPE_CONFIG[n.type] ?? DEFAULT_TYPE
                   const intLink = cfg.link ?? (
@@ -154,9 +154,9 @@ export function NotificationsContent({ notifications: init }: { notifications: N
                   )
                   return (
                     <div key={n.id}
-                      style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px 16px', borderBottom: i < group.items.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none', background: n.isRead ? 'transparent' : 'rgba(255,106,26,0.03)', transition: 'background 0.1s', cursor: 'pointer' }}
+                      style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px 16px', borderBottom: i < group.items.length-1 ? '1px solid var(--surface-hover)' : 'none', background: n.isRead ? 'transparent' : 'rgba(255,106,26,0.03)', transition: 'background 0.1s', cursor: 'pointer' }}
                       onClick={() => { if (!n.isRead) markRead(n.id) }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.025)'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-subtle)'}
                       onMouseLeave={e => e.currentTarget.style.background = n.isRead ? 'transparent' : 'rgba(255,106,26,0.03)'}>
 
                       {/* Type icon */}
@@ -168,12 +168,12 @@ export function NotificationsContent({ notifications: init }: { notifications: N
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: '13px', fontWeight: n.isRead ? 500 : 700, color: n.isRead ? '#A5AEC0' : '#EDF0F5', marginBottom: '2px' }}>{n.title}</p>
-                            <p style={{ fontSize: '12px', color: '#6B7385', lineHeight: 1.5 }}>{n.message}</p>
+                            <p style={{ fontSize: '13px', fontWeight: n.isRead ? 500 : 700, color: n.isRead ? 'var(--text-secondary)' : 'var(--text-primary)', marginBottom: '2px' }}>{n.title}</p>
+                            <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.5 }}>{n.message}</p>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                             {!n.isRead && <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#FF6A1A', flexShrink: 0 }}/>}
-                            <span style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace", whiteSpace: 'nowrap' }}>{fmtAge(n.createdAt)}</span>
+                            <span style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace", whiteSpace: 'nowrap' }}>{fmtAge(n.createdAt)}</span>
                           </div>
                         </div>
 
@@ -181,7 +181,7 @@ export function NotificationsContent({ notifications: init }: { notifications: N
                           <span style={{ fontSize: '10px', background: cfg.bg, color: cfg.color, padding: '1px 8px', borderRadius: '100px', fontWeight: 600 }}>{cfg.label}</span>
                           {intLink && (
                             <Link href={intLink} onClick={e => e.stopPropagation()}
-                              style={{ fontSize: '11px', color: '#4A9EFF', textDecoration: 'none', fontWeight: 600 }}>
+                              style={{ fontSize: '11px', color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
                               Lihat →
                             </Link>
                           )}

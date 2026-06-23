@@ -16,7 +16,7 @@ export default function GlobalError({
 
   return (
     <html lang="id">
-      <body style={{ margin: 0, background: '#0C0F16' }}>
+      <body style={{ margin: 0, background: 'var(--bg-base)' }}>
         <div style={{
           minHeight: '100vh',
           display: 'flex', flexDirection: 'column',
@@ -32,13 +32,13 @@ export default function GlobalError({
           }}>
             💥
           </div>
-          <p style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.14em', color: '#FF6B6B', textTransform: 'uppercase', marginBottom: 12 }}>
+          <p style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.14em', color: 'var(--red)', textTransform: 'uppercase', marginBottom: 12 }}>
             Kesalahan Kritis
           </p>
-          <h1 style={{ fontFamily: 'sans-serif', fontWeight: 700, fontSize: 28, color: '#EDF0F5', margin: '0 0 12px' }}>
+          <h1 style={{ fontFamily: 'sans-serif', fontWeight: 700, fontSize: 28, color: 'var(--text-primary)', margin: '0 0 12px' }}>
             Aplikasi mengalami masalah
           </h1>
-          <p style={{ color: '#6B7385', fontSize: 14, maxWidth: 360, lineHeight: 1.6, marginBottom: 32 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: 360, lineHeight: 1.6, marginBottom: 32 }}>
             Terjadi kesalahan yang tidak terduga. Tim teknis telah diberitahu.
           </p>
           <button onClick={reset} style={{

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Avatar } from '@/components/ui/avatar'
-import { Plus, Pencil, ToggleLeft, ToggleRight, Eye, EyeOff, Camera, User, Users, Globe, Moon } from 'lucide-react'
+import { Plus, Pencil, ToggleLeft, ToggleRight, Eye, EyeOff, Camera, User, Users, Globe, Moon, Sun } from 'lucide-react'
 import { ROLE_LABELS, ROLE_COLORS, ROLE_OPTIONS } from '@/lib/roles'
 import { uploadSquareImage } from '@/lib/upload-image'
+import { getTheme, setTheme, type Theme } from '@/lib/theme'
 
 interface UserRow {
   id: string; email: string; username: string | null; fullName: string; role: string
@@ -24,16 +25,16 @@ interface Props {
 }
 
 const inputStyle: React.CSSProperties = {
-  background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px',
-  padding: '10px 12px', color: '#EDF0F5', fontSize: '14px', outline: 'none', width: '100%',
+  background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px',
+  padding: '10px 12px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', width: '100%',
   fontFamily: "'Plus Jakarta Sans', sans-serif",
 }
 const labelStyle: React.CSSProperties = {
-  fontSize: '11px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace",
+  fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace",
   letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: '6px',
 }
 const sectionCard: React.CSSProperties = {
-  background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '24px',
+  background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px',
 }
 
 type Tab = 'profile' | 'users' | 'appearance'
@@ -69,17 +70,17 @@ export function SettingsContent({ me, allUsers: initialUsers, divisions, current
   return (
     <div className="max-w-5xl mx-auto animate-fade-in space-y-5">
       <div>
-        <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5]">Settings</h1>
-        <p className="text-[#6B7385] text-sm mt-1">Pengaturan akun dan tampilan</p>
+        <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">Settings</h1>
+        <p className="text-[var(--text-muted)] text-sm mt-1">Pengaturan akun dan tampilan</p>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
         {TABS.map(t => {
           const Icon = t.icon
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
-              style={{ background: tab === t.key ? '#FF6A1A' : 'transparent', color: tab === t.key ? '#0C0F16' : '#6B7385', border: 'none', borderRadius: '9px', padding: '8px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.15s' }}>
+              style={{ background: tab === t.key ? '#FF6A1A' : 'transparent', color: tab === t.key ? 'var(--bg-base)' : 'var(--text-muted)', border: 'none', borderRadius: '9px', padding: '8px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.15s' }}>
               <Icon size={13} />{t.label}
             </button>
           )
@@ -165,26 +166,26 @@ function ProfileSection({ me, divisions, onSaved }: { me: Me; divisions: { id: s
     <div className="space-y-4">
       {/* Avatar */}
       <div style={sectionCard}>
-        <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-4">Foto Profil</h2>
+        <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-4">Foto Profil</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
           <button type="button" onClick={() => !uploadingAvatar && fileRef.current?.click()}
             title="Ganti foto profil"
             style={{ position: 'relative', background: 'none', border: 'none', padding: 0, cursor: uploadingAvatar ? 'wait' : 'pointer' }}>
             <Avatar name={me.fullName} imageUrl={avatarUrl} size="xl" />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#FF6A1A', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0C0F16' }}>
-              <Camera size={13} style={{ color: '#0C0F16' }} />
+            <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#FF6A1A', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-base)' }}>
+              <Camera size={13} style={{ color: 'var(--on-accent)' }} />
             </div>
           </button>
           <input ref={fileRef} type="file" accept="image/*" onChange={onPickAvatar} style={{ display: 'none' }} />
           <div>
-            <p style={{ fontSize: '14px', fontWeight: 600, color: '#EDF0F5', fontFamily: "'Space Grotesk', sans-serif" }}>{me.fullName}</p>
-            <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '2px' }}>{ROLE_LABELS[me.role] ?? me.role}</p>
+            <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk', sans-serif" }}>{me.fullName}</p>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{ROLE_LABELS[me.role] ?? me.role}</p>
             {uploadingAvatar ? (
               <p style={{ fontSize: '12px', color: '#FF8A4C', marginTop: '8px' }}>Mengunggah foto…</p>
             ) : avatarErr ? (
-              <p style={{ fontSize: '12px', color: '#FF6B6B', marginTop: '8px' }}>{avatarErr}</p>
+              <p style={{ fontSize: '12px', color: 'var(--red)', marginTop: '8px' }}>{avatarErr}</p>
             ) : (
-              <p style={{ fontSize: '12px', color: '#4a5160', marginTop: '8px' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-faint)', marginTop: '8px' }}>
                 Klik foto untuk mengganti. Otomatis dipotong persegi · maks 5MB.
               </p>
             )}
@@ -194,9 +195,9 @@ function ProfileSection({ me, divisions, onSaved }: { me: Me; divisions: { id: s
 
       {/* Form */}
       <div style={sectionCard}>
-        <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-4">Informasi Pribadi</h2>
+        <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-4">Informasi Pribadi</h2>
         <form onSubmit={handleSave} className="space-y-4">
-          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: 'var(--red)' }}>{error}</div>}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -205,7 +206,7 @@ function ProfileSection({ me, divisions, onSaved }: { me: Me; divisions: { id: s
             </div>
             <div>
               <label style={labelStyle}>Email</label>
-              <input style={{ ...inputStyle, color: '#6B7385', cursor: 'not-allowed' }} value={me.email} disabled />
+              <input style={{ ...inputStyle, color: 'var(--text-muted)', cursor: 'not-allowed' }} value={me.email} disabled />
             </div>
           </div>
 
@@ -219,18 +220,18 @@ function ProfileSection({ me, divisions, onSaved }: { me: Me; divisions: { id: s
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label style={labelStyle}>Role</label>
-              <input style={{ ...inputStyle, color: '#6B7385', cursor: 'not-allowed' }} value={ROLE_LABELS[me.role] ?? me.role} disabled />
+              <input style={{ ...inputStyle, color: 'var(--text-muted)', cursor: 'not-allowed' }} value={ROLE_LABELS[me.role] ?? me.role} disabled />
             </div>
             <div>
               <label style={labelStyle}>Divisi</label>
-              <input style={{ ...inputStyle, color: '#6B7385', cursor: 'not-allowed' }}
+              <input style={{ ...inputStyle, color: 'var(--text-muted)', cursor: 'not-allowed' }}
                 value={divisions.find(d => d.id === me.divisionId)?.name ?? '—'} disabled />
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button type="submit" disabled={saving}
-              style={{ background: saved ? 'rgba(74,222,128,0.2)' : saving ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: saved ? '1px solid rgba(74,222,128,0.4)' : 'none', color: saved ? '#4ADE80' : '#0C0F16', borderRadius: '10px', padding: '10px 24px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+              style={{ background: saved ? 'rgba(74,222,128,0.2)' : saving ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: saved ? '1px solid rgba(74,222,128,0.4)' : 'none', color: saved ? '#4ADE80' : 'var(--bg-base)', borderRadius: '10px', padding: '10px 24px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
               {saved ? '✓ Tersimpan' : saving ? 'Menyimpan...' : 'Simpan Perubahan'}
             </button>
           </div>
@@ -270,10 +271,10 @@ function ChangePasswordSection() {
 
   return (
     <div style={sectionCard}>
-      <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-1">Ubah Password</h2>
-      <p style={{ fontSize: '12px', color: '#6B7385', marginBottom: '16px' }}>Ganti password akunmu sendiri kapan saja</p>
+      <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-1">Ubah Password</h2>
+      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>Ganti password akunmu sendiri kapan saja</p>
       <form onSubmit={handleSave} className="space-y-4">
-        {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+        {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: 'var(--red)' }}>{error}</div>}
         <div>
           <label style={labelStyle}>Password Lama *</label>
           <input style={inputStyle} type="password" value={form.currentPassword} onChange={e => setForm(f => ({ ...f, currentPassword: e.target.value }))} required />
@@ -290,7 +291,7 @@ function ChangePasswordSection() {
         </div>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <button type="submit" disabled={saving}
-            style={{ background: saved ? 'rgba(74,222,128,0.2)' : saving ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: saved ? '1px solid rgba(74,222,128,0.4)' : 'none', color: saved ? '#4ADE80' : '#0C0F16', borderRadius: '10px', padding: '10px 24px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+            style={{ background: saved ? 'rgba(74,222,128,0.2)' : saving ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: saved ? '1px solid rgba(74,222,128,0.4)' : 'none', color: saved ? '#4ADE80' : 'var(--bg-base)', borderRadius: '10px', padding: '10px 24px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
             {saved ? '✓ Password diganti' : saving ? 'Menyimpan...' : 'Ganti Password'}
           </button>
         </div>
@@ -319,15 +320,15 @@ function UserManagementSection({ users, divisions, currentUser, onToggleActive, 
       <div style={sectionCard}>
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div>
-            <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5]">Kelola User</h2>
-            <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '2px' }}>{users.length} pengguna terdaftar</p>
+            <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)]">Kelola User</h2>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{users.length} pengguna terdaftar</p>
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Cari nama / email..."
               style={{ ...inputStyle, width: '200px', padding: '8px 12px', fontSize: '13px' }} />
             <button onClick={onAdd}
-              style={{ background: '#FF6A1A', color: '#0C0F16', border: 'none', borderRadius: '10px', padding: '9px 16px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap' }}>
+              style={{ background: '#FF6A1A', color: 'var(--on-accent)', border: 'none', borderRadius: '10px', padding: '9px 16px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap' }}>
               <Plus size={14} /> Tambah User
             </button>
           </div>
@@ -336,44 +337,44 @@ function UserManagementSection({ users, divisions, currentUser, onToggleActive, 
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
                 {['Pengguna', 'Role', 'Divisi', 'Status', 'Aksi'].map(h => (
-                  <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 500 }}>{h}</th>
+                  <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 500 }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.map(u => (
-                <tr key={u.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <tr key={u.id} style={{ borderBottom: '1px solid var(--surface-hover)' }}>
                   <td style={{ padding: '11px 14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
                       <Avatar name={u.fullName} imageUrl={u.avatarUrl} size="sm" />
                       <div>
-                        <p style={{ fontSize: '13px', fontWeight: 600, color: '#EDF0F5' }}>{u.fullName}</p>
-                        <p style={{ fontSize: '11px', color: '#6B7385' }}>{u.username ? `@${u.username}` : u.email}</p>
+                        <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{u.fullName}</p>
+                        <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{u.username ? `@${u.username}` : u.email}</p>
                       </div>
                     </div>
                   </td>
                   <td style={{ padding: '11px 14px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: ROLE_COLORS[u.role] ?? '#6B7385', background: `${ROLE_COLORS[u.role] ?? '#6B7385'}18`, padding: '3px 9px', borderRadius: '100px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: ROLE_COLORS[u.role] ?? 'var(--text-muted)', background: `${ROLE_COLORS[u.role] ?? 'var(--text-muted)'}18`, padding: '3px 9px', borderRadius: '100px' }}>
                       {ROLE_LABELS[u.role] ?? u.role}
                     </span>
                   </td>
-                  <td style={{ padding: '11px 14px', fontSize: '12px', color: '#A5AEC0' }}>{u.divisionName ?? <span style={{ color: '#4a5160' }}>—</span>}</td>
+                  <td style={{ padding: '11px 14px', fontSize: '12px', color: 'var(--text-secondary)' }}>{u.divisionName ?? <span style={{ color: 'var(--text-faint)' }}>—</span>}</td>
                   <td style={{ padding: '11px 14px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: u.isActive ? '#4ADE80' : '#6B7385', background: u.isActive ? 'rgba(74,222,128,0.1)' : 'rgba(107,115,133,0.1)', padding: '3px 9px', borderRadius: '100px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: u.isActive ? '#4ADE80' : 'var(--text-muted)', background: u.isActive ? 'rgba(74,222,128,0.1)' : 'rgba(107,115,133,0.1)', padding: '3px 9px', borderRadius: '100px' }}>
                       {u.isActive ? 'Aktif' : 'Non-Aktif'}
                     </span>
                   </td>
                   <td style={{ padding: '11px 14px' }}>
                     <div style={{ display: 'flex', gap: '5px' }}>
                       <button onClick={() => onEdit(u)} title="Edit"
-                        style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: '#A5AEC0', display: 'flex' }}>
+                        style={{ background: 'var(--border)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex' }}>
                         <Pencil size={12} />
                       </button>
                       {u.id !== currentUser.id && (
                         <button onClick={() => onToggleActive(u)}
-                          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: u.isActive ? '#FF6B6B' : '#4ADE80', display: 'flex' }}>
+                          style={{ background: 'var(--border)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: u.isActive ? 'var(--red)' : '#4ADE80', display: 'flex' }}>
                           {u.isActive ? <ToggleRight size={13} /> : <ToggleLeft size={13} />}
                         </button>
                       )}
@@ -382,7 +383,7 @@ function UserManagementSection({ users, divisions, currentUser, onToggleActive, 
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: '#6B7385', fontSize: '13px' }}>Tidak ada user ditemukan</td></tr>
+                <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>Tidak ada user ditemukan</td></tr>
               )}
             </tbody>
           </table>
@@ -394,37 +395,52 @@ function UserManagementSection({ users, divisions, currentUser, onToggleActive, 
 
 /* ── Appearance Section ──────────────────────────────── */
 function AppearanceSection() {
+  const [theme, setThemeLocal] = useState<Theme>('dark')
+  useEffect(() => {
+    setThemeLocal(getTheme())
+    const sync = () => setThemeLocal(getTheme())
+    window.addEventListener('themechange', sync)
+    return () => window.removeEventListener('themechange', sync)
+  }, [])
+
+  const modes = [
+    { key: 'dark' as Theme, label: 'Dark Mode', desc: 'Tema gelap — fokus & low-light', icon: Moon },
+    { key: 'light' as Theme, label: 'Light Mode', desc: 'Tema terang yang elegan', icon: Sun },
+  ]
+
   return (
     <div className="space-y-4">
       <div style={sectionCard}>
-        <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-1">Mode Tampilan</h2>
-        <p style={{ fontSize: '12px', color: '#6B7385', marginBottom: '16px' }}>Pilih tema yang nyaman untuk kamu</p>
+        <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-1">Mode Tampilan</h2>
+        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>Pilih tema yang nyaman untuk kamu — pilihan disimpan otomatis</p>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          {[
-            { key: 'dark', label: 'Dark Mode', desc: 'Tema gelap (aktif saat ini)', active: true },
-            { key: 'light', label: 'Light Mode', desc: 'Tema terang — segera hadir', active: false },
-          ].map(m => (
-            <div key={m.key} style={{ flex: '1 1 180px', border: `1px solid ${m.active ? 'rgba(255,106,26,0.5)' : 'rgba(255,255,255,0.07)'}`, borderRadius: '12px', padding: '16px', cursor: m.active ? 'default' : 'not-allowed', opacity: m.active ? 1 : 0.5, background: m.active ? 'rgba(255,106,26,0.06)' : 'transparent' }}>
-              <Moon size={18} style={{ color: m.active ? '#FF6A1A' : '#6B7385', marginBottom: '8px' }} />
-              <p style={{ fontSize: '14px', fontWeight: 600, color: '#EDF0F5', fontFamily: "'Space Grotesk', sans-serif" }}>{m.label}</p>
-              <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '3px' }}>{m.desc}</p>
-            </div>
-          ))}
+          {modes.map(m => {
+            const active = theme === m.key
+            const Icon = m.icon
+            return (
+              <button key={m.key} onClick={() => setTheme(m.key)}
+                style={{ flex: '1 1 180px', textAlign: 'left', border: `1px solid ${active ? 'rgba(255,106,26,0.5)' : 'var(--border)'}`, borderRadius: '12px', padding: '16px', cursor: 'pointer', background: active ? 'rgba(255,106,26,0.06)' : 'transparent' }}>
+                <Icon size={18} style={{ color: active ? '#FF6A1A' : 'var(--text-muted)', marginBottom: '8px' }} />
+                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk', sans-serif" }}>{m.label}</p>
+                <p style={{ fontSize: '12px', color: active ? '#FF8A4C' : 'var(--text-muted)', marginTop: '3px' }}>{active ? 'Aktif saat ini' : m.desc}</p>
+              </button>
+            )
+          })}
         </div>
       </div>
 
       <div style={sectionCard}>
-        <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-1">Bahasa</h2>
-        <p style={{ fontSize: '12px', color: '#6B7385', marginBottom: '16px' }}>Pilih bahasa antarmuka</p>
+        <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-1">Bahasa</h2>
+        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>Pilih bahasa antarmuka</p>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           {[
             { key: 'id', label: 'Bahasa Indonesia', active: true },
             { key: 'zh', label: '中文 (Mandarin)', active: false },
           ].map(l => (
-            <div key={l.key} style={{ flex: '1 1 180px', border: `1px solid ${l.active ? 'rgba(255,106,26,0.5)' : 'rgba(255,255,255,0.07)'}`, borderRadius: '12px', padding: '16px', cursor: l.active ? 'default' : 'not-allowed', opacity: l.active ? 1 : 0.5, background: l.active ? 'rgba(255,106,26,0.06)' : 'transparent' }}>
-              <Globe size={18} style={{ color: l.active ? '#FF6A1A' : '#6B7385', marginBottom: '8px' }} />
-              <p style={{ fontSize: '14px', fontWeight: 600, color: '#EDF0F5', fontFamily: "'Space Grotesk', sans-serif" }}>{l.label}</p>
-              <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '3px' }}>{l.active ? 'Aktif saat ini' : 'Segera hadir'}</p>
+            <div key={l.key} style={{ flex: '1 1 180px', border: `1px solid ${l.active ? 'rgba(255,106,26,0.5)' : 'var(--border)'}`, borderRadius: '12px', padding: '16px', cursor: l.active ? 'default' : 'not-allowed', opacity: l.active ? 1 : 0.5, background: l.active ? 'rgba(255,106,26,0.06)' : 'transparent' }}>
+              <Globe size={18} style={{ color: l.active ? '#FF6A1A' : 'var(--text-muted)', marginBottom: '8px' }} />
+              <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk', sans-serif" }}>{l.label}</p>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '3px' }}>{l.active ? 'Aktif saat ini' : 'Segera hadir'}</p>
             </div>
           ))}
         </div>
@@ -475,13 +491,13 @@ function UserModal({ user, divisions, onClose, onSaved }: {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 py-8" style={{ background: 'rgba(0,0,0,0.75)' }}>
-      <div className="w-full max-w-md rounded-2xl flex flex-col max-h-[90vh]" style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="font-grotesk font-bold text-[16px] text-[#EDF0F5]">{isNew ? 'Tambah User' : 'Edit User'}</h2>
-          <button onClick={onClose} style={{ color: '#6B7385', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
+      <div className="w-full max-w-md rounded-2xl flex flex-col max-h-[90vh]" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }}>
+        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <h2 className="font-grotesk font-bold text-[16px] text-[var(--text-primary)]">{isNew ? 'Tambah User' : 'Edit User'}</h2>
+          <button onClick={onClose} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4 flex-1 overflow-y-auto">
-          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: 'var(--red)' }}>{error}</div>}
           <div>
             <label style={labelStyle}>Nama Lengkap *</label>
             <input style={inputStyle} value={form.fullName} onChange={e => onNameChange(e.target.value)} required />
@@ -515,7 +531,7 @@ function UserModal({ user, divisions, onClose, onSaved }: {
             <label style={labelStyle}>{isNew ? 'Password *' : 'Password baru (kosongkan jika tidak berubah)'}</label>
             <div style={{ position: 'relative' }}>
               <input style={{ ...inputStyle, paddingRight: '40px' }} type={showPw ? 'text' : 'password'} value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} placeholder={isNew ? 'Min. 8 karakter' : '••••••••'} />
-              <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#6B7385', display: 'flex' }}>
+              <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex' }}>
                 {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
@@ -523,15 +539,15 @@ function UserModal({ user, divisions, onClose, onSaved }: {
           {!isNew && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <label style={{ ...labelStyle, marginBottom: 0 }}>Status</label>
-              <button type="button" onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))} style={{ color: form.isActive ? '#4ADE80' : '#6B7385', background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+              <button type="button" onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))} style={{ color: form.isActive ? '#4ADE80' : 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
                 {form.isActive ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
               </button>
-              <span style={{ fontSize: '13px', color: form.isActive ? '#4ADE80' : '#6B7385' }}>{form.isActive ? 'Aktif' : 'Non-Aktif'}</span>
+              <span style={{ fontSize: '13px', color: form.isActive ? '#4ADE80' : 'var(--text-muted)' }}>{form.isActive ? 'Aktif' : 'Non-Aktif'}</span>
             </div>
           )}
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#A5AEC0', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>Batal</button>
-            <button type="submit" disabled={loading} style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: '#0C0F16', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, background: 'var(--border)', border: '1px solid var(--border-strong)', color: 'var(--text-secondary)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>Batal</button>
+            <button type="submit" disabled={loading} style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: 'var(--on-accent)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
               {loading ? 'Menyimpan...' : isNew ? 'Buat User' : 'Simpan'}
             </button>
           </div>

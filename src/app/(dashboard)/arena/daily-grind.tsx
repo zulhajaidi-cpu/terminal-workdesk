@@ -41,38 +41,38 @@ export function DailyGrind({ quiz, isAdmin = false, questions = [], readOnly = f
   }
 
   return (
-    <div style={{ background: '#161a23', border: '1px solid rgba(124,109,255,0.18)', borderRadius: 18, padding: 18 }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(124,109,255,0.18)', borderRadius: 18, padding: 18 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-        <Brain size={15} color="#A78BFA" />
-        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 14, color: '#EDF0F5' }}>The Daily Grind</span>
-        <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 800, color: '#3FD08A', background: 'rgba(63,208,138,0.12)', padding: '3px 9px', borderRadius: 100, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        <Brain size={15} color="var(--purple)" />
+        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>The Daily Grind</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 800, color: 'var(--green)', background: 'rgba(63,208,138,0.12)', padding: '3px 9px', borderRadius: 100, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           <Zap size={11} /> +{quiz.expReward} EXP
         </span>
       </div>
-      <p style={{ fontSize: 11, color: '#6B7385', marginBottom: 14 }}>Kuis harian · jawab benar untuk bonus EXP 🧠</p>
+      <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 14 }}>Kuis harian · jawab benar untuk bonus EXP 🧠</p>
 
       {!q ? (
-        <div style={{ textAlign: 'center', color: '#6B7385', fontSize: 13, padding: '24px 0' }}>Belum ada kuis tersedia.</div>
+        <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '24px 0' }}>Belum ada kuis tersedia.</div>
       ) : (
         <>
           {q.category && (
-            <span style={{ fontSize: 10, color: '#A78BFA', fontFamily: "'IBM Plex Mono',monospace", textTransform: 'uppercase', letterSpacing: '0.05em' }}>{q.category}</span>
+            <span style={{ fontSize: 10, color: 'var(--purple)', fontFamily: "'IBM Plex Mono',monospace", textTransform: 'uppercase', letterSpacing: '0.05em' }}>{q.category}</span>
           )}
-          <p style={{ fontSize: 14.5, fontWeight: 600, color: '#EDF0F5', fontFamily: "'Space Grotesk',sans-serif", margin: '6px 0 14px', lineHeight: 1.5 }}>{q.question}</p>
+          <p style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif", margin: '6px 0 14px', lineHeight: 1.5 }}>{q.question}</p>
 
           {err && (
-            <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: '#FF9B9B', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 12 }}>{err}</div>
+            <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: 'var(--red)', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 12 }}>{err}</div>
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {q.options.map((opt, i) => {
               const isSel = selected === i
               // Pewarnaan setelah dijawab
-              let bg = 'rgba(255,255,255,0.03)', border = 'rgba(255,255,255,0.08)', color = '#EDF0F5'
+              let bg = 'var(--surface-subtle)', border = 'var(--border)', color = 'var(--text-primary)'
               let icon: React.ReactNode = null
               if (answered && result) {
-                if (i === result.correctIndex) { bg = 'rgba(63,208,138,0.12)'; border = 'rgba(63,208,138,0.5)'; color = '#9BE8C2'; icon = <CheckCircle2 size={15} color="#3FD08A" /> }
-                else if (i === result.selectedIndex) { bg = 'rgba(255,107,107,0.1)'; border = 'rgba(255,107,107,0.5)'; color = '#FFADAD'; icon = <XCircle size={15} color="#FF6B6B" /> }
+                if (i === result.correctIndex) { bg = 'rgba(63,208,138,0.12)'; border = 'rgba(63,208,138,0.5)'; color = 'var(--green)'; icon = <CheckCircle2 size={15} color="var(--green)" /> }
+                else if (i === result.selectedIndex) { bg = 'rgba(255,107,107,0.1)'; border = 'rgba(255,107,107,0.5)'; color = 'var(--red)'; icon = <XCircle size={15} color="var(--red)" /> }
               } else if (isSel) {
                 bg = 'rgba(167,139,250,0.14)'; border = 'rgba(167,139,250,0.6)'; color = '#fff'
               }
@@ -86,7 +86,7 @@ export function DailyGrind({ quiz, isAdmin = false, questions = [], readOnly = f
                   <span style={{
                     width: 22, height: 22, borderRadius: 7, flexShrink: 0, fontSize: 11, fontWeight: 800,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: isSel && !answered ? '#A78BFA' : 'rgba(255,255,255,0.06)', color: isSel && !answered ? '#fff' : '#A5AEC0',
+                    background: isSel && !answered ? 'var(--purple)' : 'var(--border)', color: isSel && !answered ? '#fff' : 'var(--text-secondary)',
                   }}>{String.fromCharCode(65 + i)}</span>
                   <span style={{ flex: 1 }}>{opt}</span>
                   {icon}
@@ -97,7 +97,7 @@ export function DailyGrind({ quiz, isAdmin = false, questions = [], readOnly = f
 
           {/* Aksi / hasil */}
           {readOnly ? (
-            <div style={{ marginTop: 12, textAlign: 'center', color: '#6B7385', fontSize: 12, padding: '10px 0', background: 'rgba(255,255,255,0.02)', borderRadius: 10 }}>
+            <div style={{ marginTop: 12, textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, padding: '10px 0', background: 'var(--surface-subtle)', borderRadius: 10 }}>
               👁️ Mode spectator: lihat saja, tidak bisa jawab kuis.
             </div>
           ) : !answered ? (
@@ -106,8 +106,8 @@ export function DailyGrind({ quiz, isAdmin = false, questions = [], readOnly = f
                 marginTop: 14, width: '100%', padding: '10px 0', borderRadius: 11, border: 'none',
                 fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 13.5,
                 cursor: selected == null ? 'not-allowed' : 'pointer',
-                background: selected == null ? 'rgba(255,255,255,0.06)' : 'linear-gradient(90deg,#7C6DFF,#A78BFA)',
-                color: selected == null ? '#6B7385' : '#fff', opacity: busy ? 0.6 : 1,
+                background: selected == null ? 'var(--border)' : 'linear-gradient(90deg,#7C6DFF,var(--purple))',
+                color: selected == null ? 'var(--text-muted)' : '#fff', opacity: busy ? 0.6 : 1,
                 boxShadow: selected == null ? 'none' : '0 0 18px rgba(124,109,255,0.4)',
               }}>
               {busy ? 'Mengirim…' : 'Kirim Jawaban'}
@@ -116,20 +116,20 @@ export function DailyGrind({ quiz, isAdmin = false, questions = [], readOnly = f
             <div style={{ marginTop: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                 {result.isCorrect ? (
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#3FD08A', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--green)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                     <CheckCircle2 size={16} /> Benar! +{result.expAwarded} EXP
                   </span>
                 ) : (
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#FF8A8A', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--red)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                     <XCircle size={16} /> Belum tepat — tapi tak ada EXP berkurang 👍
                   </span>
                 )}
               </div>
               <div style={{ display: 'flex', gap: 9, background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 11, padding: '11px 13px' }}>
                 <Lightbulb size={16} color="#C4B5FD" style={{ flexShrink: 0, marginTop: 1 }} />
-                <p style={{ fontSize: 12.5, color: '#CDBFFF', lineHeight: 1.5 }}>{result.explanation}</p>
+                <p style={{ fontSize: 12.5, color: 'var(--purple)', lineHeight: 1.5 }}>{result.explanation}</p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 12, fontSize: 11, color: '#6B7385', fontFamily: "'IBM Plex Mono',monospace" }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 12, fontSize: 11, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono',monospace" }}>
                 <Lock size={11} /> Kuis berikutnya besok. Sampai jumpa, grinder!
               </div>
             </div>
@@ -181,16 +181,16 @@ function QuizAdmin({ questions }: { questions: AdminQuestion[] }) {
   }
 
   const input: React.CSSProperties = {
-    background: '#10141d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '7px 10px',
-    color: '#EDF0F5', fontSize: 12.5, width: '100%', fontFamily: "'Space Grotesk',sans-serif",
+    background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)', borderRadius: 8, padding: '7px 10px',
+    color: 'var(--text-primary)', fontSize: 12.5, width: '100%', fontFamily: "'Space Grotesk',sans-serif",
   }
   const optRow = (label: string, key: 'a' | 'b' | 'c' | 'd', idx: number) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <button type="button" onClick={() => setF({ ...f, correct: idx })}
         title="Tandai sebagai jawaban benar"
         style={{ width: 26, height: 26, flexShrink: 0, borderRadius: 7, fontSize: 11, fontWeight: 800, cursor: 'pointer',
-          border: f.correct === idx ? '1px solid #3FD08A' : '1px solid rgba(255,255,255,0.12)',
-          background: f.correct === idx ? 'rgba(63,208,138,0.2)' : 'rgba(255,255,255,0.04)', color: f.correct === idx ? '#3FD08A' : '#A5AEC0' }}>
+          border: f.correct === idx ? '1px solid var(--green)' : '1px solid var(--border-strong)',
+          background: f.correct === idx ? 'rgba(63,208,138,0.2)' : 'var(--surface-hover)', color: f.correct === idx ? 'var(--green)' : 'var(--text-secondary)' }}>
         {label}
       </button>
       <input style={input} placeholder={`Pilihan ${label}`} value={f[key]} onChange={e => setF({ ...f, [key]: e.target.value })} />
@@ -198,24 +198,24 @@ function QuizAdmin({ questions }: { questions: AdminQuestion[] }) {
   )
 
   return (
-    <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
+    <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px dashed var(--border-strong)' }}>
       <button onClick={() => setOpen(o => !o)}
         style={{ display: 'flex', alignItems: 'center', gap: 7, width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
-        <Settings2 size={13} color="#A78BFA" />
-        <span style={{ fontSize: 11, color: '#A5AEC0', fontFamily: "'IBM Plex Mono',monospace", textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <Settings2 size={13} color="var(--purple)" />
+        <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: "'IBM Plex Mono',monospace", textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Admin · Bank Soal ({activeCount} aktif / {questions.length} total)
         </span>
-        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#6B7385' }}>{open ? '▲' : '▼'}</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-muted)' }}>{open ? '▲' : '▼'}</span>
       </button>
 
       {open && (
         <div style={{ marginTop: 12 }}>
-          {err && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: '#FF9B9B', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 10 }}>{err}</div>}
+          {err && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: 'var(--red)', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 10 }}>{err}</div>}
 
           {adding ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'rgba(255,255,255,0.02)', padding: 12, borderRadius: 10, marginBottom: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'var(--surface-subtle)', padding: 12, borderRadius: 10, marginBottom: 12 }}>
               <textarea style={{ ...input, minHeight: 56, resize: 'vertical' }} placeholder="Tulis pertanyaan…" value={f.question} onChange={e => setF({ ...f, question: e.target.value })} />
-              <div style={{ fontSize: 10.5, color: '#6B7385', fontFamily: "'IBM Plex Mono',monospace" }}>Klik huruf untuk menandai jawaban benar (hijau)</div>
+              <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono',monospace" }}>Klik huruf untuk menandai jawaban benar (hijau)</div>
               {optRow('A', 'a', 0)}
               {optRow('B', 'b', 1)}
               {optRow('C', 'c', 2)}
@@ -226,15 +226,15 @@ function QuizAdmin({ questions }: { questions: AdminQuestion[] }) {
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={save} disabled={busy === 'save'}
-                  style={{ fontSize: 12.5, fontWeight: 800, color: '#fff', background: 'linear-gradient(90deg,#7C6DFF,#A78BFA)', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', opacity: busy === 'save' ? 0.6 : 1 }}>
+                  style={{ fontSize: 12.5, fontWeight: 800, color: '#fff', background: 'linear-gradient(90deg,#7C6DFF,var(--purple))', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', opacity: busy === 'save' ? 0.6 : 1 }}>
                   {busy === 'save' ? 'Menyimpan…' : 'Simpan soal'}
                 </button>
-                <button onClick={() => { setAdding(false); setErr(null) }} style={{ fontSize: 12, color: '#6B7385', background: 'transparent', border: 'none', cursor: 'pointer' }}>Batal</button>
+                <button onClick={() => { setAdding(false); setErr(null) }} style={{ fontSize: 12, color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer' }}>Batal</button>
               </div>
             </div>
           ) : (
             <button onClick={() => setAdding(true)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#A78BFA', background: 'rgba(124,109,255,0.1)', border: '1px solid rgba(124,109,255,0.25)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer', marginBottom: 12 }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: 'var(--purple)', background: 'rgba(124,109,255,0.1)', border: '1px solid rgba(124,109,255,0.25)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer', marginBottom: 12 }}>
               <Plus size={13} /> Tambah soal
             </button>
           )}
@@ -242,13 +242,13 @@ function QuizAdmin({ questions }: { questions: AdminQuestion[] }) {
           {/* Daftar soal (20 terbaru) dengan toggle aktif/nonaktif */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 260, overflowY: 'auto' }}>
             {questions.slice(0, 30).map(q => (
-              <div key={q.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 9px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', opacity: q.isActive ? 1 : 0.45 }}>
+              <div key={q.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 9px', borderRadius: 8, background: 'var(--surface-subtle)', opacity: q.isActive ? 1 : 0.45 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, color: '#EDF0F5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{q.question}</div>
-                  <div style={{ fontSize: 10, color: '#6B7385', fontFamily: "'IBM Plex Mono',monospace" }}>{q.category} · {q.points} EXP</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{q.question}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono',monospace" }}>{q.category} · {q.points} EXP</div>
                 </div>
                 <button onClick={() => toggle(q.id, q.isActive)} disabled={busy === q.id} title={q.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-                  style={{ flexShrink: 0, background: 'transparent', border: 'none', cursor: 'pointer', color: q.isActive ? '#3FD08A' : '#6B7385', padding: 4 }}>
+                  style={{ flexShrink: 0, background: 'transparent', border: 'none', cursor: 'pointer', color: q.isActive ? 'var(--green)' : 'var(--text-muted)', padding: 4 }}>
                   {q.isActive ? <Eye size={15} /> : <EyeOff size={15} />}
                 </button>
               </div>

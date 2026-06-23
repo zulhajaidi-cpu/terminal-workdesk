@@ -12,16 +12,16 @@ interface Props {
 }
 
 const inputStyle: React.CSSProperties = {
-  background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px',
-  padding: '11px 14px', color: '#EDF0F5', fontSize: '14px', outline: 'none', width: '100%',
+  background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px',
+  padding: '11px 14px', color: 'var(--text-primary)', fontSize: '14px', outline: 'none', width: '100%',
   fontFamily: "'Plus Jakarta Sans', sans-serif",
 }
 const labelStyle: React.CSSProperties = {
-  fontSize: '11px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace",
+  fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace",
   letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: '6px',
 }
 const sectionStyle: React.CSSProperties = {
-  background: '#10141d', border: '1px solid rgba(255,255,255,0.07)',
+  background: 'var(--bg-elevated)', border: '1px solid var(--border)',
   borderRadius: '16px', padding: '24px',
 }
 
@@ -119,25 +119,25 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => router.back()}
-          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '9px', padding: '7px 10px', cursor: 'pointer', color: '#A5AEC0', display: 'flex', alignItems: 'center' }}>
+          style={{ background: 'var(--border)', border: '1px solid var(--border)', borderRadius: '9px', padding: '7px 10px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
           <ChevronLeft size={16} />
         </button>
         <div>
-          <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5]">Buat Project Baru</h1>
-          <p className="text-[#6B7385] text-sm mt-0.5">Isi detail & task project — tersimpan sebagai Draft, hasilnya dikirim untuk review setelah semua task selesai</p>
+          <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">Buat Project Baru</h1>
+          <p className="text-[var(--text-muted)] text-sm mt-0.5">Isi detail & task project — tersimpan sebagai Draft, hasilnya dikirim untuk review setelah semua task selesai</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
-          <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '12px', padding: '12px 16px', fontSize: '14px', color: '#FF6B6B', display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '12px', padding: '12px 16px', fontSize: '14px', color: 'var(--red)', display: 'flex', gap: '8px', alignItems: 'center' }}>
             <Info size={15} />{error}
           </div>
         )}
 
         {/* Section 1 — Info Dasar */}
         <div style={sectionStyle}>
-          <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-4">Informasi Dasar</h2>
+          <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-4">Informasi Dasar</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label style={labelStyle}>Nama Project *</label>
@@ -180,7 +180,7 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
 
         {/* Section 2 — Tujuan & Output */}
         <div style={sectionStyle}>
-          <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-4">Tujuan & Output</h2>
+          <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-4">Tujuan & Output</h2>
           <div className="space-y-4">
             <div>
               <label style={labelStyle}>Objective / Tujuan Project *</label>
@@ -199,7 +199,7 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
 
         {/* Section 3 — Timeline & Budget */}
         <div style={sectionStyle}>
-          <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-4">Timeline & Anggaran</h2>
+          <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-4">Timeline & Anggaran</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label style={labelStyle}>Tanggal Mulai *</label>
@@ -220,8 +220,8 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
 
         {/* Section 4 — Tim */}
         <div style={sectionStyle}>
-          <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-1">Anggota Tim</h2>
-          <p style={{ fontSize: '12px', color: '#6B7385', marginBottom: '16px' }}>Kamu otomatis masuk sebagai anggota. Tambah anggota lain di bawah.</p>
+          <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-1">Anggota Tim</h2>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>Kamu otomatis masuk sebagai anggota. Tambah anggota lain di bawah.</p>
 
           {/* Selected members chips */}
           <div className="flex flex-wrap gap-2 mb-4">
@@ -257,8 +257,8 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
         <div style={sectionStyle}>
           <div className="flex items-center justify-between mb-1">
             <div>
-              <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5]">Tasks Project</h2>
-              <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '2px' }}>
+              <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)]">Tasks Project</h2>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
                 Opsional — tambahkan task yang akan otomatis masuk ke halaman Tasks
               </p>
             </div>
@@ -269,20 +269,20 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
           </div>
 
           {taskDrafts.length === 0 && (
-            <div style={{ border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', padding: '24px', textAlign: 'center', marginTop: '12px' }}>
-              <p style={{ fontSize: '13px', color: '#4a5160' }}>Belum ada task. Klik "+ Tambah Task" untuk menambahkan.</p>
+            <div style={{ border: '1px dashed var(--border-strong)', borderRadius: '12px', padding: '24px', textAlign: 'center', marginTop: '12px' }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-faint)' }}>Belum ada task. Klik "+ Tambah Task" untuk menambahkan.</p>
             </div>
           )}
 
           <div className="space-y-3 mt-3">
             {taskDrafts.map((task, idx) => (
-              <div key={task.id} style={{ background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '16px' }}>
+              <div key={task.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px' }}>
                 <div className="flex items-center gap-2 mb-3">
-                  <span style={{ fontSize: '11px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", background: 'var(--surface-hover)', padding: '2px 8px', borderRadius: '6px' }}>
                     Task {idx + 1}
                   </span>
                   <button type="button" onClick={() => removeTask(task.id)}
-                    style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#FF6B6B', display: 'flex', alignItems: 'center' }}>
+                    style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--red)', display: 'flex', alignItems: 'center' }}>
                     <Trash2 size={13} />
                   </button>
                 </div>
@@ -320,9 +320,9 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
                         const m = members.find(x => x.id === uid)
                         if (!m) return null
                         return (
-                          <span key={uid} style={{ fontSize: '12px', background: 'rgba(74,158,255,0.1)', border: '1px solid rgba(74,158,255,0.25)', color: '#4A9EFF', padding: '2px 10px 2px 8px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <span key={uid} style={{ fontSize: '12px', background: 'rgba(74,158,255,0.1)', border: '1px solid rgba(74,158,255,0.25)', color: 'var(--blue)', padding: '2px 10px 2px 8px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                             {m.fullName}
-                            <button type="button" onClick={() => toggleTaskAssignee(task.id, uid)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4A9EFF', padding: 0, display: 'flex' }}>
+                            <button type="button" onClick={() => toggleTaskAssignee(task.id, uid)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--blue)', padding: 0, display: 'flex' }}>
                               <X size={10} />
                             </button>
                           </span>
@@ -338,7 +338,7 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
 
         {/* Section 6 — Tambahan */}
         <div style={sectionStyle}>
-          <h2 className="font-grotesk font-bold text-[15px] text-[#EDF0F5] mb-4">Informasi Tambahan</h2>
+          <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)] mb-4">Informasi Tambahan</h2>
           <div className="space-y-4">
             <div>
               <label style={labelStyle}>Link Attachment / Brief (Google Drive / URL)</label>
@@ -356,7 +356,7 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
         </div>
 
         {/* Submit */}
-        <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '16px', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {/* Flow info */}
           <div style={{ background: 'rgba(255,106,26,0.08)', border: '1px solid rgba(255,106,26,0.2)', borderRadius: '10px', padding: '12px 16px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
             <Info size={15} style={{ color: '#FF8A4C', marginTop: '2px', flexShrink: 0 }} />
@@ -367,11 +367,11 @@ export function NewProjectForm({ divisions, members, currentUser }: Props) {
 
           <div className="flex gap-3">
             <button type="button" onClick={() => router.back()}
-              style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#A5AEC0', borderRadius: '11px', padding: '12px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>
+              style={{ flex: 1, background: 'var(--border)', border: '1px solid var(--border-strong)', color: 'var(--text-secondary)', borderRadius: '11px', padding: '12px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>
               Batal
             </button>
             <button type="submit" disabled={loading}
-              style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: '#0C0F16', borderRadius: '11px', padding: '12px', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px', boxShadow: loading ? 'none' : '0 10px 25px -8px rgba(255,106,26,0.7)' }}>
+              style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: 'var(--on-accent)', borderRadius: '11px', padding: '12px', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px', boxShadow: loading ? 'none' : '0 10px 25px -8px rgba(255,106,26,0.7)' }}>
               {loading ? 'Menyimpan...' : 'Buat Project (Draft) →'}
             </button>
           </div>

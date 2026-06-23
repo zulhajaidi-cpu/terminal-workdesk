@@ -1,33 +1,99 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+/* ── TEMA: :root = Dark (default, tak berubah). [data-theme="light"] = override ── */
 :root {
+  color-scheme: dark;
+
+  /* Surfaces */
   --bg-base: #0C0F16;
+  --bg-sidebar: #0E1219;
   --bg-card: #141925;
   --bg-elevated: #10141d;
   --bg-hover: #1a2030;
+  --surface-subtle: rgba(255,255,255,0.03);
+  --surface-hover: rgba(255,255,255,0.05);
+
+  /* Borders */
   --border: rgba(255,255,255,0.07);
   --border-strong: rgba(255,255,255,0.12);
 
+  /* Text */
+  --text-primary: #EDF0F5;
+  --text-secondary: #A5AEC0;
+  --text-muted: #6B7385;
+  --text-faint: #4A5160;
+
+  /* Teks gelap di atas tombol/aksen terang — SELALU gelap di kedua tema */
+  --on-accent: #0C0F16;
+
+  /* Orange accent — dipertahankan sama di kedua tema */
   --orange-primary: #FF6A1A;
   --orange-light: #FF8A4C;
   --orange-dark: #E2540A;
   --orange-muted: rgba(255,106,26,0.12);
   --orange-border: rgba(255,106,26,0.28);
 
-  --text-primary: #EDF0F5;
-  --text-secondary: #A5AEC0;
-  --text-muted: #6B7385;
-
+  /* Accent text — punya varian kontras untuk light */
+  --gold: #F5C451;
+  --peach: #FFB489;
   --green: #3FD08A;
   --red: #FF6B6B;
-  --blue: #56A9E8;
-  --yellow: #FFB489;
+  --blue: #4A9EFF;
+  --purple: #A78BFA;
+  --pink: #FF8FA8;
+
+  /* Efek */
+  --shadow-card: none;
+  --scrollbar: rgba(255,255,255,0.1);
+  --scrollbar-hover: rgba(255,255,255,0.2);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces — abu sangat terang + kartu putih bersih (referensi InvestIQ) */
+  --bg-base: #F3F4F7;
+  --bg-sidebar: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-hover: #EDEFF3;
+  --surface-subtle: rgba(18,22,31,0.035);
+  --surface-hover: rgba(18,22,31,0.055);
+
+  --border: rgba(18,22,31,0.09);
+  --border-strong: rgba(18,22,31,0.15);
+
+  --text-primary: #1A1D24;
+  --text-secondary: #545C6B;
+  --text-muted: #868E9E;
+  --text-faint: #A6ADBA;
+
+  /* Orange tetap (otomatis dari :root, tak perlu di-override) */
+
+  --gold: #B8860B;
+  --peach: #C2693A;
+  --green: #16A34A;
+  --red: #DC2626;
+  --blue: #2563EB;
+  --purple: #7C3AED;
+  --pink: #DB2777;
+
+  --shadow-card: 0 1px 2px rgba(18,22,31,0.04), 0 10px 28px -14px rgba(18,22,31,0.14);
+  --scrollbar: rgba(18,22,31,0.18);
+  --scrollbar-hover: rgba(18,22,31,0.32);
 }
 
 @theme inline {
   --color-background: var(--bg-base);
   --color-foreground: var(--text-primary);
+}
+
+/* Light mode: beri bayangan halus "melayang" otomatis ke setiap permukaan kartu
+   (elemen yang inline-style-nya mereferensikan token kartu). Dark tidak terpengaruh. */
+:root[data-theme="light"] [style*="var(--bg-card)"],
+:root[data-theme="light"] [style*="var(--bg-elevated)"] {
+  box-shadow: var(--shadow-card);
 }
 
 * {
@@ -45,6 +111,7 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Custom scrollbar */
@@ -56,11 +123,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
+  background: var(--scrollbar);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.2);
+  background: var(--scrollbar-hover);
 }
 
 /* Hide scrollbar for mobile nav */

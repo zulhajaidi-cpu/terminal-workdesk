@@ -36,7 +36,7 @@ export function Avatar({ name, size = 'md', imageUrl, className }: AvatarProps) 
         'rounded-full flex items-center justify-center flex-shrink-0 font-grotesk font-bold',
         box, text, className
       )}
-      style={{ background: 'linear-gradient(135deg,#FF8A4C,#E2540A)', color: '#0C0F16' }}
+      style={{ background: 'linear-gradient(135deg,#FF8A4C,#E2540A)', color: 'var(--on-accent)' }}
     >
       {initials}
     </div>

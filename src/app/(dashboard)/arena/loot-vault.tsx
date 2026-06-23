@@ -29,13 +29,13 @@ interface Props {
 }
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
-  claimed:   { label: 'Menunggu serah-terima', color: '#F5C451', bg: 'rgba(245,196,81,0.12)' },
-  fulfilled: { label: 'Sudah diserahkan',      color: '#3FD08A', bg: 'rgba(63,208,138,0.12)' },
-  rejected:  { label: 'Ditolak',               color: '#FF6B6B', bg: 'rgba(255,107,107,0.12)' },
+  claimed:   { label: 'Menunggu serah-terima', color: 'var(--gold)', bg: 'rgba(245,196,81,0.12)' },
+  fulfilled: { label: 'Sudah diserahkan',      color: 'var(--green)', bg: 'rgba(63,208,138,0.12)' },
+  rejected:  { label: 'Ditolak',               color: 'var(--red)', bg: 'rgba(255,107,107,0.12)' },
 }
 
 const MEDAL = ['🥇', '🥈', '🥉']
-const RANK_COLOR = ['#F5C451', '#C8D0DD', '#D9893E']
+const RANK_COLOR = ['var(--gold)', '#C8D0DD', '#D9893E']
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Jakarta' })
@@ -69,15 +69,15 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
   const hasAny = eligible.length > 0 || locked.length > 0 || claimed.length > 0
 
   return (
-    <div style={{ background: '#161a23', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 18, padding: 18 }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 18, padding: 18 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
         <Gift size={15} color="#FF8A4C" />
-        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 14, color: '#EDF0F5' }}>Loot Vault</span>
+        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>Loot Vault</span>
       </div>
-      <p style={{ fontSize: 11, color: '#6B7385', marginBottom: 14 }}>Tebus reward dari level & juara leaderboard 🎁</p>
+      <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 14 }}>Tebus reward dari level & juara leaderboard 🎁</p>
 
       {err && (
-        <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: '#FF9B9B', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 12 }}>
+        <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: 'var(--red)', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 12 }}>
           {err}
         </div>
       )}
@@ -86,7 +86,7 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
       <MonthlyRewardsPanel currentMonth={currentMonth} isAdmin={isAdmin} />
 
       {!hasAny && (
-        <div style={{ textAlign: 'center', color: '#6B7385', fontSize: 13, padding: '28px 0' }}>
+        <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '28px 0' }}>
           Belum ada reward klaim lainnya. Naikkan level & menangkan leaderboard untuk membuka loot! ⚔️
         </div>
       )}
@@ -98,7 +98,7 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
             {eligible.map(r => (
               <RewardCard key={r.key} title={r.title} description={r.description} imageUrl={r.imageUrl} accent="#FF6A1A">
-                <span style={{ fontSize: 10.5, color: '#FFB489', display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: "'IBM Plex Mono',monospace" }}>
+                <span style={{ fontSize: 10.5, color: 'var(--peach)', display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: "'IBM Plex Mono',monospace" }}>
                   {r.source === 'monthly' ? <Trophy size={11} /> : <Sparkles size={11} />} {r.reason}
                 </span>
                 <button
@@ -107,8 +107,8 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
                   style={{
                     marginTop: 10, width: '100%', padding: '8px 0', borderRadius: 10, border: 'none', cursor: r.soldOut || readOnly ? 'not-allowed' : 'pointer',
                     fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 13,
-                    background: r.soldOut || readOnly ? 'rgba(255,255,255,0.06)' : 'linear-gradient(90deg,#FF6A1A,#FF8A4C)',
-                    color: r.soldOut || readOnly ? '#6B7385' : '#fff', opacity: busy === r.key ? 0.6 : 1,
+                    background: r.soldOut || readOnly ? 'var(--border)' : 'linear-gradient(90deg,#FF6A1A,#FF8A4C)',
+                    color: r.soldOut || readOnly ? 'var(--text-muted)' : '#fff', opacity: busy === r.key ? 0.6 : 1,
                     boxShadow: r.soldOut || readOnly ? 'none' : '0 0 18px rgba(255,106,26,0.4)',
                   }}>
                   {readOnly ? '👁️ Lihat saja' : r.soldOut ? 'Stok habis' : busy === r.key ? 'Mengklaim…' : 'Klaim Reward'}
@@ -122,18 +122,18 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
       {/* Claimed — riwayat klaim user */}
       {claimed.length > 0 && (
         <div style={{ marginBottom: locked.length ? 18 : 0 }}>
-          <SectionLabel icon={<Package size={12} color="#3FD08A" />} text="Sudah kamu klaim" />
+          <SectionLabel icon={<Package size={12} color="var(--green)" />} text="Sudah kamu klaim" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {claimed.map((c: ClaimedReward) => {
               const st = STATUS_META[c.status] ?? STATUS_META.claimed
               return (
-                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: 'var(--surface-subtle)', border: '1px solid var(--border)' }}>
                   <span style={{ width: 30, height: 30, borderRadius: 9, flexShrink: 0, background: st.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {c.status === 'fulfilled' ? <CheckCircle2 size={15} color={st.color} /> : <Clock3 size={15} color={st.color} />}
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#EDF0F5', fontFamily: "'Space Grotesk',sans-serif" }}>{c.title}</div>
-                    <div style={{ fontSize: 10, color: '#6B7385', fontFamily: "'IBM Plex Mono',monospace" }}>Diklaim {fmtDate(c.claimedAt)}{c.notes ? ` · ${c.notes}` : ''}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif" }}>{c.title}</div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono',monospace" }}>Diklaim {fmtDate(c.claimedAt)}{c.notes ? ` · ${c.notes}` : ''}</div>
                   </div>
                   <span style={{ flexShrink: 0, fontSize: 10.5, fontWeight: 700, color: st.color, background: st.bg, padding: '3px 9px', borderRadius: 100 }}>{st.label}</span>
                 </div>
@@ -146,11 +146,11 @@ export function LootVault({ rewards, isAdmin, adminClaims, adminCatalog, current
       {/* Locked — belum memenuhi syarat */}
       {locked.length > 0 && (
         <div>
-          <SectionLabel icon={<Lock size={12} color="#6B7385" />} text="Belum terbuka" />
+          <SectionLabel icon={<Lock size={12} color="var(--text-muted)" />} text="Belum terbuka" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
             {locked.map((r: LockedReward) => (
               <RewardCard key={r.key} title={r.title} description={r.description} imageUrl={r.imageUrl} accent="#3a4150" locked>
-                <span style={{ fontSize: 10.5, color: '#6B7385', display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: "'IBM Plex Mono',monospace" }}>
+                <span style={{ fontSize: 10.5, color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: "'IBM Plex Mono',monospace" }}>
                   <Lock size={11} /> {r.requirement}
                 </span>
               </RewardCard>
@@ -224,21 +224,21 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
   }
 
   const input: React.CSSProperties = {
-    background: '#10141d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '7px 10px',
-    color: '#EDF0F5', fontSize: 12.5, width: '100%', fontFamily: "'Space Grotesk',sans-serif",
+    background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)', borderRadius: 8, padding: '7px 10px',
+    color: 'var(--text-primary)', fontSize: 12.5, width: '100%', fontFamily: "'Space Grotesk',sans-serif",
   }
 
   return (
     <div style={{ marginBottom: 18 }}>
-      <SectionLabel icon={<Crown size={12} color="#F5C451" />} text={`Reward Bulan Ini · ${monthLabel}`} />
+      <SectionLabel icon={<Crown size={12} color="var(--gold)" />} text={`Reward Bulan Ini · ${monthLabel}`} />
 
       {err && (
-        <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: '#FF9B9B', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 10 }}>{err}</div>
+        <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: 'var(--red)', fontSize: 12, padding: '8px 12px', borderRadius: 10, marginBottom: 10 }}>{err}</div>
       )}
 
       {rewards.length === 0 ? (
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 16px', marginBottom: isAdmin ? 10 : 0 }}>
-          <p style={{ fontSize: 12, color: '#6B7385', marginBottom: liveTop.length ? 10 : 0 }}>
+        <div style={{ background: 'var(--surface-subtle)', border: '1px dashed var(--border-strong)', borderRadius: 12, padding: '14px 16px', marginBottom: isAdmin ? 10 : 0 }}>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: liveTop.length ? 10 : 0 }}>
             Admin belum menetapkan hadiah bulan ini. Live leaderboard sementara:
           </p>
           {liveTop.length > 0 && (
@@ -247,8 +247,8 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
                 <div key={s.userId} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 14 }}>{MEDAL[i] ?? s.rank}</span>
                   <Avatar name={s.fullName} imageUrl={s.avatarUrl ?? undefined} size="sm" />
-                  <span style={{ fontSize: 12.5, color: '#EDF0F5', flex: 1 }}>{s.fullName}</span>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: RANK_COLOR[i] ?? '#A5AEC0' }}>{s.exp.toLocaleString('id-ID')} EXP</span>
+                  <span style={{ fontSize: 12.5, color: 'var(--text-primary)', flex: 1 }}>{s.fullName}</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: RANK_COLOR[i] ?? 'var(--text-secondary)' }}>{s.exp.toLocaleString('id-ID')} EXP</span>
                 </div>
               ))}
             </div>
@@ -259,7 +259,7 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
           {rewards.map(r => (
             <div key={r.id} style={{
               display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 12,
-              background: 'radial-gradient(120% 140% at 0% 0%, rgba(245,196,81,0.1) 0%, rgba(16,20,29,0) 50%), #10141d',
+              background: 'radial-gradient(120% 140% at 0% 0%, rgba(245,196,81,0.1) 0%, rgba(16,20,29,0) 50%), var(--bg-elevated)',
               border: '1px solid rgba(245,196,81,0.22)',
             }}>
               <span style={{ fontSize: 20, width: 28, textAlign: 'center', flexShrink: 0 }}>{MEDAL[r.rank - 1] ?? `#${r.rank}`}</span>
@@ -267,25 +267,25 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
                 <img src={r.rewardImageLink} alt={r.rewardName} style={{ width: 44, height: 44, borderRadius: 9, objectFit: 'cover', flexShrink: 0, border: '1px solid rgba(245,196,81,0.3)' }} />
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#EDF0F5', fontFamily: "'Space Grotesk',sans-serif" }}>{r.rewardName}</div>
-                {r.notes && <div style={{ fontSize: 11, color: '#6B7385', marginTop: 1 }}>{r.notes}</div>}
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif" }}>{r.rewardName}</div>
+                {r.notes && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{r.notes}</div>}
                 <div style={{ marginTop: 5, display: 'flex', alignItems: 'center', gap: 6 }}>
                   {r.standing ? (
                     <>
                       <Avatar name={r.standing.fullName} imageUrl={r.standing.avatarUrl ?? undefined} size="sm" />
-                      <span style={{ fontSize: 12, color: '#FFE6B8' }}>
+                      <span style={{ fontSize: 12, color: 'var(--gold)' }}>
                         Juara sementara: <strong>{r.standing.fullName}</strong> · {r.standing.exp.toLocaleString('id-ID')} EXP
                       </span>
                     </>
                   ) : (
-                    <span style={{ fontSize: 11.5, color: '#6B7385' }}>Belum ada peserta di posisi ini</span>
+                    <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Belum ada peserta di posisi ini</span>
                   )}
                 </div>
               </div>
               {isAdmin && (
                 <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                  <button onClick={() => openEdit(r)} title="Edit hadiah" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#A5AEC0', padding: 5 }}><Pencil size={14} /></button>
-                  <button onClick={() => remove(r.id)} disabled={busy === r.id} title="Hapus" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#FF8A8A', padding: 5 }}><Trash2 size={14} /></button>
+                  <button onClick={() => openEdit(r)} title="Edit hadiah" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 5 }}><Pencil size={14} /></button>
+                  <button onClick={() => remove(r.id)} disabled={busy === r.id} title="Hapus" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--red)', padding: 5 }}><Trash2 size={14} /></button>
                 </div>
               )}
             </div>
@@ -295,32 +295,32 @@ function MonthlyRewardsPanel({ currentMonth, isAdmin }: { currentMonth: CurrentM
 
       {isAdmin && (
         editing !== null ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, background: 'rgba(255,255,255,0.02)', padding: 12, borderRadius: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, background: 'var(--surface-subtle)', padding: 12, borderRadius: 10 }}>
             <div style={{ display: 'flex', gap: 7 }}>
               <input style={{ ...input, maxWidth: 90 }} type="number" min={1} placeholder="Rank" value={form.rank} onChange={e => setForm({ ...form, rank: Number(e.target.value) || 1 })} />
               <input style={input} placeholder="Nama hadiah (mis. Kanky Running Shoes)" value={form.rewardName} onChange={e => setForm({ ...form, rewardName: e.target.value })} />
             </div>
             <input style={input} placeholder="Catatan (opsional)" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 48, height: 48, borderRadius: 9, flexShrink: 0, overflow: 'hidden', background: '#10141d', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {form.rewardImageLink ? <img src={form.rewardImageLink} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Gift size={18} color="#6B7385" />}
+              <span style={{ width: 48, height: 48, borderRadius: 9, flexShrink: 0, overflow: 'hidden', background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {form.rewardImageLink ? <img src={form.rewardImageLink} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Gift size={18} color="var(--text-muted)" />}
               </span>
-              <label style={{ fontSize: 11.5, fontWeight: 700, color: '#F5C451', background: 'rgba(245,196,81,0.1)', border: '1px solid rgba(245,196,81,0.25)', borderRadius: 8, padding: '7px 12px', cursor: busy === 'photo' ? 'wait' : 'pointer', opacity: busy === 'photo' ? 0.6 : 1 }}>
+              <label style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--gold)', background: 'rgba(245,196,81,0.1)', border: '1px solid rgba(245,196,81,0.25)', borderRadius: 8, padding: '7px 12px', cursor: busy === 'photo' ? 'wait' : 'pointer', opacity: busy === 'photo' ? 0.6 : 1 }}>
                 {busy === 'photo' ? 'Mengunggah…' : 'Pilih foto produk (persegi)'}
                 <input type="file" accept="image/*" onChange={onPickPhoto} disabled={busy === 'photo'} style={{ display: 'none' }} />
               </label>
             </div>
             <div style={{ display: 'flex', gap: 7 }}>
               <button onClick={save} disabled={busy === 'save'}
-                style={{ fontSize: 12, fontWeight: 700, color: '#10141d', background: 'linear-gradient(90deg,#F5C451,#F0B429)', border: 'none', borderRadius: 8, padding: '7px 14px', cursor: 'pointer', opacity: busy === 'save' ? 0.6 : 1 }}>
+                style={{ fontSize: 12, fontWeight: 700, color: 'var(--bg-elevated)', background: 'linear-gradient(90deg,var(--gold),#F0B429)', border: 'none', borderRadius: 8, padding: '7px 14px', cursor: 'pointer', opacity: busy === 'save' ? 0.6 : 1 }}>
                 {busy === 'save' ? 'Menyimpan…' : 'Simpan'}
               </button>
-              <button onClick={() => setEditing(null)} style={{ fontSize: 12, color: '#6B7385', background: 'transparent', border: 'none', cursor: 'pointer' }}>Batal</button>
+              <button onClick={() => setEditing(null)} style={{ fontSize: 12, color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer' }}>Batal</button>
             </div>
           </div>
         ) : (
           <button onClick={() => openEdit()}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#F5C451', background: 'rgba(245,196,81,0.1)', border: '1px solid rgba(245,196,81,0.25)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: 'var(--gold)', background: 'rgba(245,196,81,0.1)', border: '1px solid rgba(245,196,81,0.25)', borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
             <Plus size={13} /> Tambah hadiah rank {(rewards[rewards.length - 1]?.rank ?? 0) + 1}
           </button>
         )
@@ -361,27 +361,27 @@ function AdminPanel({ claims, catalog }: { claims: AdminClaim[]; catalog: AdminC
   }
 
   const inputStyle: React.CSSProperties = {
-    background: '#10141d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '7px 10px',
-    color: '#EDF0F5', fontSize: 12, width: '100%', fontFamily: "'IBM Plex Mono',monospace",
+    background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)', borderRadius: 8, padding: '7px 10px',
+    color: 'var(--text-primary)', fontSize: 12, width: '100%', fontFamily: "'IBM Plex Mono',monospace",
   }
 
   return (
-    <div style={{ marginTop: 22, paddingTop: 16, borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
+    <div style={{ marginTop: 22, paddingTop: 16, borderTop: '1px dashed var(--border-strong)' }}>
       <SectionLabel icon={<Package size={12} color="#FF8A4C" />} text={`Admin · Klaim masuk (${pending.length} menunggu)`} />
       {claims.length === 0 ? (
-        <div style={{ fontSize: 12, color: '#6B7385', padding: '6px 0 14px' }}>Belum ada klaim.</div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '6px 0 14px' }}>Belum ada klaim.</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 18 }}>
           {claims.slice(0, 20).map(c => {
             const st = STATUS_META[c.status] ?? STATUS_META.claimed
             return (
-              <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, background: 'rgba(255,255,255,0.03)' }}>
+              <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, background: 'var(--surface-subtle)' }}>
                 <Avatar name={c.userName} imageUrl={c.userAvatar ?? undefined} size="sm" />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12.5, color: '#EDF0F5', fontFamily: "'Space Grotesk',sans-serif" }}>
+                  <div style={{ fontSize: 12.5, color: 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif" }}>
                     <strong>{c.userName}</strong> → {c.title}
                   </div>
-                  <div style={{ fontSize: 10, color: '#6B7385', fontFamily: "'IBM Plex Mono',monospace" }}>{fmtDate(c.claimedAt)}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono',monospace" }}>{fmtDate(c.claimedAt)}</div>
                 </div>
                 {c.status === 'claimed' ? (
                   <button onClick={() => fulfill(c.id)} disabled={busy === c.id}
@@ -400,17 +400,17 @@ function AdminPanel({ claims, catalog }: { claims: AdminClaim[]; catalog: AdminC
       <SectionLabel icon={<Gift size={12} color="#FF8A4C" />} text="Admin · Katalog reward" />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
         {catalog.map(c => (
-          <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', opacity: c.isActive ? 1 : 0.5 }}>
-            <span style={{ fontSize: 12.5, color: '#EDF0F5', flex: 1 }}>
-              {c.name} <span style={{ color: '#6B7385', fontSize: 11 }}>· {c.unlockType === 'level' ? `Level ${c.threshold}` : c.unlockType} · {c.claimedCount} klaim{c.stock != null ? ` / stok ${c.stock}` : ''}</span>
+          <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8, background: 'var(--surface-subtle)', opacity: c.isActive ? 1 : 0.5 }}>
+            <span style={{ fontSize: 12.5, color: 'var(--text-primary)', flex: 1 }}>
+              {c.name} <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>· {c.unlockType === 'level' ? `Level ${c.threshold}` : c.unlockType} · {c.claimedCount} klaim{c.stock != null ? ` / stok ${c.stock}` : ''}</span>
             </span>
-            {!c.isActive && <span style={{ fontSize: 10, color: '#6B7385' }}>nonaktif</span>}
+            {!c.isActive && <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>nonaktif</span>}
           </div>
         ))}
       </div>
 
       {adding ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, background: 'rgba(255,255,255,0.02)', padding: 12, borderRadius: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, background: 'var(--surface-subtle)', padding: 12, borderRadius: 10 }}>
           <input style={inputStyle} placeholder="Nama reward (mis. Kopi Fore)" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           <div style={{ display: 'flex', gap: 7 }}>
             <input style={inputStyle} type="number" placeholder="Level minimal" value={form.threshold} onChange={e => setForm({ ...form, threshold: e.target.value })} />
@@ -422,7 +422,7 @@ function AdminPanel({ claims, catalog }: { claims: AdminClaim[]; catalog: AdminC
               style={{ fontSize: 12, fontWeight: 700, color: '#fff', background: 'linear-gradient(90deg,#FF6A1A,#FF8A4C)', border: 'none', borderRadius: 8, padding: '7px 14px', cursor: 'pointer', opacity: busy === 'add' || !form.name.trim() ? 0.6 : 1 }}>
               {busy === 'add' ? 'Menyimpan…' : 'Simpan reward'}
             </button>
-            <button onClick={() => setAdding(false)} style={{ fontSize: 12, color: '#6B7385', background: 'transparent', border: 'none', cursor: 'pointer' }}>Batal</button>
+            <button onClick={() => setAdding(false)} style={{ fontSize: 12, color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer' }}>Batal</button>
           </div>
         </div>
       ) : (
@@ -438,7 +438,7 @@ function AdminPanel({ claims, catalog }: { claims: AdminClaim[]; catalog: AdminC
 /* ═══════════════════ PARTS ═══════════════════ */
 function SectionLabel({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10.5, color: '#A5AEC0', fontFamily: "'IBM Plex Mono',monospace", textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 9 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10.5, color: 'var(--text-secondary)', fontFamily: "'IBM Plex Mono',monospace", textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 9 }}>
       {icon} {text}
     </div>
   )
@@ -449,21 +449,21 @@ function RewardCard({ title, description, imageUrl, accent, locked, children }: 
 }) {
   return (
     <div style={{
-      background: locked ? 'rgba(255,255,255,0.02)' : 'radial-gradient(120% 120% at 0% 0%, rgba(255,106,26,0.1) 0%, rgba(16,20,29,0) 50%), #10141d',
-      border: `1px solid ${locked ? 'rgba(255,255,255,0.07)' : 'rgba(255,106,26,0.28)'}`, borderRadius: 14, padding: 14,
+      background: locked ? 'var(--surface-subtle)' : 'radial-gradient(120% 120% at 0% 0%, rgba(255,106,26,0.1) 0%, rgba(16,20,29,0) 50%), var(--bg-elevated)',
+      border: `1px solid ${locked ? 'var(--border)' : 'rgba(255,106,26,0.28)'}`, borderRadius: 14, padding: 14,
       boxShadow: locked ? 'none' : '0 0 20px rgba(255,106,26,0.1)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
         <span style={{ width: 40, height: 40, borderRadius: 11, flexShrink: 0, background: `${accent}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', filter: locked ? 'grayscale(0.6)' : 'none' }}>
           {imageUrl
             ? <img src={imageUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            : <Gift size={20} color={locked ? '#6B7385' : accent} />}
+            : <Gift size={20} color={locked ? 'var(--text-muted)' : accent} />}
         </span>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: locked ? '#A5AEC0' : '#EDF0F5', fontFamily: "'Space Grotesk',sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: locked ? 'var(--text-secondary)' : 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
         </div>
       </div>
-      {description && <p style={{ fontSize: 11, color: '#6B7385', marginBottom: 8, lineHeight: 1.45 }}>{description}</p>}
+      {description && <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.45 }}>{description}</p>}
       {children}
     </div>
   )

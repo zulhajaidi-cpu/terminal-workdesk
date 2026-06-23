@@ -47,11 +47,11 @@ interface Props {
 
 const MOODS = [
   { emoji: '🤩', label: 'Sangat Semangat', color: '#FF6A1A' },
-  { emoji: '🙂', label: 'Baik',            color: '#3FD08A' },
-  { emoji: '😐', label: 'Biasa Saja',      color: '#4A9EFF' },
+  { emoji: '🙂', label: 'Baik',            color: 'var(--green)' },
+  { emoji: '😐', label: 'Biasa Saja',      color: 'var(--blue)' },
   { emoji: '😎', label: 'Santai / Aman',   color: '#06B6D4' },
-  { emoji: '🥳', label: 'Ada Kabar Baik',  color: '#A78BFA' },
-  { emoji: '😴', label: 'Mengantuk',       color: '#94A3B8' },
+  { emoji: '🥳', label: 'Ada Kabar Baik',  color: 'var(--purple)' },
+  { emoji: '😴', label: 'Mengantuk',       color: 'var(--text-faint)' },
   { emoji: '🤯', label: 'Banyak Pikiran',  color: '#F59E0B' },
   { emoji: '😰', label: 'Dikejar Deadline',color: '#EF4444' },
   { emoji: '🤒', label: 'Kurang Fit',      color: '#78716C' },
@@ -60,10 +60,10 @@ const MOODS = [
 
 /* ═══════════════ STATUS COLORS ═══════════════ */
 const STATUS_COLORS: Record<string, string> = {
-  'Completed':   '#3FD08A',
+  'Completed':   'var(--green)',
   'In Progress': '#FF6A1A',
-  'To Do':       '#6B7385',
-  'Need Review': '#4A9EFF',
+  'To Do':       'var(--text-muted)',
+  'Need Review': 'var(--blue)',
   'Revision':    '#F59E0B',
   'On Hold':     '#F59E0B',
 }
@@ -72,8 +72,8 @@ const STATUS_COLORS: Record<string, string> = {
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '10px 14px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
-      {label != null && <p style={{ fontSize: '11px', color: '#94A3B8', marginBottom: '6px', fontFamily: "'IBM Plex Mono', monospace" }}>{label}</p>}
+    <div style={{ background: '#1e293b', border: '1px solid var(--border-strong)', borderRadius: '12px', padding: '10px 14px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+      {label != null && <p style={{ fontSize: '11px', color: 'var(--text-faint)', marginBottom: '6px', fontFamily: "'IBM Plex Mono', monospace" }}>{label}</p>}
       {payload.map((p: any, i: number) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: p.color ?? p.payload?.color, display: 'inline-block' }} />
@@ -88,23 +88,23 @@ function ChartTooltip({ active, payload, label }: any) {
 }
 
 const CARD = 'rounded-3xl p-5'
-const cardStyle: React.CSSProperties = { background: '#161a23', border: '1px solid rgba(255,255,255,0.06)' }
+const cardStyle: React.CSSProperties = { background: 'var(--bg-card)', border: '1px solid var(--border)' }
 
 /* Gradient progress bar — % penyelesaian Projects / Tasks */
 function CompletionBar({ label, done, total, pct }: { label: string; done: number; total: number; pct: number }) {
   return (
     <div>
       <div className="flex items-end justify-between mb-1.5">
-        <span className="font-grotesk text-[13px] text-[#A5AEC0]">{label}</span>
+        <span className="font-grotesk text-[13px] text-[var(--text-secondary)]">{label}</span>
         <div className="flex items-baseline gap-1.5">
-          <span className="font-grotesk font-bold text-[26px] text-[#EDF0F5] leading-none">{pct}%</span>
-          <span className="text-[11px] text-[#6B7385] font-mono">{done}/{total}</span>
+          <span className="font-grotesk font-bold text-[26px] text-[var(--text-primary)] leading-none">{pct}%</span>
+          <span className="text-[11px] text-[var(--text-muted)] font-mono">{done}/{total}</span>
         </div>
       </div>
-      <div style={{ height: 14, borderRadius: 100, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+      <div style={{ height: 14, borderRadius: 100, background: 'var(--border)', overflow: 'hidden' }}>
         <div style={{
           height: '100%', width: `${pct}%`, borderRadius: 100,
-          background: 'linear-gradient(90deg, #A3E635 0%, #3FD08A 55%, #22D3EE 100%)',
+          background: 'linear-gradient(90deg, #A3E635 0%, var(--green) 55%, #22D3EE 100%)',
           boxShadow: '0 0 12px rgba(63,208,138,0.45)',
           transition: 'width 0.6s ease',
         }} />
@@ -146,10 +146,10 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
       {/* Header greeting */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5] leading-tight">
+          <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)] leading-tight">
             Halo, {profile?.full_name?.split(' ')[0] ?? 'User'} 👋
           </h1>
-          <p className="text-[#6B7385] text-sm mt-0.5">
+          <p className="text-[var(--text-muted)] text-sm mt-0.5">
             {profile?.divisions?.name ?? 'Department Terminal'} · {monthName} {year}
           </p>
         </div>
@@ -159,16 +159,16 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
             onChange={e => handleDivisionChange(e.target.value)}
             disabled={isPending}
             style={{
-              background: '#161a23', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px',
-              padding: '8px 12px', color: '#EDF0F5', fontSize: '13px', fontFamily: "'Space Grotesk', sans-serif",
+              background: 'var(--bg-card)', border: '1px solid var(--border-strong)', borderRadius: '10px',
+              padding: '8px 12px', color: 'var(--text-primary)', fontSize: '13px', fontFamily: "'Space Grotesk', sans-serif",
               cursor: 'pointer',
             }}
           >
             <option value="all">Semua Divisi</option>
             {divisions.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
-          <div className="flex items-center gap-2 text-[#6B7385] font-mono text-[11px]">
-            <span className="w-2 h-2 rounded-full bg-[#3FD08A] animate-pulse-dot" />
+          <div className="flex items-center gap-2 text-[var(--text-muted)] font-mono text-[11px]">
+            <span className="w-2 h-2 rounded-full bg-[var(--green)] animate-pulse-dot" />
             Live data
           </div>
         </div>
@@ -186,11 +186,11 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
         <StatCard label="Project Aktif" value={stats.totalProjects} sub={`${stats.overdueProjects} overdue`} />
         <StatCard label="Task Aktif" value={stats.activeTasks} />
         <StatCard label="Deadline Alert" value={stats.overdueTasks} valueColor="#FF8A4C" sub="deadline ≤ 3 hari" />
-        <StatCard label={`Selesai ${monthName.slice(0, 3)}`} value={stats.completedThisMonth} valueColor="#3FD08A" />
+        <StatCard label={`Selesai ${monthName.slice(0, 3)}`} value={stats.completedThisMonth} valueColor="var(--green)" />
         <div className="col-span-2 sm:col-span-1">
           <Card style={{ background: 'linear-gradient(135deg,rgba(255,106,26,0.16),rgba(255,106,26,0.04))', borderColor: 'rgba(255,106,26,0.28)' }}>
             <div className="p-3 sm:p-4">
-              <div className="font-mono text-[9.5px] tracking-widest text-[#FFB489] uppercase mb-1">Poin Saya</div>
+              <div className="font-mono text-[9.5px] tracking-widest text-[var(--peach)] uppercase mb-1">Poin Saya</div>
               <div className="font-grotesk font-bold text-2xl text-white">{myPoints}</div>
               {myRank > 0 && <div className="text-[11px] text-[#FF8A4C] mt-0.5">Peringkat #{myRank}</div>}
             </div>
@@ -203,10 +203,10 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
         {/* Progress: % Projects & Tasks selesai */}
         <div className={CARD} style={cardStyle}>
           <div className="flex items-center gap-2 mb-1">
-            <TrendingUp size={15} className="text-[#3FD08A]" />
-            <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Progress Penyelesaian</span>
+            <TrendingUp size={15} className="text-[var(--green)]" />
+            <span className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">Progress Penyelesaian</span>
           </div>
-          <p className="text-[11px] text-[#6B7385] mb-5">{isAllDivisions ? 'Semua divisi' : 'Divisi terpilih'}</p>
+          <p className="text-[11px] text-[var(--text-muted)] mb-5">{isAllDivisions ? 'Semua divisi' : 'Divisi terpilih'}</p>
           <div className="flex flex-col gap-6 pt-1">
             <CompletionBar label="Projects" done={progress.projectsDone} total={progress.projectsTotal} pct={projectPct} />
             <CompletionBar label="Tasks" done={progress.tasksDone} total={progress.tasksTotal} pct={taskPct} />
@@ -216,12 +216,12 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
         {/* Donut: Task status breakdown */}
         <div className={CARD} style={cardStyle}>
           <div className="flex items-center gap-2 mb-1">
-            <CheckCircle size={15} className="text-[#4A9EFF]" />
-            <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Status Task</span>
+            <CheckCircle size={15} className="text-[var(--blue)]" />
+            <span className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">Status Task</span>
           </div>
-          <p className="text-[11px] text-[#6B7385] mb-2">{isAllDivisions ? 'Semua divisi' : 'Divisi terpilih'}</p>
+          <p className="text-[11px] text-[var(--text-muted)] mb-2">{isAllDivisions ? 'Semua divisi' : 'Divisi terpilih'}</p>
           {taskStatusChartData.length === 0 ? (
-            <div className="flex items-center justify-center h-[210px] text-[#6B7385] text-sm">Belum ada task</div>
+            <div className="flex items-center justify-center h-[210px] text-[var(--text-muted)] text-sm">Belum ada task</div>
           ) : (
             <ResponsiveContainer width="100%" height={210}>
               <PieChart>
@@ -231,7 +231,7 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
                 </Pie>
                 <Tooltip content={<ChartTooltip />} />
                 <Legend verticalAlign="bottom" height={28}
-                  formatter={(v) => <span style={{ color: '#A5AEC0', fontSize: 10 }}>{v}</span>}
+                  formatter={(v) => <span style={{ color: 'var(--text-secondary)', fontSize: 10 }}>{v}</span>}
                   iconType="circle" iconSize={8} />
               </PieChart>
             </ResponsiveContainer>
@@ -242,25 +242,25 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
         <div className={CARD} style={cardStyle}>
           <div className="flex items-center gap-2 mb-1">
             <Star size={15} className="text-[#FF6A1A]" />
-            <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Tren Penyelesaian · 14 Hari</span>
+            <span className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">Tren Penyelesaian · 14 Hari</span>
           </div>
-          <p className="text-[11px] text-[#6B7385] mb-4">Task selesai per hari</p>
+          <p className="text-[11px] text-[var(--text-muted)] mb-4">Task selesai per hari</p>
           {trendChartData.length === 0 ? (
-            <div className="flex items-center justify-center h-[210px] text-[#6B7385] text-sm">Belum ada task selesai 14 hari ini</div>
+            <div className="flex items-center justify-center h-[210px] text-[var(--text-muted)] text-sm">Belum ada task selesai 14 hari ini</div>
           ) : (
             <ResponsiveContainer width="100%" height={210}>
               <AreaChart data={trendChartData} margin={{ top: 6, right: 8, left: -24, bottom: 0 }}>
                 <defs>
                   <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3FD08A" stopOpacity={0.5} />
-                    <stop offset="100%" stopColor="#3FD08A" stopOpacity={0} />
+                    <stop offset="0%" stopColor="var(--green)" stopOpacity={0.5} />
+                    <stop offset="100%" stopColor="var(--green)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="day" tick={{ fill: '#6B7385', fontSize: 9 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#6B7385', fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#3FD08A', strokeWidth: 1, strokeDasharray: '4 4' }} />
-                <Area type="monotone" dataKey="selesai" name="Task Selesai" stroke="#3FD08A" strokeWidth={2.5}
-                  fill="url(#trendGrad)" dot={{ fill: '#3FD08A', r: 3 }} activeDot={{ r: 5 }} />
+                <XAxis dataKey="day" tick={{ fill: 'var(--text-muted)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'var(--green)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                <Area type="monotone" dataKey="selesai" name="Task Selesai" stroke="var(--green)" strokeWidth={2.5}
+                  fill="url(#trendGrad)" dot={{ fill: 'var(--green)', r: 3 }} activeDot={{ r: 5 }} />
               </AreaChart>
             </ResponsiveContainer>
           )}
@@ -275,32 +275,32 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
 
           {/* My Tasks */}
           <Card>
-            <div className="flex items-center justify-between p-4 border-b border-[rgba(255,255,255,0.06)]">
+            <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
               <div className="flex items-center gap-2">
                 <CheckCircle size={16} className="text-[#FF8A4C]" />
-                <span className="font-grotesk font-semibold text-[15px] text-[#EDF0F5]">Tugas Saya</span>
+                <span className="font-grotesk font-semibold text-[15px] text-[var(--text-primary)]">Tugas Saya</span>
               </div>
               <Link href="/tasks" className="text-[12px] text-[#FF8A4C] hover:underline flex items-center gap-1">
                 Lihat semua <ArrowRight size={12} />
               </Link>
             </div>
-            <div className="divide-y divide-[rgba(255,255,255,0.04)]">
+            <div className="divide-y divide-[var(--surface-hover)]">
               {myTasks.length === 0 ? (
-                <div className="p-8 text-center text-[#6B7385] text-sm">
+                <div className="p-8 text-center text-[var(--text-muted)] text-sm">
                   Tidak ada task aktif. Kerja bagus! 🎉
                 </div>
               ) : myTasks.map(task => (
                 <Link key={task.id} href={`/tasks?id=${task.id}`}
-                  className="flex items-start gap-3 p-4 hover:bg-white/[0.02] transition-colors group">
+                  className="flex items-start gap-3 p-4 hover:bg-[var(--surface-hover)] transition-colors group">
                   <div className="w-2 h-2 rounded-full flex-shrink-0 mt-2"
-                    style={{ background: task.is_overdue ? '#FF6B6B' : task.status === 'In Progress' ? '#FF8A4C' : '#6B7385' }} />
+                    style={{ background: task.is_overdue ? 'var(--red)' : task.status === 'In Progress' ? '#FF8A4C' : 'var(--text-muted)' }} />
                   <div className="flex-1 min-w-0">
-                    <div className="text-[13.5px] text-[#EDF0F5] font-medium truncate group-hover:text-white">{task.name}</div>
+                    <div className="text-[13.5px] text-[var(--text-primary)] font-medium truncate group-hover:text-[var(--orange-primary)]">{task.name}</div>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {task.projects?.name && (
-                        <span className="font-mono text-[9.5px] text-[#6B7385] bg-white/5 px-1.5 py-0.5 rounded">{task.projects.name}</span>
+                        <span className="font-mono text-[9.5px] text-[var(--text-muted)] bg-white/5 px-1.5 py-0.5 rounded">{task.projects.name}</span>
                       )}
-                      <span className="font-mono text-[10px] text-[#6B7385]">
+                      <span className="font-mono text-[10px] text-[var(--text-muted)]">
                         {formatDate(task.due_date, { day: 'numeric', month: 'short' })}
                       </span>
                     </div>
@@ -316,29 +316,29 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
 
           {/* Recent Projects */}
           <Card>
-            <div className="flex items-center justify-between p-4 border-b border-[rgba(255,255,255,0.06)]">
+            <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
               <div className="flex items-center gap-2">
                 <TrendingUp size={16} className="text-[#FF8A4C]" />
-                <span className="font-grotesk font-semibold text-[15px] text-[#EDF0F5]">Project Aktif</span>
+                <span className="font-grotesk font-semibold text-[15px] text-[var(--text-primary)]">Project Aktif</span>
               </div>
               <Link href="/projects" className="text-[12px] text-[#FF8A4C] hover:underline flex items-center gap-1">
                 Lihat semua <ArrowRight size={12} />
               </Link>
             </div>
-            <div className="divide-y divide-[rgba(255,255,255,0.04)]">
+            <div className="divide-y divide-[var(--surface-hover)]">
               {recentProjects.length === 0 ? (
-                <div className="p-8 text-center text-[#6B7385] text-sm">Belum ada project aktif.</div>
+                <div className="p-8 text-center text-[var(--text-muted)] text-sm">Belum ada project aktif.</div>
               ) : recentProjects.map(p => (
                 <Link key={p.id} href={`/projects/${p.id}`}
-                  className="flex items-center gap-4 p-4 hover:bg-white/[0.02] transition-colors group">
+                  className="flex items-center gap-4 p-4 hover:bg-[var(--surface-hover)] transition-colors group">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[13.5px] text-[#EDF0F5] font-medium truncate group-hover:text-white">{p.name}</span>
+                      <span className="text-[13.5px] text-[var(--text-primary)] font-medium truncate group-hover:text-[var(--orange-primary)]">{p.name}</span>
                       {p.is_overdue && <Badge variant="red">Overdue</Badge>}
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-[10px] text-[#6B7385]">{(p.divisions as { name?: string } | null)?.name ?? '—'}</span>
-                      <span className="font-mono text-[10px] text-[#6B7385]">Deadline {formatDate(p.deadline, { day: 'numeric', month: 'short' })}</span>
+                      <span className="font-mono text-[10px] text-[var(--text-muted)]">{(p.divisions as { name?: string } | null)?.name ?? '—'}</span>
+                      <span className="font-mono text-[10px] text-[var(--text-muted)]">Deadline {formatDate(p.deadline, { day: 'numeric', month: 'short' })}</span>
                     </div>
                     <ProgressBar value={p.progress} className="mt-2" color={getProgressColor(p.progress)} height={5} showLabel />
                   </div>
@@ -357,10 +357,10 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
           {/* KPI card */}
           {myKpi.length > 0 && (
             <Card>
-              <div className="flex items-center justify-between p-4 border-b border-[rgba(255,255,255,0.06)]">
+              <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
                 <div className="flex items-center gap-2">
                   <Star size={16} className="text-[#FF8A4C]" />
-                  <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">KPI {monthName}</span>
+                  <span className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">KPI {monthName}</span>
                 </div>
                 {kpiOverall !== null && (
                   <span className="font-grotesk font-bold text-lg" style={{ color: getProgressColor(kpiOverall) }}>
@@ -374,9 +374,9 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
                   const pct = k.max_score > 0 ? Math.round((score / k.max_score) * 100) : 0
                   return (
                     <div key={i}>
-                      <div className="flex justify-between text-[11px] text-[#A5AEC0] mb-1">
+                      <div className="flex justify-between text-[11px] text-[var(--text-secondary)] mb-1">
                         <span className="truncate max-w-[60%]">{k.kpi_name}</span>
-                        <span className="font-mono text-[#EDF0F5]">{pct}%</span>
+                        <span className="font-mono text-[var(--text-primary)]">{pct}%</span>
                       </div>
                       <ProgressBar value={pct} color={getProgressColor(pct)} height={5} animated={false} />
                     </div>
@@ -391,32 +391,32 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
 
           {/* Leaderboard */}
           <Card>
-            <div className="p-4 border-b border-[rgba(255,255,255,0.06)]">
+            <div className="p-4 border-b border-[var(--border)]">
               <div className="flex items-center gap-2">
                 <Trophy size={16} className="text-[#FF8A4C]" />
-                <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Leaderboard</span>
+                <span className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">Leaderboard</span>
               </div>
             </div>
             {monthlyReward && (
               <div className="mx-4 mt-4 p-3 rounded-xl"
                 style={{ background: 'linear-gradient(135deg,#1a130c,#120d08)', border: '1px solid rgba(255,106,26,0.28)' }}>
-                <div className="font-mono text-[9.5px] tracking-widest text-[#FFB489] uppercase">Hadiah Bulan Ini</div>
+                <div className="font-mono text-[9.5px] tracking-widest text-[var(--peach)] uppercase">Hadiah Bulan Ini</div>
                 <div className="font-grotesk font-bold text-[14px] text-white mt-1">{monthlyReward.reward_name}</div>
               </div>
             )}
             <div className="p-4 space-y-2">
               {leaderboard.length === 0 ? (
-                <div className="text-center text-[#6B7385] text-sm py-4">Belum ada data poin bulan ini.</div>
+                <div className="text-center text-[var(--text-muted)] text-sm py-4">Belum ada data poin bulan ini.</div>
               ) : leaderboard.map((l) => (
                 <div key={l.userId} className="flex items-center gap-3 py-1.5">
                   <span className="font-grotesk font-bold text-[13px] w-5 flex-shrink-0"
-                    style={{ color: l.rank === 1 ? '#FF8A4C' : l.rank === 2 ? '#A5AEC0' : l.rank === 3 ? '#C08040' : '#6B7385' }}>
+                    style={{ color: l.rank === 1 ? '#FF8A4C' : l.rank === 2 ? 'var(--text-secondary)' : l.rank === 3 ? '#C08040' : 'var(--text-muted)' }}>
                     {l.rank}
                   </span>
                   <Avatar name={l.name} size="sm" />
                   <div className="flex-1 min-w-0">
-                    <div className="text-[12px] text-[#EDF0F5] font-medium truncate">{l.name}</div>
-                    <div className="font-mono text-[10px] text-[#6B7385]">{l.division}</div>
+                    <div className="text-[12px] text-[var(--text-primary)] font-medium truncate">{l.name}</div>
+                    <div className="font-mono text-[10px] text-[var(--text-muted)]">{l.division}</div>
                   </div>
                   <span className="font-grotesk font-bold text-[13px] text-white flex-shrink-0">{l.total}</span>
                 </div>
@@ -430,20 +430,20 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
           {/* Upcoming Events */}
           {upcomingEvents.length > 0 && (
             <Card>
-              <div className="flex items-center justify-between p-4 border-b border-[rgba(255,255,255,0.06)]">
+              <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
                 <div className="flex items-center gap-2">
                   <Calendar size={16} className="text-[#FF8A4C]" />
-                  <span className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">Agenda</span>
+                  <span className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">Agenda</span>
                 </div>
                 <Link href="/calendar" className="text-[12px] text-[#FF8A4C] hover:underline">Lihat →</Link>
               </div>
-              <div className="divide-y divide-[rgba(255,255,255,0.04)]">
+              <div className="divide-y divide-[var(--surface-hover)]">
                 {upcomingEvents.map(ev => (
                   <div key={ev.id} className="flex items-center gap-3 p-3.5">
                     <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#FF8A4C' }} />
                     <div className="flex-1 min-w-0">
-                      <div className="text-[12.5px] text-[#EDF0F5] font-medium truncate">{ev.title}</div>
-                      <div className="font-mono text-[10px] text-[#6B7385] mt-0.5">
+                      <div className="text-[12.5px] text-[var(--text-primary)] font-medium truncate">{ev.title}</div>
+                      <div className="font-mono text-[10px] text-[var(--text-muted)] mt-0.5">
                         {formatDate(ev.start_at, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })}
                       </div>
                     </div>
@@ -474,8 +474,8 @@ function MoodTracker({ todayMood }: { todayMood: { emoji: string; label: string 
 
   return (
     <div className={CARD} style={cardStyle}>
-      <p className="font-grotesk font-semibold text-[14px] text-[#EDF0F5]">How are you feeling today?</p>
-      <p className="text-[11px] text-[#6B7385] mt-0.5 mb-4">Pilih mood-mu hari ini</p>
+      <p className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">How are you feeling today?</p>
+      <p className="text-[11px] text-[var(--text-muted)] mt-0.5 mb-4">Pilih mood-mu hari ini</p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
         {MOODS.map((m, i) => {
           const active = selected === i
@@ -494,7 +494,7 @@ function MoodTracker({ todayMood }: { todayMood: { emoji: string; label: string 
               }}>
                 {m.emoji}
               </span>
-              <span style={{ fontSize: '9px', textAlign: 'center', lineHeight: 1.2, color: active ? m.color : '#6B7385', fontWeight: active ? 700 : 500 }}>
+              <span style={{ fontSize: '9px', textAlign: 'center', lineHeight: 1.2, color: active ? m.color : 'var(--text-muted)', fontWeight: active ? 700 : 500 }}>
                 {m.label}
               </span>
             </button>
@@ -514,7 +514,7 @@ function LegendDot({ color, label }: { color: string; label: string }) {
   return (
     <div className="flex items-center gap-1.5">
       <span style={{ width: 9, height: 9, borderRadius: '50%', background: color, display: 'inline-block' }} />
-      <span className="text-[11px] text-[#A5AEC0]">{label}</span>
+      <span className="text-[11px] text-[var(--text-secondary)]">{label}</span>
     </div>
   )
 }

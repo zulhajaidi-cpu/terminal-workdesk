@@ -19,10 +19,10 @@ interface Props {
 }
 
 const STATUS_CFG: Record<string, { bg: string; color: string }> = {
-  'Draft':       { bg: 'rgba(107,115,133,0.15)', color: '#6B7385' },
+  'Draft':       { bg: 'rgba(107,115,133,0.15)', color: 'var(--text-muted)' },
   'Need Review': { bg: 'rgba(245,158,11,0.15)',  color: '#F59E0B' },
   'Approved':    { bg: 'rgba(74,222,128,0.15)',  color: '#4ADE80' },
-  'Rejected':    { bg: 'rgba(255,107,107,0.15)', color: '#FF6B6B' },
+  'Rejected':    { bg: 'rgba(255,107,107,0.15)', color: 'var(--red)' },
   'Archived':    { bg: 'rgba(139,92,246,0.15)',  color: '#8B5CF6' },
 }
 const ASSET_STATUSES = Object.keys(STATUS_CFG)
@@ -89,11 +89,11 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5]">Assets</h1>
-          <p className="text-[#6B7385] text-sm mt-1">{assets.length} asset terdaftar</p>
+          <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">Assets</h1>
+          <p className="text-[var(--text-muted)] text-sm mt-1">{assets.length} asset terdaftar</p>
         </div>
         <button onClick={() => { setEditAsset(null); setShowModal(true) }}
-          style={{ background: '#FF6A1A', color: '#0C0F16', border: 'none', borderRadius: '11px', padding: '9px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          style={{ background: '#FF6A1A', color: 'var(--on-accent)', border: 'none', borderRadius: '11px', padding: '9px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Plus size={15} /> Upload Asset
         </button>
       </div>
@@ -102,8 +102,8 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
         {ASSET_STATUSES.map(s => (
           <div key={s} onClick={() => setStatusFilter(statusFilter === s ? 'Semua' : s)}
-            style={{ background: '#10141d', border: `1px solid ${statusFilter === s ? STATUS_CFG[s].color + '55' : 'rgba(255,255,255,0.07)'}`, borderRadius: '11px', padding: '10px 14px', cursor: 'pointer' }}>
-            <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '3px' }}>{s}</p>
+            style={{ background: 'var(--bg-elevated)', border: `1px solid ${statusFilter === s ? STATUS_CFG[s].color + '55' : 'var(--border)'}`, borderRadius: '11px', padding: '10px 14px', cursor: 'pointer' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '3px' }}>{s}</p>
             <p style={{ fontSize: '20px', fontWeight: 700, color: STATUS_CFG[s].color, fontFamily: "'Space Grotesk', sans-serif" }}>{counts[s] ?? 0}</p>
           </div>
         ))}
@@ -111,18 +111,18 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <div style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', gap: '8px', background: '#141925', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '11px', padding: '9px 12px' }}>
-          <Search size={14} style={{ color: '#6B7385', flexShrink: 0 }} />
+        <div style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '11px', padding: '9px 12px' }}>
+          <Search size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari nama, kategori, atau tag..."
-            style={{ background: 'transparent', border: 'none', outline: 'none', color: '#EDF0F5', fontSize: '13px', width: '100%' }} />
+            style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontSize: '13px', width: '100%' }} />
         </div>
         <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
-          style={{ background: '#141925', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '11px', padding: '9px 12px', color: '#EDF0F5', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
+          style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '11px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
           <option value="Semua">Semua Kategori</option>
           {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
         <select value={divisionFilter} onChange={e => setDivisionFilter(e.target.value)}
-          style={{ background: '#141925', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '11px', padding: '9px 12px', color: '#EDF0F5', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
+          style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '11px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
           <option value="Semua">Semua Divisi</option>
           {divisionNames.map(d => <option key={d} value={d}>{d}</option>)}
         </select>
@@ -130,9 +130,9 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
 
       {/* Grid / List */}
       {filtered.length === 0 ? (
-        <div style={{ background: '#10141d', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
-          <FolderOpen size={36} style={{ color: '#4a5160', margin: '0 auto 12px' }} />
-          <p style={{ color: '#6B7385', fontSize: '14px' }}>Tidak ada asset ditemukan</p>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px dashed var(--border-strong)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
+          <FolderOpen size={36} style={{ color: 'var(--text-faint)', margin: '0 auto 12px' }} />
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Tidak ada asset ditemukan</p>
           <button onClick={() => { setEditAsset(null); setShowModal(true) }}
             style={{ marginTop: '14px', background: 'rgba(255,106,26,0.1)', border: '1px solid rgba(255,106,26,0.3)', color: '#FF8A4C', borderRadius: '10px', padding: '9px 18px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
             + Upload Asset Pertama
@@ -143,9 +143,9 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
           {filtered.map(a => (
             <div key={a.id}
               onClick={() => setDetailAsset(a)}
-              style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '16px', cursor: 'pointer', transition: 'border-color 0.15s, transform 0.15s' }}
+              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '14px', padding: '16px', cursor: 'pointer', transition: 'border-color 0.15s, transform 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,106,26,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.transform = 'translateY(0)' }}>
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(0)' }}>
               {/* Icon + category */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                 <div style={{ background: 'rgba(255,106,26,0.1)', border: '1px solid rgba(255,106,26,0.2)', borderRadius: '10px', padding: '8px 10px', fontSize: '11px', color: '#FF8A4C', fontWeight: 600 }}>
@@ -154,13 +154,13 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
                 <StatusBadge status={a.status} />
               </div>
 
-              <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#EDF0F5', marginBottom: '4px', lineHeight: 1.3 }}>{a.name}</h3>
+              <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px', lineHeight: 1.3 }}>{a.name}</h3>
 
-              {a.description && <p style={{ fontSize: '12px', color: '#6B7385', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{a.description}</p>}
+              {a.description && <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{a.description}</p>}
 
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
                 {(a.tags ?? []).slice(0, 3).map(tag => (
-                  <span key={tag} style={{ fontSize: '10px', background: 'rgba(255,255,255,0.05)', color: '#6B7385', padding: '2px 8px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <span key={tag} style={{ fontSize: '10px', background: 'var(--surface-hover)', color: 'var(--text-muted)', padding: '2px 8px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '3px' }}>
                     <Tag size={8} />{tag}
                   </span>
                 ))}
@@ -168,22 +168,22 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <p style={{ fontSize: '11px', color: '#6B7385' }}>{a.divisionName ?? '—'}</p>
-                  {a.version && <p style={{ fontSize: '10px', color: '#4a5160', fontFamily: "'IBM Plex Mono', monospace" }}>v{a.version}</p>}
+                  <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{a.divisionName ?? '—'}</p>
+                  {a.version && <p style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: "'IBM Plex Mono', monospace" }}>v{a.version}</p>}
                 </div>
                 <div className="flex gap-2" onClick={e => e.stopPropagation()}>
                   <a href={a.driveLink} target="_blank" rel="noopener noreferrer"
-                    style={{ background: 'rgba(74,158,255,0.1)', border: '1px solid rgba(74,158,255,0.2)', borderRadius: '7px', padding: '5px 7px', color: '#4A9EFF', display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                    style={{ background: 'rgba(74,158,255,0.1)', border: '1px solid rgba(74,158,255,0.2)', borderRadius: '7px', padding: '5px 7px', color: 'var(--blue)', display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
                     <ExternalLink size={12} />
                   </a>
                   {canManageAsset(currentUser.role, a.uploadedBy, currentUser.id) && (
                     <>
                       <button onClick={() => { setEditAsset(a); setShowModal(true) }}
-                        style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: '#A5AEC0', display: 'flex' }}>
+                        style={{ background: 'var(--border)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex' }}>
                         <Pencil size={12} />
                       </button>
                       <button onClick={() => handleDelete(a.id)}
-                        style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: '#FF6B6B', display: 'flex' }}>
+                        style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: 'var(--red)', display: 'flex' }}>
                         <Trash2 size={12} />
                       </button>
                     </>
@@ -198,17 +198,17 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
       {/* Detail side panel */}
       {detailAsset && (
         <div className="fixed inset-0 z-40 flex justify-end" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setDetailAsset(null)}>
-          <div style={{ width: '100%', maxWidth: '380px', background: '#10141d', borderLeft: '1px solid rgba(255,255,255,0.08)', height: '100%', overflowY: 'auto', padding: '24px' }}
+          <div style={{ width: '100%', maxWidth: '380px', background: 'var(--bg-elevated)', borderLeft: '1px solid var(--border)', height: '100%', overflowY: 'auto', padding: '24px' }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 className="font-grotesk font-bold text-[16px] text-[#EDF0F5]">Detail Asset</h2>
-              <button onClick={() => setDetailAsset(null)} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '8px', padding: '6px 8px', cursor: 'pointer', color: '#6B7385', display: 'flex' }}><X size={15} /></button>
+              <h2 className="font-grotesk font-bold text-[16px] text-[var(--text-primary)]">Detail Asset</h2>
+              <button onClick={() => setDetailAsset(null)} style={{ background: 'var(--border)', border: 'none', borderRadius: '8px', padding: '6px 8px', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex' }}><X size={15} /></button>
             </div>
 
             <div className="space-y-4">
               <div>
                 <p style={{ fontSize: '10px', color: '#FF8A4C', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '4px' }}>{detailAsset.category}</p>
-                <h3 className="font-grotesk font-bold text-[18px] text-[#EDF0F5]">{detailAsset.name}</h3>
+                <h3 className="font-grotesk font-bold text-[18px] text-[var(--text-primary)]">{detailAsset.name}</h3>
               </div>
 
               <StatusBadge status={detailAsset.status} />
@@ -220,33 +220,33 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
                   { label: 'Diupload oleh', val: detailAsset.uploaderName ?? '—' },
                   { label: 'Project', val: detailAsset.projectName ?? '—' },
                 ].map(item => (
-                  <div key={item.label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '9px', padding: '10px 12px' }}>
-                    <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '3px' }}>{item.label}</p>
-                    <p style={{ fontSize: '13px', color: '#A5AEC0' }}>{item.val}</p>
+                  <div key={item.label} style={{ background: 'var(--surface-subtle)', borderRadius: '9px', padding: '10px 12px' }}>
+                    <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '3px' }}>{item.label}</p>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{item.val}</p>
                   </div>
                 ))}
               </div>
 
               {detailAsset.description && (
-                <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '9px', padding: '10px 12px' }}>
-                  <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Deskripsi</p>
-                  <p style={{ fontSize: '13px', color: '#A5AEC0', lineHeight: 1.6 }}>{detailAsset.description}</p>
+                <div style={{ background: 'var(--surface-subtle)', borderRadius: '9px', padding: '10px 12px' }}>
+                  <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '5px' }}>Deskripsi</p>
+                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{detailAsset.description}</p>
                 </div>
               )}
 
               {(detailAsset.tags ?? []).length > 0 && (
                 <div>
-                  <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '6px' }}>Tags</p>
+                  <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '6px' }}>Tags</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                     {(detailAsset.tags ?? []).map(t => (
-                      <span key={t} style={{ fontSize: '11px', background: 'rgba(255,255,255,0.06)', color: '#A5AEC0', padding: '3px 10px', borderRadius: '100px' }}>{t}</span>
+                      <span key={t} style={{ fontSize: '11px', background: 'var(--border)', color: 'var(--text-secondary)', padding: '3px 10px', borderRadius: '100px' }}>{t}</span>
                     ))}
                   </div>
                 </div>
               )}
 
               <a href={detailAsset.driveLink} target="_blank" rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(74,158,255,0.08)', border: '1px solid rgba(74,158,255,0.2)', borderRadius: '10px', padding: '11px 14px', color: '#4A9EFF', fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(74,158,255,0.08)', border: '1px solid rgba(74,158,255,0.2)', borderRadius: '10px', padding: '11px 14px', color: 'var(--blue)', fontSize: '13px', textDecoration: 'none', fontWeight: 600 }}>
                 <ExternalLink size={14} /> Buka di Google Drive
               </a>
 
@@ -254,7 +254,7 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
                 <>
                   {/* Quick status change */}
                   <div>
-                    <p style={{ fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '6px' }}>Ubah Status</p>
+                    <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '6px' }}>Ubah Status</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                       {ASSET_STATUSES.filter(s => s !== detailAsset.status).map(s => (
                         <button key={s} onClick={() => handleStatusChange(detailAsset.id, s)}
@@ -267,11 +267,11 @@ export function AssetsContent({ assets: initialAssets, divisions, projects, curr
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                     <button onClick={() => { setEditAsset(detailAsset); setShowModal(true) }}
-                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px', cursor: 'pointer', color: '#A5AEC0', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                      style={{ background: 'var(--border)', border: '1px solid var(--border-strong)', borderRadius: '10px', padding: '10px', cursor: 'pointer', color: 'var(--text-secondary)', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
                       <Pencil size={13} /> Edit
                     </button>
                     <button onClick={() => handleDelete(detailAsset.id)}
-                      style={{ background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.2)', borderRadius: '10px', padding: '10px', cursor: 'pointer', color: '#FF6B6B', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                      style={{ background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.2)', borderRadius: '10px', padding: '10px', cursor: 'pointer', color: 'var(--red)', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
                       <Trash2 size={13} /> Hapus
                     </button>
                   </div>
@@ -323,12 +323,12 @@ function AssetModal({ asset, divisions, projects, currentUser, onClose, onSaved 
   const [error, setError] = useState<string | null>(null)
 
   const inputS: React.CSSProperties = {
-    background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px',
-    padding: '10px 12px', color: '#EDF0F5', fontSize: '13px', outline: 'none', width: '100%',
+    background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px',
+    padding: '10px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', width: '100%',
     fontFamily: "'Plus Jakarta Sans', sans-serif",
   }
   const labelS: React.CSSProperties = {
-    fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace",
+    fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace",
     letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: '5px',
   }
 
@@ -373,14 +373,14 @@ function AssetModal({ asset, divisions, projects, currentUser, onClose, onSaved 
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 py-8" style={{ background: 'rgba(0,0,0,0.75)' }}>
-      <div className="w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh]" style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="font-grotesk font-bold text-[16px] text-[#EDF0F5]">{isNew ? 'Upload Asset' : 'Edit Asset'}</h2>
-          <button onClick={onClose} style={{ color: '#6B7385', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
+      <div className="w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh]" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }}>
+        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <h2 className="font-grotesk font-bold text-[16px] text-[var(--text-primary)]">{isNew ? 'Upload Asset' : 'Edit Asset'}</h2>
+          <button onClick={onClose} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4 flex-1 overflow-y-auto">
-          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: 'var(--red)' }}>{error}</div>}
 
           <div>
             <label style={labelS}>Nama Asset *</label>
@@ -450,9 +450,9 @@ function AssetModal({ asset, divisions, projects, currentUser, onClose, onSaved 
             {form.tags.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '8px' }}>
                 {form.tags.map(t => (
-                  <span key={t} style={{ fontSize: '11px', background: 'rgba(255,255,255,0.06)', color: '#A5AEC0', padding: '3px 10px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span key={t} style={{ fontSize: '11px', background: 'var(--border)', color: 'var(--text-secondary)', padding: '3px 10px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                     {t}
-                    <button type="button" onClick={() => setForm(f => ({ ...f, tags: f.tags.filter(x => x !== t) }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7385', padding: 0, display: 'flex', lineHeight: 1 }}><X size={10} /></button>
+                    <button type="button" onClick={() => setForm(f => ({ ...f, tags: f.tags.filter(x => x !== t) }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 0, display: 'flex', lineHeight: 1 }}><X size={10} /></button>
                   </span>
                 ))}
               </div>
@@ -460,8 +460,8 @@ function AssetModal({ asset, divisions, projects, currentUser, onClose, onSaved 
           </div>
 
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#A5AEC0', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>Batal</button>
-            <button type="submit" disabled={loading} style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: '#0C0F16', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, background: 'var(--border)', border: '1px solid var(--border-strong)', color: 'var(--text-secondary)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>Batal</button>
+            <button type="submit" disabled={loading} style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: 'var(--on-accent)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
               {loading ? 'Menyimpan...' : isNew ? 'Upload' : 'Simpan'}
             </button>
           </div>

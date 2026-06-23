@@ -24,15 +24,15 @@ interface Props {
 }
 
 const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']
-const STATUS_COLOR: Record<string, string> = { Draft: '#6B7385', Reviewed: '#4A9EFF', Final: '#4ADE80' }
+const STATUS_COLOR: Record<string, string> = { Draft: 'var(--text-muted)', Reviewed: 'var(--blue)', Final: '#4ADE80' }
 
 const inputS: React.CSSProperties = {
-  background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '9px',
-  padding: '9px 12px', color: '#EDF0F5', fontSize: '13px', outline: 'none', width: '100%',
+  background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '9px',
+  padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', width: '100%',
   fontFamily: "'Plus Jakarta Sans', sans-serif",
 }
 const labelS: React.CSSProperties = {
-  fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace",
+  fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace",
   letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: '4px',
 }
 
@@ -89,8 +89,8 @@ export function KpiContent({ kpiItems, viewableUsers, month, year, targetUserId,
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5]">KPI Individu</h1>
-          <p className="text-[#6B7385] text-sm mt-1">
+          <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">KPI Individu</h1>
+          <p className="text-[var(--text-muted)] text-sm mt-1">
             {targetUserId === currentUser.id ? 'KPI kamu' : `KPI ${targetUser?.fullName ?? '—'}`} · {MONTHS[month - 1]} {year}
           </p>
         </div>
@@ -115,7 +115,7 @@ export function KpiContent({ kpiItems, viewableUsers, month, year, targetUserId,
 
           {canEdit && !anyFinal && (
             <button onClick={() => { setEditItem(null); setShowForm(true) }}
-              style={{ background: '#FF6A1A', color: '#0C0F16', border: 'none', borderRadius: '10px', padding: '9px 16px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              style={{ background: '#FF6A1A', color: 'var(--on-accent)', border: 'none', borderRadius: '10px', padding: '9px 16px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }}>
               <Plus size={14} /> Tambah KPI
             </button>
           )}
@@ -137,10 +137,10 @@ export function KpiContent({ kpiItems, viewableUsers, month, year, targetUserId,
           { label: 'Skor Akhir', value: totalFinal.toFixed(1), unit: 'poin' },
           { label: 'Status', value: anyFinal ? 'Final' : kpiItems.some(k => k.status === 'Reviewed') ? 'Reviewed' : 'Draft', unit: '' },
         ].map(s => (
-          <div key={s.label} style={{ background: '#10141d', border: `1px solid ${(s as any).warn ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.07)'}`, borderRadius: '14px', padding: '16px 18px' }}>
-            <p style={{ fontSize: '11px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '6px' }}>{s.label}</p>
-            <p className="font-grotesk font-bold text-2xl" style={{ color: (s as any).warn ? '#F59E0B' : '#EDF0F5' }}>{s.value}</p>
-            {s.unit && <p style={{ fontSize: '11px', color: '#6B7385', marginTop: '2px' }}>{s.unit}</p>}
+          <div key={s.label} style={{ background: 'var(--bg-elevated)', border: `1px solid ${(s as any).warn ? 'rgba(245,158,11,0.4)' : 'var(--border)'}`, borderRadius: '14px', padding: '16px 18px' }}>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '6px' }}>{s.label}</p>
+            <p className="font-grotesk font-bold text-2xl" style={{ color: (s as any).warn ? '#F59E0B' : 'var(--text-primary)' }}>{s.value}</p>
+            {s.unit && <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{s.unit}</p>}
           </div>
         ))}
       </div>
@@ -155,19 +155,19 @@ export function KpiContent({ kpiItems, viewableUsers, month, year, targetUserId,
 
       {/* KPI Table */}
       {kpiItems.length === 0 ? (
-        <div style={{ background: '#10141d', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
-          <Target size={36} style={{ color: '#4a5160', margin: '0 auto 12px' }} />
-          <p className="font-grotesk font-bold text-[#6B7385]">Belum ada KPI untuk periode ini</p>
-          {canEdit && <p style={{ fontSize: '13px', color: '#4a5160', marginTop: '6px' }}>Klik "+ Tambah KPI" untuk mulai mengisi</p>}
+        <div style={{ background: 'var(--bg-elevated)', border: '1px dashed var(--border-strong)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
+          <Target size={36} style={{ color: 'var(--text-faint)', margin: '0 auto 12px' }} />
+          <p className="font-grotesk font-bold text-[var(--text-muted)]">Belum ada KPI untuk periode ini</p>
+          {canEdit && <p style={{ fontSize: '13px', color: 'var(--text-faint)', marginTop: '6px' }}>Klik "+ Tambah KPI" untuk mulai mengisi</p>}
         </div>
       ) : (
-        <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+                <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface-subtle)' }}>
                   {['KPI / Indikator', 'Bobot', 'Target', 'Realisasi', 'Skor Auto', 'Skor Final', 'Status', ''].map(h => (
-                    <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontSize: '10px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>
+                    <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -178,33 +178,33 @@ export function KpiContent({ kpiItems, viewableUsers, month, year, targetUserId,
                   const pct = item.target && item.realization ? Math.round((Number(item.realization) / Number(item.target)) * 100) : null
 
                   return (
-                    <tr key={item.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <tr key={item.id} style={{ borderBottom: '1px solid var(--surface-hover)' }}>
                       <td style={{ padding: '12px 14px', maxWidth: '220px' }}>
-                        <p style={{ fontSize: '13px', fontWeight: 600, color: '#EDF0F5' }}>{item.kpiName}</p>
-                        {item.evaluationNote && <p style={{ fontSize: '11px', color: '#6B7385', marginTop: '2px', fontStyle: 'italic' }}>"{item.evaluationNote}"</p>}
+                        <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{item.kpiName}</p>
+                        {item.evaluationNote && <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontStyle: 'italic' }}>"{item.evaluationNote}"</p>}
                       </td>
                       <td style={{ padding: '12px 14px' }}>
                         <span style={{ fontSize: '14px', fontWeight: 700, color: '#FF8A4C' }}>{Number(item.weight)}%</span>
                       </td>
-                      <td style={{ padding: '12px 14px', fontSize: '13px', color: '#A5AEC0' }}>
-                        {item.target ?? <span style={{ color: '#4a5160' }}>—</span>}
+                      <td style={{ padding: '12px 14px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                        {item.target ?? <span style={{ color: 'var(--text-faint)' }}>—</span>}
                       </td>
                       <td style={{ padding: '12px 14px' }}>
                         <div>
-                          <span style={{ fontSize: '13px', fontWeight: 600, color: pct !== null ? (pct >= 100 ? '#4ADE80' : pct >= 80 ? '#F59E0B' : '#FF6B6B') : '#6B7385' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 600, color: pct !== null ? (pct >= 100 ? '#4ADE80' : pct >= 80 ? '#F59E0B' : 'var(--red)') : 'var(--text-muted)' }}>
                             {item.realization ?? '—'}
                           </span>
-                          {pct !== null && <span style={{ fontSize: '11px', color: '#6B7385', marginLeft: '4px' }}>({pct}%)</span>}
+                          {pct !== null && <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginLeft: '4px' }}>({pct}%)</span>}
                         </div>
                       </td>
-                      <td style={{ padding: '12px 14px', fontSize: '13px', color: '#A5AEC0' }}>
+                      <td style={{ padding: '12px 14px', fontSize: '13px', color: 'var(--text-secondary)' }}>
                         {auto !== null ? auto.toFixed(1) : '—'}
                       </td>
                       <td style={{ padding: '12px 14px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#EDF0F5' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
                           {final !== null ? final.toFixed(1) : '—'}
                         </span>
-                        <span style={{ fontSize: '11px', color: '#6B7385' }}>/{Number(item.maxScore)}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>/{Number(item.maxScore)}</span>
                       </td>
                       <td style={{ padding: '12px 14px' }}>
                         <span style={{ fontSize: '11px', fontWeight: 600, color: STATUS_COLOR[item.status], background: `${STATUS_COLOR[item.status]}18`, padding: '3px 9px', borderRadius: '100px' }}>
@@ -216,11 +216,11 @@ export function KpiContent({ kpiItems, viewableUsers, month, year, targetUserId,
                           {canEdit && item.status === 'Draft' && (
                             <>
                               <button onClick={() => { setEditItem(item); setShowForm(true) }}
-                                style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: '#A5AEC0', display: 'flex' }}>
+                                style={{ background: 'var(--border)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex' }}>
                                 <Pencil size={12} />
                               </button>
                               <button onClick={() => handleDelete(item.id)}
-                                style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: '#FF6B6B', display: 'flex' }}>
+                                style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '7px', padding: '5px 7px', cursor: 'pointer', color: 'var(--red)', display: 'flex' }}>
                                 <Trash2 size={12} />
                               </button>
                             </>
@@ -239,8 +239,8 @@ export function KpiContent({ kpiItems, viewableUsers, month, year, targetUserId,
               </tbody>
               {/* Total row */}
               <tfoot>
-                <tr style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                  <td style={{ padding: '12px 14px', fontSize: '13px', fontWeight: 700, color: '#EDF0F5', fontFamily: "'Space Grotesk', sans-serif" }}>TOTAL</td>
+                <tr style={{ background: 'var(--surface-subtle)', borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '12px 14px', fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Space Grotesk', sans-serif" }}>TOTAL</td>
                   <td style={{ padding: '12px 14px', fontSize: '14px', fontWeight: 700, color: weightOk ? '#4ADE80' : '#F59E0B' }}>{totalWeightPct}%</td>
                   <td colSpan={3} />
                   <td style={{ padding: '12px 14px', fontSize: '14px', fontWeight: 700, color: '#FF6A1A' }}>{totalFinal.toFixed(1)}</td>
@@ -254,13 +254,13 @@ export function KpiContent({ kpiItems, viewableUsers, month, year, targetUserId,
 
       {/* Actions */}
       {kpiItems.length > 0 && canEdit && allDraft && weightOk && (
-        <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '14px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
           <div>
-            <p className="font-grotesk font-bold text-[14px] text-[#EDF0F5]">Kirim KPI untuk Review</p>
-            <p style={{ fontSize: '12px', color: '#6B7385', marginTop: '2px' }}>Semua item akan berubah status menjadi "Reviewed" dan dikirim ke Manager untuk evaluasi</p>
+            <p className="font-grotesk font-bold text-[14px] text-[var(--text-primary)]">Kirim KPI untuk Review</p>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Semua item akan berubah status menjadi "Reviewed" dan dikirim ke Manager untuk evaluasi</p>
           </div>
           <button onClick={handleSubmitForReview} disabled={saving}
-            style={{ background: '#FF6A1A', border: 'none', color: '#0C0F16', borderRadius: '10px', padding: '10px 20px', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '13px', whiteSpace: 'nowrap' }}>
+            style={{ background: '#FF6A1A', border: 'none', color: 'var(--on-accent)', borderRadius: '10px', padding: '10px 20px', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '13px', whiteSpace: 'nowrap' }}>
             {saving ? 'Mengirim...' : 'Kirim untuk Review →'}
           </button>
         </div>
@@ -323,13 +323,13 @@ function KpiFormModal({ item, month, year, targetUserId, onClose, onSaved }: {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 py-8" style={{ background: 'rgba(0,0,0,0.75)' }}>
-      <div className="w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh]" style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.1)' }}>
-        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="font-grotesk font-bold text-[16px] text-[#EDF0F5]">{isNew ? 'Tambah KPI Baru' : 'Edit KPI'}</h2>
-          <button onClick={onClose} style={{ color: '#6B7385', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
+      <div className="w-full max-w-lg rounded-2xl flex flex-col max-h-[90vh]" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }}>
+        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <h2 className="font-grotesk font-bold text-[16px] text-[var(--text-primary)]">{isNew ? 'Tambah KPI Baru' : 'Edit KPI'}</h2>
+          <button onClick={onClose} style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>&times;</button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4 flex-1 overflow-y-auto">
-          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: '#FF6B6B' }}>{error}</div>}
+          {error && <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '10px 14px', fontSize: '13px', color: 'var(--red)' }}>{error}</div>}
 
           <div>
             <label style={labelS}>Nama KPI / Indikator *</label>
@@ -387,11 +387,11 @@ function KpiFormModal({ item, month, year, targetUserId, onClose, onSaved }: {
 
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={onClose}
-              style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#A5AEC0', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>
+              style={{ flex: 1, background: 'var(--border)', border: '1px solid var(--border-strong)', color: 'var(--text-secondary)', borderRadius: '10px', padding: '11px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '14px' }}>
               Batal
             </button>
             <button type="submit" disabled={loading}
-              style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: '#0C0F16', borderRadius: '10px', padding: '11px', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
+              style={{ flex: 2, background: loading ? 'rgba(255,106,26,0.5)' : '#FF6A1A', border: 'none', color: 'var(--on-accent)', borderRadius: '10px', padding: '11px', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '14px' }}>
               {loading ? 'Menyimpan...' : isNew ? 'Tambah KPI' : 'Simpan Perubahan'}
             </button>
           </div>

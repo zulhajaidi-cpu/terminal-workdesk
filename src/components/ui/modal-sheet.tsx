@@ -14,8 +14,8 @@ export function ModalSheet({
   onClose,
   children,
   maxWidth = 'max-w-lg',
-  background = '#10141d',
-  border = '1px solid rgba(255,255,255,0.1)',
+  background = 'var(--bg-elevated)',
+  border = '1px solid var(--border-strong)',
 }: Props) {
   const [translateY, setTranslateY] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -65,7 +65,7 @@ export function ModalSheet({
         >
           {/* Drag handle — mobile only */}
           <div className="lg:hidden pt-3 pb-1 flex justify-center flex-shrink-0" style={{ cursor: 'grab' }}>
-            <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.2)' }} />
+            <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'var(--border-strong)' }} />
           </div>
           {children}
         </div>

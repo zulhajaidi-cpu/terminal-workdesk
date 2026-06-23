@@ -12,8 +12,8 @@ export function Card({ children, className, style, onClick }: CardProps) {
     <div
       className={cn(
         'rounded-2xl border',
-        'bg-[#141925] border-[rgba(255,255,255,0.06)]',
-        onClick && 'cursor-pointer hover:border-[rgba(255,255,255,0.12)] transition-colors',
+        'bg-[var(--bg-card)] border-[var(--border)]',
+        onClick && 'cursor-pointer hover:border-[var(--border-strong)] transition-colors',
         className
       )}
       style={style}
@@ -26,7 +26,7 @@ export function Card({ children, className, style, onClick }: CardProps) {
 
 export function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('p-4 border-b border-[rgba(255,255,255,0.06)]', className)}>
+    <div className={cn('p-4 border-b border-[var(--border)]', className)}>
       {children}
     </div>
   )
@@ -38,7 +38,7 @@ export function CardBody({ children, className }: { children: React.ReactNode; c
 
 export function CardTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <h3 className={cn('font-grotesk font-semibold text-[15px] text-[#EDF0F5]', className)}>
+    <h3 className={cn('font-grotesk font-semibold text-[15px] text-[var(--text-primary)]', className)}>
       {children}
     </h3>
   )
@@ -55,9 +55,9 @@ export function StatCard({ label, value, sub, valueColor = '#fff' }: StatCardPro
   return (
     <Card>
       <div className="p-3 sm:p-4">
-        <div className="font-mono text-[10px] tracking-widest text-[#6B7385] uppercase mb-1">{label}</div>
+        <div className="font-mono text-[10px] tracking-widest text-[var(--text-muted)] uppercase mb-1">{label}</div>
         <div className="font-grotesk font-bold text-2xl" style={{ color: valueColor }}>{value}</div>
-        {sub && <div className="text-[11px] mt-1" style={{ color: valueColor === '#fff' ? '#6B7385' : valueColor }}>{sub}</div>}
+        {sub && <div className="text-[11px] mt-1" style={{ color: valueColor === '#fff' ? 'var(--text-muted)' : valueColor }}>{sub}</div>}
       </div>
     </Card>
   )

@@ -23,13 +23,13 @@ const STEP_ROLE_LABEL: Record<string, string> = {
   spv: 'Leader Divisi', manager: 'Manager', director: 'Direktur',
 }
 const ACTION_COLOR: Record<string, string> = {
-  pending: '#6B7385', approve: '#4ADE80', reject: '#FF6B6B', revision: '#F59E0B',
+  pending: 'var(--text-muted)', approve: '#4ADE80', reject: 'var(--red)', revision: '#F59E0B',
 }
 const ACTION_LABEL: Record<string, string> = {
   pending: 'Menunggu', approve: 'Disetujui', reject: 'Ditolak', revision: 'Perlu Revisi',
 }
 const PRIORITY_COLOR: Record<string, string> = {
-  Low: '#6B7385', Medium: '#4A9EFF', High: '#F59E0B', Urgent: '#FF6B6B',
+  Low: 'var(--text-muted)', Medium: 'var(--blue)', High: '#F59E0B', Urgent: 'var(--red)',
 }
 
 export function ApprovalsContent({ pendingForMe, others, currentUser }: Props) {
@@ -42,12 +42,12 @@ export function ApprovalsContent({ pendingForMe, others, currentUser }: Props) {
     <div className="max-w-5xl mx-auto animate-fade-in space-y-5">
       {/* Header */}
       <div>
-        <h1 className="font-grotesk font-bold text-2xl text-[#EDF0F5]">Approvals</h1>
-        <p className="text-[#6B7385] text-sm mt-1">Kelola persetujuan project yang membutuhkan tindakanmu</p>
+        <h1 className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">Approvals</h1>
+        <p className="text-[var(--text-muted)] text-sm mt-1">Kelola persetujuan project yang membutuhkan tindakanmu</p>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
         {[
           { key: 'pending', label: `Perlu Aksi${pendingForMe.length > 0 ? ` (${pendingForMe.length})` : ''}` },
           { key: 'history', label: 'Semua' },
@@ -55,7 +55,7 @@ export function ApprovalsContent({ pendingForMe, others, currentUser }: Props) {
           <button key={t.key} onClick={() => setTab(t.key as any)}
             style={{
               background: tab === t.key ? '#FF6A1A' : 'transparent',
-              color: tab === t.key ? '#0C0F16' : '#6B7385',
+              color: tab === t.key ? 'var(--bg-base)' : 'var(--text-muted)',
               border: 'none', borderRadius: '9px', padding: '7px 18px',
               cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 600, fontSize: '13px', transition: 'all 0.15s',
@@ -67,9 +67,9 @@ export function ApprovalsContent({ pendingForMe, others, currentUser }: Props) {
 
       {/* Empty state */}
       {list.length === 0 && (
-        <div style={{ background: '#10141d', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
+        <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
           <CheckCircle size={40} style={{ color: '#4ADE80', margin: '0 auto 12px' }} />
-          <p className="font-grotesk font-bold text-[#EDF0F5] text-[15px]">
+          <p className="font-grotesk font-bold text-[var(--text-primary)] text-[15px]">
             {tab === 'pending' ? 'Tidak ada approval yang perlu ditindaklanjuti' : 'Belum ada data approval'}
           </p>
         </div>
@@ -117,7 +117,7 @@ function ApprovalCard({ item, currentUser, onAction }: { item: ApprovalItem; cur
   const isApproved = item.status === 'Approved'
 
   return (
-    <div style={{ background: '#10141d', border: `1px solid ${item.canActNow ? 'rgba(255,106,26,0.3)' : 'rgba(255,255,255,0.07)'}`, borderRadius: '16px', overflow: 'hidden' }}>
+    <div style={{ background: 'var(--bg-elevated)', border: `1px solid ${item.canActNow ? 'rgba(255,106,26,0.3)' : 'var(--border)'}`, borderRadius: '16px', overflow: 'hidden' }}>
       {/* Card header */}
       <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
@@ -126,32 +126,32 @@ function ApprovalCard({ item, currentUser, onAction }: { item: ApprovalItem; cur
           )}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <p className="font-grotesk font-bold text-[#EDF0F5] text-[14px]">{item.project.name ?? '—'}</p>
-              <span style={{ fontSize: '11px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace" }}>{item.project.code}</span>
+              <p className="font-grotesk font-bold text-[var(--text-primary)] text-[14px]">{item.project.name ?? '—'}</p>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace" }}>{item.project.code}</span>
               {item.project.priority && (
                 <span style={{ fontSize: '11px', fontWeight: 700, color: PRIORITY_COLOR[item.project.priority], background: `${PRIORITY_COLOR[item.project.priority]}18`, padding: '2px 8px', borderRadius: '100px' }}>
                   {item.project.priority}
                 </span>
               )}
             </div>
-            <p style={{ fontSize: '12px', color: '#6B7385' }}>
-              Diajukan oleh <span style={{ color: '#A5AEC0' }}>{item.requesterName ?? '—'}</span>
-              {item.project.deadline && <> · Deadline: <span style={{ color: '#A5AEC0' }}>{formatDate(item.project.deadline)}</span></>}
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+              Diajukan oleh <span style={{ color: 'var(--text-secondary)' }}>{item.requesterName ?? '—'}</span>
+              {item.project.deadline && <> · Deadline: <span style={{ color: 'var(--text-secondary)' }}>{formatDate(item.project.deadline)}</span></>}
             </p>
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '12px', fontWeight: 600, color: isApproved ? '#4ADE80' : isRejected ? '#FF6B6B' : '#F59E0B', background: isApproved ? 'rgba(74,222,128,0.1)' : isRejected ? 'rgba(255,107,107,0.1)' : 'rgba(245,158,11,0.1)', padding: '4px 12px', borderRadius: '100px' }}>
+          <span style={{ fontSize: '12px', fontWeight: 600, color: isApproved ? '#4ADE80' : isRejected ? 'var(--red)' : '#F59E0B', background: isApproved ? 'rgba(74,222,128,0.1)' : isRejected ? 'rgba(255,107,107,0.1)' : 'rgba(245,158,11,0.1)', padding: '4px 12px', borderRadius: '100px' }}>
             {isApproved ? 'Disetujui' : isRejected ? 'Ditolak' : `Step ${item.currentStep}/3`}
           </span>
           <button onClick={() => router.push(`/projects/${item.project.id}`)}
-            style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', color: '#A5AEC0', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
+            style={{ background: 'var(--border)', border: 'none', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
             Detail <ChevronRight size={12} />
           </button>
           {currentUser.role === 'super_admin' && (
             <button onClick={handleDelete} title="Hapus approval ini"
-              style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '8px', padding: '6px 8px', cursor: 'pointer', color: '#FF6B6B', display: 'flex', alignItems: 'center' }}>
+              style={{ background: 'rgba(255,107,107,0.08)', border: 'none', borderRadius: '8px', padding: '6px 8px', cursor: 'pointer', color: 'var(--red)', display: 'flex', alignItems: 'center' }}>
               <Trash2 size={14} />
             </button>
           )}
@@ -161,7 +161,7 @@ function ApprovalCard({ item, currentUser, onAction }: { item: ApprovalItem; cur
       {/* Approval steps timeline */}
       <div style={{ padding: '0 20px 16px', display: 'flex', gap: '8px' }}>
         {item.steps.map((step, i) => {
-          const color = ACTION_COLOR[step.action] ?? '#6B7385'
+          const color = ACTION_COLOR[step.action] ?? 'var(--text-muted)'
           return (
             <div key={i} style={{ flex: 1, position: 'relative' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
@@ -173,9 +173,9 @@ function ApprovalCard({ item, currentUser, onAction }: { item: ApprovalItem; cur
                 </div>
                 {i < item.steps.length - 1 && <div style={{ flex: 1, height: '1px', background: `${color}40` }} />}
               </div>
-              <p style={{ fontSize: '11px', color: '#6B7385', fontFamily: "'IBM Plex Mono', monospace" }}>{STEP_ROLE_LABEL[step.role] ?? step.role}</p>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace" }}>{STEP_ROLE_LABEL[step.role] ?? step.role}</p>
               <p style={{ fontSize: '11px', color, fontWeight: 600 }}>{ACTION_LABEL[step.action] ?? step.action}</p>
-              {step.note && <p style={{ fontSize: '11px', color: '#6B7385', marginTop: '2px', fontStyle: 'italic' }}>"{step.note}"</p>}
+              {step.note && <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontStyle: 'italic' }}>"{step.note}"</p>}
             </div>
           )
         })}
@@ -183,7 +183,7 @@ function ApprovalCard({ item, currentUser, onAction }: { item: ApprovalItem; cur
 
       {/* Action buttons — hanya muncul jika giliran user ini */}
       {item.canActNow && !showNote && (
-        <div style={{ padding: '12px 20px 16px', display: 'flex', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '12px 20px 16px', display: 'flex', gap: '8px', borderTop: '1px solid var(--surface-hover)' }}>
           <button onClick={() => submitAction('approve')} disabled={loading}
             style={{ flex: 2, background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ADE80', borderRadius: '10px', padding: '9px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
             <CheckCircle size={14} /> Setujui
@@ -193,7 +193,7 @@ function ApprovalCard({ item, currentUser, onAction }: { item: ApprovalItem; cur
             <RotateCcw size={13} /> Revisi
           </button>
           <button onClick={() => { setActionType('reject'); setShowNote(true) }} disabled={loading}
-            style={{ flex: 1, background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: '#FF6B6B', borderRadius: '10px', padding: '9px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            style={{ flex: 1, background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', color: 'var(--red)', borderRadius: '10px', padding: '9px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
             <XCircle size={13} /> Tolak
           </button>
         </div>
@@ -201,25 +201,25 @@ function ApprovalCard({ item, currentUser, onAction }: { item: ApprovalItem; cur
 
       {/* Note form */}
       {showNote && (
-        <div style={{ padding: '12px 20px 16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '12px 20px 16px', borderTop: '1px solid var(--surface-hover)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-            <AlertTriangle size={13} style={{ color: actionType === 'reject' ? '#FF6B6B' : '#F59E0B' }} />
-            <p style={{ fontSize: '13px', fontWeight: 600, color: actionType === 'reject' ? '#FF6B6B' : '#F59E0B' }}>
+            <AlertTriangle size={13} style={{ color: actionType === 'reject' ? 'var(--red)' : '#F59E0B' }} />
+            <p style={{ fontSize: '13px', fontWeight: 600, color: actionType === 'reject' ? 'var(--red)' : '#F59E0B' }}>
               {actionType === 'reject' ? 'Alasan penolakan' : 'Catatan revisi'} (wajib)
             </p>
           </div>
           <textarea
             value={note} onChange={e => setNote(e.target.value)}
             placeholder="Jelaskan alasan atau hal yang perlu diperbaiki..."
-            style={{ background: '#141925', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '10px 12px', color: '#EDF0F5', fontSize: '13px', outline: 'none', width: '100%', minHeight: '80px', resize: 'vertical', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', width: '100%', minHeight: '80px', resize: 'vertical', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           />
           <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
             <button onClick={() => { setShowNote(false); setNote(''); setActionType(null) }}
-              style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#A5AEC0', borderRadius: '10px', padding: '8px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px' }}>
+              style={{ flex: 1, background: 'var(--border)', border: '1px solid var(--border-strong)', color: 'var(--text-secondary)', borderRadius: '10px', padding: '8px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px' }}>
               Batal
             </button>
             <button onClick={() => actionType && submitAction(actionType)} disabled={loading}
-              style={{ flex: 2, background: actionType === 'reject' ? 'rgba(255,107,107,0.2)' : 'rgba(245,158,11,0.2)', border: `1px solid ${actionType === 'reject' ? 'rgba(255,107,107,0.4)' : 'rgba(245,158,11,0.4)'}`, color: actionType === 'reject' ? '#FF6B6B' : '#F59E0B', borderRadius: '10px', padding: '8px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '13px' }}>
+              style={{ flex: 2, background: actionType === 'reject' ? 'rgba(255,107,107,0.2)' : 'rgba(245,158,11,0.2)', border: `1px solid ${actionType === 'reject' ? 'rgba(255,107,107,0.4)' : 'rgba(245,158,11,0.4)'}`, color: actionType === 'reject' ? 'var(--red)' : '#F59E0B', borderRadius: '10px', padding: '8px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '13px' }}>
               {loading ? 'Memproses...' : actionType === 'reject' ? 'Konfirmasi Tolak' : 'Konfirmasi Revisi'}
             </button>
           </div>

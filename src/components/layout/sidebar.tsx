@@ -38,22 +38,22 @@ export function Sidebar({ onClose, role }: SidebarProps) {
   return (
     <aside
       className="flex flex-col h-full"
-      style={{ background: '#0E1219', borderRight: '1px solid rgba(255,255,255,0.06)', width: '240px', minWidth: '240px' }}
+      style={{ background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border)', width: '240px', minWidth: '240px' }}
     >
       {/* Logo */}
-      <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center"
             style={{ background: 'linear-gradient(135deg,#FF8A4C,#E2540A)' }}>
-            <span className="font-grotesk font-bold text-[13px] text-[#0C0F16]">TW</span>
+            <span className="font-grotesk font-bold text-[13px] text-[var(--on-accent)]">TW</span>
           </div>
           <div>
-            <div className="font-grotesk font-semibold text-[13px] text-[#EDF0F5] leading-tight">Terminal</div>
-            <div className="font-mono text-[9.5px] text-[#6B7385] tracking-widest uppercase leading-tight">Workdesk</div>
+            <div className="font-grotesk font-semibold text-[13px] text-[var(--text-primary)] leading-tight">Terminal</div>
+            <div className="font-mono text-[9.5px] text-[var(--text-muted)] tracking-widest uppercase leading-tight">Workdesk</div>
           </div>
         </div>
         {onClose && (
-          <button onClick={onClose} className="text-[#6B7385] hover:text-[#EDF0F5] transition-colors lg:hidden">
+          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors lg:hidden">
             <X size={18} />
           </button>
         )}
@@ -72,7 +72,7 @@ export function Sidebar({ onClose, role }: SidebarProps) {
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group',
                 isActive
                   ? 'bg-[rgba(255,106,26,0.12)] text-[#FF8A4C]'
-                  : 'text-[#6B7385] hover:text-[#A5AEC0] hover:bg-[rgba(255,255,255,0.04)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]'
               )}
             >
               <Icon size={17} className="flex-shrink-0" strokeWidth={isActive ? 2 : 1.7} />
@@ -84,13 +84,13 @@ export function Sidebar({ onClose, role }: SidebarProps) {
       </nav>
 
       {/* Bottom accent */}
-      <div className="px-5 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="px-5 py-4" style={{ borderTop: '1px solid var(--border)' }}>
         {isSpectator(role ?? '') && (
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '10.5px', fontWeight: 700, color: '#8B93A6', background: 'rgba(139,147,166,0.12)', border: '1px solid rgba(139,147,166,0.3)', borderRadius: '100px', padding: '3px 10px', marginBottom: '8px' }}>
             👁️ Mode Spectator · Lihat Saja
           </div>
         )}
-        <div className="font-mono text-[9.5px] text-[#4a5160] tracking-wider uppercase">
+        <div className="font-mono text-[9.5px] text-[var(--text-faint)] tracking-wider uppercase">
           Dept Terminal GODA · v2.1
         </div>
       </div>
