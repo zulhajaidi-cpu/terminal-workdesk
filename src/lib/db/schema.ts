@@ -41,6 +41,7 @@ export const users = pgTable('users', {
   role:       userRoleEnum('role').notNull().default('staff'),
   divisionId: uuid('division_id').references(() => divisions.id),
   isActive:   boolean('is_active').notNull().default(true),
+  pendingApproval: boolean('pending_approval').notNull().default(false),
   passwordHash: text('password_hash').notNull(),
   createdAt:  timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt:  timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

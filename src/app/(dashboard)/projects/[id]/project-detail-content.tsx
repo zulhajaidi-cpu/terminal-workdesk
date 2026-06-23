@@ -264,7 +264,7 @@ function TaskQuickModal({ task, allUsers, onClose, onTaskUpdated }: {
                   style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', resize: 'none', minHeight: '60px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 />
                 <button onClick={submitProgress} disabled={posting || !note.trim()}
-                  style={{ background: note.trim() ? '#FF6A1A' : 'rgba(255,106,26,0.2)', border: 'none', borderRadius: '10px', padding: '10px 12px', cursor: note.trim() ? 'pointer' : 'default', color: note.trim() ? 'var(--bg-base)' : 'var(--text-faint)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                  style={{ background: note.trim() ? '#FF6A1A' : 'rgba(255,106,26,0.2)', border: 'none', borderRadius: '10px', padding: '10px 12px', cursor: note.trim() ? 'pointer' : 'default', color: note.trim() ? 'var(--on-accent)' : 'var(--text-faint)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                   <Send size={14} />
                 </button>
               </div>
@@ -515,7 +515,7 @@ export function ProjectDetailContent({ project, currentUserRole, currentUserId, 
                   className="w-full flex items-center justify-center gap-2 rounded-xl py-3 font-grotesk font-bold text-[14px] transition-all"
                   style={{
                     background: atLeastOneChecked && !submitting ? '#FF6A1A' : 'var(--border)',
-                    color: atLeastOneChecked && !submitting ? 'var(--bg-base)' : 'var(--text-muted)',
+                    color: atLeastOneChecked && !submitting ? 'var(--on-accent)' : 'var(--text-muted)',
                     cursor: atLeastOneChecked && !submitting ? 'pointer' : 'not-allowed',
                     boxShadow: atLeastOneChecked && !submitting ? '0 10px 25px -8px rgba(255,106,26,0.7)' : 'none',
                   }}>

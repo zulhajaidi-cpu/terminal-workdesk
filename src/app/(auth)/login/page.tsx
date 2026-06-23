@@ -124,8 +124,9 @@ export default function LoginPage() {
           </form>
 
           <div style={{ borderTop: '1px solid var(--border)', marginTop: '24px', paddingTop: '18px', textAlign: 'center' }}>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              Belum punya akun? Hubungi Super Admin untuk mendapatkan akses.
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+              Belum punya akun?{' '}
+              <a href="/register" style={{ color: '#FF8A4C', fontWeight: 600 }}>Daftar di sini →</a>
             </p>
           </div>
         </div>

@@ -189,7 +189,7 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
         <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-card)', borderRadius: '12px', padding: '4px', width: 'fit-content' }}>
           {SECTION_TABS.map(tab => (
             <button key={tab} onClick={() => setSectionTab(tab)}
-              style={{ padding: '7px 16px', borderRadius: '9px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: "'Space Grotesk', sans-serif", transition: 'all 0.15s', background: sectionTab === tab ? '#FF6A1A' : 'transparent', color: sectionTab === tab ? 'var(--bg-base)' : 'var(--text-muted)' }}>
+              style={{ padding: '7px 16px', borderRadius: '9px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: "'Space Grotesk', sans-serif", transition: 'all 0.15s', background: sectionTab === tab ? '#FF6A1A' : 'transparent', color: sectionTab === tab ? 'var(--on-accent)' : 'var(--text-muted)' }}>
               {tab}
             </button>
           ))}
@@ -713,7 +713,7 @@ function TaskDetailPanel({ task, currentUser, canEditTask, canDeleteTask, onClos
                   style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', resize: 'none', minHeight: '60px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                 />
                 <button onClick={submitProgress} disabled={posting || !note.trim()}
-                  style={{ background: note.trim() ? '#FF6A1A' : 'rgba(255,106,26,0.2)', border: 'none', borderRadius: '10px', padding: '10px 12px', cursor: note.trim() ? 'pointer' : 'default', color: note.trim() ? 'var(--bg-base)' : 'var(--text-faint)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                  style={{ background: note.trim() ? '#FF6A1A' : 'rgba(255,106,26,0.2)', border: 'none', borderRadius: '10px', padding: '10px 12px', cursor: note.trim() ? 'pointer' : 'default', color: note.trim() ? 'var(--on-accent)' : 'var(--text-faint)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                   <Send size={14} />
                 </button>
               </div>

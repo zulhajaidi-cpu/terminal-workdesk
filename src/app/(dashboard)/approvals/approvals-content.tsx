@@ -55,7 +55,7 @@ export function ApprovalsContent({ pendingForMe, others, currentUser }: Props) {
           <button key={t.key} onClick={() => setTab(t.key as any)}
             style={{
               background: tab === t.key ? '#FF6A1A' : 'transparent',
-              color: tab === t.key ? 'var(--bg-base)' : 'var(--text-muted)',
+              color: tab === t.key ? 'var(--on-accent)' : 'var(--text-muted)',
               border: 'none', borderRadius: '9px', padding: '7px 18px',
               cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 600, fontSize: '13px', transition: 'all 0.15s',

@@ -24,6 +24,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (body.role !== undefined) updates.role = body.role
     if (body.divisionId !== undefined) updates.divisionId = body.divisionId || null
     if (body.isActive !== undefined) updates.isActive = body.isActive
+    if (body.pendingApproval !== undefined) updates.pendingApproval = body.pendingApproval
     if (body.username !== undefined) {
       const username = String(body.username).toLowerCase().trim()
       if (!/^[a-z0-9._]{3,20}$/.test(username)) {
@@ -61,4 +62,29 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       createdAt: updated.createdAt.toISOString(), divisionName: divRow[0]?.name ?? null,
     }
   })
+}
+
+// Soft-delete user (mis. menolak pendaftaran). Super Admin only. Username/email bebas dipakai lagi
+// karena kita lepas keduanya saat menghapus (unique index tak menghalangi pendaftaran ulang).
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const session = await getSession()
+  if (!session || session.role !== 'super_admin') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+  }
+  if (session.id === id) {
+    return NextResponse.json({ error: 'Tidak bisa menghapus akun sendiri' }, { status: 400 })
+  }
+
+  const [deleted] = await db.update(users)
+    .set({
+      deletedAt: new Date(), isActive: false, pendingApproval: false,
+      username: null, email: `deleted_${id}@internal.goda`, // lepas username & email agar bisa dipakai ulang
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, id))
+    .returning({ id: users.id })
+  if (!deleted) return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 })
+
+  return NextResponse.json({ ok: true })
 }

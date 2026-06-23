@@ -18,13 +18,21 @@ export async function POST(request: NextRequest) {
     .where(or(eq(users.email, identifier), eq(users.username, identifier)))
     .limit(1)
 
-  if (!user || !user.isActive) {
+  if (!user) {
     return NextResponse.json({ error: 'Username/email atau password salah' }, { status: 401 })
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash)
   if (!valid) {
     return NextResponse.json({ error: 'Username/email atau password salah' }, { status: 401 })
+  }
+
+  // Akun nonaktif: kalau dari pendaftaran mandiri yang belum disetujui, beri pesan yang jelas.
+  if (!user.isActive) {
+    if (user.pendingApproval) {
+      return NextResponse.json({ error: 'Akun kamu masih menunggu persetujuan admin. Coba lagi setelah disetujui.' }, { status: 403 })
+    }
+    return NextResponse.json({ error: 'Akun kamu nonaktif. Hubungi admin.' }, { status: 403 })
   }
 
   await setSession({

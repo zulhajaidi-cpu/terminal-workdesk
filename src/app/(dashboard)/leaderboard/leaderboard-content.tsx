@@ -97,7 +97,7 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
         <div style={{ display: 'flex', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '3px', gap: '2px' }}>
           {([['month','Bulan Ini'],['last','Bulan Lalu'],['all','All Time']] as const).map(([k,l]) => (
             <button key={k} onClick={() => setPeriod(k)}
-              style={{ padding: '5px 14px', borderRadius: '7px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, background: period===k ? '#FF6A1A' : 'transparent', color: period===k ? 'var(--bg-base)' : 'var(--text-muted)', fontFamily: "'Space Grotesk', sans-serif", transition: 'all 0.15s' }}>
+              style={{ padding: '5px 14px', borderRadius: '7px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, background: period===k ? '#FF6A1A' : 'transparent', color: period===k ? 'var(--on-accent)' : 'var(--text-muted)', fontFamily: "'Space Grotesk', sans-serif", transition: 'all 0.15s' }}>
               {l}
             </button>
           ))}

@@ -200,7 +200,7 @@ export function EventsContent({ events: init, divisions, allUsers, participantRo
 
         <div style={{ display:'flex', background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:'10px', padding:'3px', gap:'2px' }}>
           {([['all','Semua'],['upcoming','Mendatang'],['past','Lalu']] as const).map(([k,l]) => (
-            <button key={k} onClick={() => setTimeFilter(k)} style={{ padding:'5px 10px', borderRadius:'7px', border:'none', cursor:'pointer', fontSize:'11px', fontWeight:700, background: timeFilter===k ? 'var(--blue)' : 'transparent', color: timeFilter===k ? 'var(--bg-base)' : 'var(--text-muted)', fontFamily:"'Space Grotesk',sans-serif" }}>{l}</button>
+            <button key={k} onClick={() => setTimeFilter(k)} style={{ padding:'5px 10px', borderRadius:'7px', border:'none', cursor:'pointer', fontSize:'11px', fontWeight:700, background: timeFilter===k ? 'var(--blue)' : 'transparent', color: timeFilter===k ? 'var(--on-accent)' : 'var(--text-muted)', fontFamily:"'Space Grotesk',sans-serif" }}>{l}</button>
           ))}
         </div>
       </div>

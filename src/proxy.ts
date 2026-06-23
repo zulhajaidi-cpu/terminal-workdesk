@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 
-const PUBLIC_PATHS = ['/login', '/api/auth/login']
+const PUBLIC_PATHS = ['/login', '/api/auth/login', '/register', '/api/auth/register']
 
 // Endpoint mutasi yang tetap boleh diakses spectator (login/logout/ganti password sendiri).
 const SPECTATOR_ALLOW = ['/api/auth/login', '/api/auth/logout', '/api/auth/change-password']

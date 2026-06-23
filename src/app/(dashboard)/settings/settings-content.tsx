@@ -10,7 +10,7 @@ import { getTheme, setTheme, type Theme } from '@/lib/theme'
 
 interface UserRow {
   id: string; email: string; username: string | null; fullName: string; role: string
-  isActive: boolean; avatarUrl: string | null; divisionId: string | null
+  isActive: boolean; pendingApproval?: boolean; avatarUrl: string | null; divisionId: string | null
   createdAt: string; divisionName: string | null
 }
 interface Me {
@@ -67,6 +67,20 @@ export function SettingsContent({ me, allUsers: initialUsers, divisions, current
     setShowModal(false); setEditUser(null)
   }
 
+  async function approveUser(user: UserRow) {
+    const res = await fetch(`/api/users/${user.id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isActive: true, pendingApproval: false }),
+    })
+    if (res.ok) setUsers(prev => prev.map(u => u.id === user.id ? { ...u, isActive: true, pendingApproval: false } : u))
+  }
+
+  async function rejectUser(user: UserRow) {
+    if (!confirm(`Tolak & hapus pendaftaran "${user.fullName}" (@${user.username})?`)) return
+    const res = await fetch(`/api/users/${user.id}`, { method: 'DELETE' })
+    if (res.ok) setUsers(prev => prev.filter(u => u.id !== user.id))
+  }
+
   return (
     <div className="max-w-5xl mx-auto animate-fade-in space-y-5">
       <div>
@@ -80,7 +94,7 @@ export function SettingsContent({ me, allUsers: initialUsers, divisions, current
           const Icon = t.icon
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
-              style={{ background: tab === t.key ? '#FF6A1A' : 'transparent', color: tab === t.key ? 'var(--bg-base)' : 'var(--text-muted)', border: 'none', borderRadius: '9px', padding: '8px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.15s' }}>
+              style={{ background: tab === t.key ? '#FF6A1A' : 'transparent', color: tab === t.key ? 'var(--on-accent)' : 'var(--text-muted)', border: 'none', borderRadius: '9px', padding: '8px 18px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.15s' }}>
               <Icon size={13} />{t.label}
             </button>
           )
@@ -95,6 +109,8 @@ export function SettingsContent({ me, allUsers: initialUsers, divisions, current
         <UserManagementSection
           users={users} divisions={divisions} currentUser={currentUser}
           onToggleActive={toggleActive}
+          onApprove={approveUser}
+          onReject={rejectUser}
           onEdit={u => { setEditUser(u); setShowModal(true) }}
           onAdd={() => { setEditUser(null); setShowModal(true) }}
         />
@@ -301,15 +317,20 @@ function ChangePasswordSection() {
 }
 
 /* ── User Management Section ─────────────────────────── */
-function UserManagementSection({ users, divisions, currentUser, onToggleActive, onEdit, onAdd }: {
+function UserManagementSection({ users, divisions, currentUser, onToggleActive, onApprove, onReject, onEdit, onAdd }: {
   users: UserRow[]; divisions: { id: string; name: string }[]
   currentUser: { id: string; role: string }
   onToggleActive: (u: UserRow) => void
+  onApprove: (u: UserRow) => void
+  onReject: (u: UserRow) => void
   onEdit: (u: UserRow) => void
   onAdd: () => void
 }) {
   const [search, setSearch] = useState('')
-  const filtered = users.filter(u =>
+  // Akun menunggu persetujuan tampil di antrean terpisah, bukan di tabel user utama.
+  const pending = users.filter(u => u.pendingApproval)
+  const active = users.filter(u => !u.pendingApproval)
+  const filtered = active.filter(u =>
     u.fullName.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase()) ||
     (u.username ?? '').toLowerCase().includes(search.toLowerCase())
@@ -317,11 +338,46 @@ function UserManagementSection({ users, divisions, currentUser, onToggleActive, 
 
   return (
     <div className="space-y-4">
+      {/* Antrean pendaftaran menunggu persetujuan */}
+      {pending.length > 0 && (
+        <div style={{ ...sectionCard, border: '1px solid rgba(255,106,26,0.35)', background: 'radial-gradient(120% 140% at 0% 0%, rgba(255,106,26,0.07) 0%, var(--bg-elevated) 55%)' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#FF8A4C', fontFamily: "'Space Grotesk', sans-serif" }}>📝 Permintaan Pendaftaran</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--on-accent)', background: '#FF6A1A', borderRadius: '100px', padding: '2px 9px' }}>{pending.length}</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {pending.map(u => (
+              <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '12px', background: 'var(--surface-subtle)', border: '1px solid var(--border)' }}>
+                <Avatar name={u.fullName} imageUrl={u.avatarUrl} size="sm" />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', flexWrap: 'wrap' }}>
+                    <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{u.fullName}</p>
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: ROLE_COLORS[u.role] ?? '#6B7385', background: `${ROLE_COLORS[u.role] ?? '#6B7385'}1F`, padding: '2px 8px', borderRadius: '100px' }}>
+                      {ROLE_LABELS[u.role] ?? u.role}
+                    </span>
+                    {u.divisionName && <span style={{ fontSize: '10.5px', color: 'var(--text-secondary)' }}>· {u.divisionName}</span>}
+                  </div>
+                  <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", marginTop: '2px' }}>@{u.username} · daftar {new Date(u.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
+                </div>
+                <button onClick={() => onApprove(u)}
+                  style={{ flexShrink: 0, fontSize: '12px', fontWeight: 700, color: '#fff', background: 'linear-gradient(90deg,#16a34a,#22c55e)', border: 'none', borderRadius: '9px', padding: '7px 13px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>
+                  ✓ Setujui
+                </button>
+                <button onClick={() => onReject(u)} title="Tolak & hapus"
+                  style={{ flexShrink: 0, fontSize: '12px', fontWeight: 600, color: 'var(--red)', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '9px', padding: '7px 13px', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif" }}>
+                  Tolak
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div style={sectionCard}>
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div>
             <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)]">Kelola User</h2>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{users.length} pengguna terdaftar</p>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{active.length} pengguna terdaftar</p>
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <input value={search} onChange={e => setSearch(e.target.value)}

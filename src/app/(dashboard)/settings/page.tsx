@@ -25,7 +25,8 @@ export default async function SettingsPage() {
     session.role === 'super_admin'
       ? db.select({
           id: users.id, email: users.email, username: users.username, fullName: users.fullName,
-          role: users.role, isActive: users.isActive, avatarUrl: users.avatarUrl,
+          role: users.role, isActive: users.isActive, pendingApproval: users.pendingApproval,
+          avatarUrl: users.avatarUrl,
           divisionId: users.divisionId, createdAt: users.createdAt,
           divisionName: divisions.name,
         })
