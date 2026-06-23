@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Bell, Search, Menu, LogOut } from 'lucide-react'
 import { Avatar } from '@/components/ui/avatar'
 
@@ -9,9 +10,10 @@ interface TopbarProps {
   user?: { full_name: string; role: string; avatar_url?: string | null }
   onMenuClick?: () => void
   title?: string
+  unreadCount?: number
 }
 
-export function Topbar({ user, onMenuClick, title }: TopbarProps) {
+export function Topbar({ user, onMenuClick, title, unreadCount = 0 }: TopbarProps) {
   const [showUserMenu, setShowUserMenu] = useState(false)
   const router = useRouter()
   async function handleLogout() {
@@ -21,6 +23,7 @@ export function Topbar({ user, onMenuClick, title }: TopbarProps) {
   }
 
   const roleLabels: Record<string, string> = {
+    spectator:     'Spectator',
     staff:         'Staff',
     leader_divisi: 'SPV',
     spv_manager:   'Manager',
@@ -61,11 +64,17 @@ export function Topbar({ user, onMenuClick, title }: TopbarProps) {
 
       <div className="ml-auto flex items-center gap-2">
         {/* Notifications */}
-        <button className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[#6B7385] hover:text-[#EDF0F5] hover:bg-white/5 transition-all"
+        <Link href="/notifications" aria-label={`Notifikasi${unreadCount > 0 ? ` (${unreadCount} belum dibaca)` : ''}`}
+          className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[#6B7385] hover:text-[#EDF0F5] hover:bg-white/5 transition-all"
           style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
           <Bell size={16} />
-          <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#FF6A1A]" />
-        </button>
+          {unreadCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 min-w-[17px] h-[17px] px-1 rounded-full flex items-center justify-center font-grotesk font-bold text-[10px] text-white"
+              style={{ background: '#FF6A1A', boxShadow: '0 0 0 2px #0C0F16' }}>
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </Link>
 
         {/* User menu */}
         {user && (
