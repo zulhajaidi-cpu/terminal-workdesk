@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
+import { cache } from 'react'
 import { db } from './db'
 import { users } from './db/schema'
 import { eq } from 'drizzle-orm'
@@ -33,12 +34,24 @@ export async function verifyToken(token: string): Promise<SessionUser | null> {
   }
 }
 
-export async function getSession(): Promise<SessionUser | null> {
+// getSession membaca identitas dari JWT, TAPI meng-overlay role/divisi/aktif TERBARU dari DB
+// (di-cache per-request via React cache → 1 query walau dipanggil banyak komponen). Ini membuat
+// perubahan role oleh admin langsung berlaku tanpa user harus logout, dan user yang dinonaktifkan
+// /dihapus otomatis kehilangan sesi. Field display (nama/avatar/email) tetap dari JWT.
+export const getSession = cache(async (): Promise<SessionUser | null> => {
   const cookieStore = await cookies()
   const token = cookieStore.get(COOKIE_NAME)?.value
   if (!token) return null
-  return verifyToken(token)
-}
+  const payload = await verifyToken(token)
+  if (!payload) return null
+
+  const [fresh] = await db
+    .select({ role: users.role, divisionId: users.divisionId, isActive: users.isActive, deletedAt: users.deletedAt })
+    .from(users).where(eq(users.id, payload.id)).limit(1)
+  if (!fresh || !fresh.isActive || fresh.deletedAt) return null
+
+  return { ...payload, role: fresh.role, divisionId: fresh.divisionId }
+})
 
 export async function setSession(user: SessionUser): Promise<void> {
   const token = await signToken(user)

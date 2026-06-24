@@ -115,6 +115,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     db.select({
       id: madingPosts.id, title: madingPosts.title, content: madingPosts.content,
       mediaUrl: madingPosts.mediaUrl, createdAt: madingPosts.createdAt,
+      creatorId: madingPosts.createdBy,
       creatorName: users.fullName, creatorAvatar: users.avatarUrl, creatorRole: users.role,
     })
       .from(madingPosts)
@@ -240,6 +241,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         content: r.content,
         mediaUrl: r.mediaUrl ?? null,
         createdAt: new Date(r.createdAt as any).toISOString(),
+        creatorId: r.creatorId ?? null,
         creatorName: r.creatorName ?? 'Unknown',
         creatorAvatar: r.creatorAvatar ?? null,
         creatorRole: r.creatorRole ?? 'staff',

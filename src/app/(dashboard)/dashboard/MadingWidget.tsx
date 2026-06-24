@@ -8,6 +8,7 @@ import {
 } from './mading-actions'
 import { Avatar } from '@/components/ui/avatar'
 import { Megaphone, Plus, X, Send, ImageIcon, Trash2, MessageCircle, ThumbsUp } from 'lucide-react'
+import { CharacterCardModal } from '../leaderboard/character-card-modal'
 
 export interface MadingReaction { emoji: string; count: number }
 
@@ -17,6 +18,7 @@ export interface MadingPost {
   content: string
   mediaUrl: string | null
   createdAt: string
+  creatorId: string | null
   creatorName: string
   creatorAvatar: string | null
   creatorRole: string
@@ -65,6 +67,7 @@ export function MadingWidget({ posts: initialPosts, canPost, canModerate, curren
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [cardUserId, setCardUserId] = useState<string | null>(null)
 
   function handleSubmit(formData: FormData) {
     setError(null)
@@ -116,7 +119,7 @@ export function MadingWidget({ posts: initialPosts, canPost, canModerate, curren
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '32px 0' }}>Belum ada pengumuman. 📋</div>
         ) : posts.map(post => (
           <PostCard key={post.id} post={post} canDelete={canPost} onDelete={handleDelete} deletingId={deletingId}
-            canModerate={canModerate} currentUserId={currentUserId} />
+            canModerate={canModerate} currentUserId={currentUserId} onOpenCard={setCardUserId} />
         ))}
       </div>
 
@@ -182,6 +185,9 @@ export function MadingWidget({ posts: initialPosts, canPost, canModerate, curren
           </div>
         </div>
       )}
+
+      {/* Character card (klik nama/foto penulis atau komentator) */}
+      {cardUserId && <CharacterCardModal userId={cardUserId} onClose={() => setCardUserId(null)} />}
     </div>
   )
 }
@@ -221,9 +227,9 @@ function ImageLightbox({ url, onClose }: { url: string; onClose: () => void }) {
   )
 }
 
-function PostCard({ post, canDelete, onDelete, deletingId, canModerate, currentUserId }: {
+function PostCard({ post, canDelete, onDelete, deletingId, canModerate, currentUserId, onOpenCard }: {
   post: MadingPost; canDelete: boolean; onDelete: (id: string) => void; deletingId: string | null
-  canModerate: boolean; currentUserId: string
+  canModerate: boolean; currentUserId: string; onOpenCard: (userId: string) => void
 }) {
   const isDeleting = deletingId === post.id
   const [lightbox, setLightbox] = useState<string | null>(null)
@@ -297,10 +303,14 @@ function PostCard({ post, canDelete, onDelete, deletingId, canModerate, currentU
     <div style={{ background: 'var(--surface-subtle)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px', opacity: isDeleting ? 0.5 : 1, transition: 'opacity 0.2s' }}>
       {lightbox && <ImageLightbox url={lightbox} onClose={() => setLightbox(null)} />}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
-        <Avatar name={post.creatorName} imageUrl={post.creatorAvatar ?? undefined} size="sm" />
+        <span onClick={() => post.creatorId && onOpenCard(post.creatorId)} style={{ cursor: post.creatorId ? 'pointer' : 'default', display: 'flex', flexShrink: 0 }} title="Lihat kartu karakter">
+          <Avatar name={post.creatorName} imageUrl={post.creatorAvatar ?? undefined} size="sm" />
+        </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' as const }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif", whiteSpace: 'nowrap' as const }}>{post.creatorName}</span>
+            <span onClick={() => post.creatorId && onOpenCard(post.creatorId)}
+              style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif", whiteSpace: 'nowrap' as const, cursor: post.creatorId ? 'pointer' : 'default' }}
+              title="Lihat kartu karakter">{post.creatorName}</span>
             <span style={{ fontSize: 10, background: 'rgba(255,106,26,0.14)', color: 'var(--peach)', borderRadius: 6, padding: '1px 7px', fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.04em', whiteSpace: 'nowrap' as const }}>
               {ROLE_LABEL[post.creatorRole] ?? post.creatorRole}
             </span>
@@ -391,11 +401,13 @@ function PostCard({ post, canDelete, onDelete, deletingId, canModerate, currentU
           ) : (comments && comments.length > 0) ? (
             comments.map(c => (
               <div key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                <Avatar name={c.userName ?? '?'} imageUrl={c.userAvatar ?? undefined} size="sm" />
+                <span onClick={() => c.userId && onOpenCard(c.userId)} style={{ cursor: c.userId ? 'pointer' : 'default', display: 'flex', flexShrink: 0 }} title="Lihat kartu karakter">
+                  <Avatar name={c.userName ?? '?'} imageUrl={c.userAvatar ?? undefined} size="sm" />
+                </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ background: 'var(--surface-hover)', borderRadius: 12, padding: '7px 11px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif" }}>{c.userName ?? 'Pengguna'}</span>
+                      <span onClick={() => c.userId && onOpenCard(c.userId)} style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', fontFamily: "'Space Grotesk',sans-serif", cursor: c.userId ? 'pointer' : 'default' }} title="Lihat kartu karakter">{c.userName ?? 'Pengguna'}</span>
                       {c.userRole && <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>{ROLE_LABEL[c.userRole] ?? c.userRole}</span>}
                     </div>
                     <div style={{ fontSize: 13, color: '#C7CDD9', lineHeight: 1.5, whiteSpace: 'pre-wrap' as const, wordBreak: 'break-word' as const }}>{c.content}</div>

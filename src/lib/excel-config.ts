@@ -57,7 +57,7 @@ export const EXCEL_CONFIGS: Record<ExcelEntity, EntityConfig> = {
       { key: 'dueDate',     header: 'Due Date',            example: '2026-06-20',                   required: true,  note: 'YYYY-MM-DD' },
       { key: 'description', header: 'Deskripsi / Target',  example: 'Detail pekerjaan yang harus dilakukan' },
       { key: 'outputUrl',   header: 'Link Output',         example: 'https://drive.google.com/…',  note: 'link hasil kerja / deliverable' },
-      { key: 'assignee',    header: 'Assignee',            example: 'Raihan',                       note: 'nama lengkap user sesuai sistem' },
+      { key: 'assignee',    header: 'Assignee',            example: 'Raihan, Awan, Nanda',          note: 'boleh >1 orang, pisahkan dengan koma' },
     ],
   },
   kpi: {

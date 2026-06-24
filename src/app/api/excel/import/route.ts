@@ -180,7 +180,8 @@ export async function POST(request: NextRequest) {
       if (rawCode && !projId) {
         errors.push({ row: rowNo, message: `Kode project "${rawCode}" tidak ditemukan — task dibuat tanpa project` })
       }
-      const assigneeId = findUser(str(r.assignee))
+      // Assignee bisa lebih dari satu — dipisah koma/titik-koma/baris (mis. "Raihan, Awan, Nanda").
+      const { ids: assigneeIds, missing: missAssignee } = findUsers(str(r.assignee))
       const status = enumOr(r.status, VALID.taskStatus, 'To Do')
       const priority = enumOr(r.priority, VALID.priority, 'Medium')
       const outputUrl = str(r.outputUrl) || null
@@ -191,9 +192,14 @@ export async function POST(request: NextRequest) {
           VALUES (${name}, ${projId}, ${divId}, ${status}, ${priority}, ${due},
                   ${str(r.description) || null}, ${outputUrl}, ${session.id}, false, false)
           RETURNING id` as { id: string }[]
-        if (assigneeId && res[0]) {
-          await sql`INSERT INTO task_assignees (task_id, user_id) VALUES (${res[0].id}, ${assigneeId})
-                    ON CONFLICT (task_id, user_id) DO NOTHING`
+        if (res[0]) {
+          for (const uid of assigneeIds) {
+            await sql`INSERT INTO task_assignees (task_id, user_id) VALUES (${res[0].id}, ${uid})
+                      ON CONFLICT (task_id, user_id) DO NOTHING`
+          }
+        }
+        if (missAssignee.length > 0) {
+          errors.push({ row: rowNo, message: `Assignee tidak ditemukan & dilewati: ${missAssignee.join(', ')}` })
         }
         if (projId && res[0]) await recalcProjectProgress(projId)
         inserted++
