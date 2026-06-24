@@ -44,6 +44,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     monthlyRewardRow,
     madingRows,
     todayMoodRows,
+    activeProjectsList,
+    activeTasksList,
+    deadlineTasksList,
+    completedTasksList,
   ] = await Promise.all([
     db.select({ id: divisions.id, name: divisions.name }).from(divisions).orderBy(asc(divisions.name)),
     db.select({ count: sql<number>`count(*)` }).from(projects)
@@ -125,6 +129,24 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         eq(userMoods.moodDate, sql`(CURRENT_DATE AT TIME ZONE 'Asia/Jakarta')::date`),
       ))
       .limit(1),
+
+    // Daftar lengkap utk modal kartu stat (#6) — div-filtered, capped.
+    db.select({ id: projects.id, name: projects.name, status: projects.status, deadline: projects.deadline, isOverdue: projects.isOverdue, divisionName: divisions.name })
+      .from(projects).leftJoin(divisions, eq(projects.divisionId, divisions.id))
+      .where(and(isNull(projects.deletedAt), ne(projects.status, 'Cancelled'), ne(projects.status, 'Completed'), ...(divId ? [eq(projects.divisionId, divId)] : [])))
+      .orderBy(asc(projects.deadline)).limit(60),
+    db.select({ id: tasks.id, name: tasks.name, status: tasks.status, dueDate: tasks.dueDate, isOverdue: tasks.isOverdue, divisionName: divisions.name, projectName: projects.name })
+      .from(tasks).leftJoin(divisions, eq(tasks.divisionId, divisions.id)).leftJoin(projects, eq(tasks.projectId, projects.id))
+      .where(and(isNull(tasks.deletedAt), ne(tasks.status, 'Completed'), ne(tasks.status, 'Cancelled'), ...(divId ? [eq(tasks.divisionId, divId)] : [])))
+      .orderBy(asc(tasks.dueDate)).limit(60),
+    db.select({ id: tasks.id, name: tasks.name, status: tasks.status, dueDate: tasks.dueDate, isOverdue: tasks.isOverdue, divisionName: divisions.name, projectName: projects.name })
+      .from(tasks).leftJoin(divisions, eq(tasks.divisionId, divisions.id)).leftJoin(projects, eq(tasks.projectId, projects.id))
+      .where(and(isNull(tasks.deletedAt), ne(tasks.status, 'Completed'), ne(tasks.status, 'Cancelled'), lte(tasks.dueDate, sql`NOW() + INTERVAL '3 days'`), ...(divId ? [eq(tasks.divisionId, divId)] : [])))
+      .orderBy(asc(tasks.dueDate)).limit(60),
+    db.select({ id: tasks.id, name: tasks.name, status: tasks.status, dueDate: tasks.completedAt, isOverdue: tasks.isOverdue, divisionName: divisions.name, projectName: projects.name })
+      .from(tasks).leftJoin(divisions, eq(tasks.divisionId, divisions.id)).leftJoin(projects, eq(tasks.projectId, projects.id))
+      .where(and(isNull(tasks.deletedAt), eq(tasks.status, 'Completed'), gte(tasks.completedAt, monthStart), ...(divId ? [eq(tasks.divisionId, divId)] : [])))
+      .orderBy(desc(tasks.completedAt)).limit(60),
   ])
 
   const myTotalPoints = myPointsRaw.reduce((sum, r) => sum + (r.points ?? 0), 0)
@@ -188,6 +210,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         activeTasks: Number(activeTasksRows[0]?.count ?? 0),
         overdueTasks: Number(overdueTasksRows[0]?.count ?? 0),
         completedThisMonth: Number(completedTasksRows[0]?.count ?? 0),
+      }}
+      statLists={{
+        projects: activeProjectsList as any[],
+        tasks: activeTasksList as any[],
+        deadline: deadlineTasksList as any[],
+        completed: completedTasksList as any[],
       }}
       recentProjects={recentProjects as any[]}
       myTasks={myTasks as any[]}

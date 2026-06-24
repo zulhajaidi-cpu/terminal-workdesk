@@ -17,7 +17,7 @@ export default async function LeaderboardPage() {
   const lastMonth = month === 1 ? 12 : month - 1
   const lastYear  = month === 1 ? year - 1 : year
 
-  const [monthlyRows, allTimeRows, lastMonthRows, badgeRows, allUsers, rewardRows] = await Promise.all([
+  const [monthlyRows, allTimeRows, lastMonthRows, badgeRows, allUsers, rewardRows, expSourceRows] = await Promise.all([
     // This month
     db.select({
       userId: pointsLedger.userId,
@@ -84,7 +84,23 @@ export default async function LeaderboardPage() {
       .from(monthlyRewards)
       .leftJoin(users, eq(monthlyRewards.winnerUserId, users.id))
       .where(and(eq(monthlyRewards.periodMonth, month), eq(monthlyRewards.periodYear, year))),
+
+    // Rincian EXP per sumber (all-time, kecuali 'kpi') untuk character card
+    db.select({
+      userId: pointsLedger.userId,
+      sourceType: pointsLedger.sourceType,
+      total: sql<number>`cast(sum(${pointsLedger.points}) as int)`,
+    })
+      .from(pointsLedger)
+      .where(sql`${pointsLedger.sourceType} <> 'kpi'`)
+      .groupBy(pointsLedger.userId, pointsLedger.sourceType),
   ])
+
+  // Susun map: userId → { sourceType: total } (EXP all-time per sumber, excl kpi).
+  const expBySource: Record<string, Record<string, number>> = {}
+  for (const r of expSourceRows as { userId: string; sourceType: string; total: number }[]) {
+    (expBySource[r.userId] ??= {})[r.sourceType] = r.total
+  }
 
   return (
     <LeaderboardContent
@@ -94,6 +110,7 @@ export default async function LeaderboardPage() {
       badgeRows={badgeRows as any[]}
       allUsers={allUsers as any[]}
       rewards={rewardRows as any[]}
+      expBySource={expBySource}
       currentUser={{ id: session.id, role: session.role }}
       currentPeriod={{ month, year }}
     />

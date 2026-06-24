@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Trophy, Plus, X, Crown, Zap } from 'lucide-react'
 import { ROLE_LABELS } from '@/lib/roles'
+import { CharacterCard, type CharacterUser } from './character-card'
 
 interface PointRow { userId: string; totalPoints: number }
 interface UserRow  { id: string; fullName: string; avatarUrl: string|null; role: string; divisionId: string|null; divisionName: string|null }
@@ -13,6 +14,7 @@ interface Props {
   monthly: PointRow[]; allTime: PointRow[]; lastMonth: PointRow[]
   badgeRows: BadgeRow[]; allUsers: UserRow[]
   rewards: RewardRow[]
+  expBySource: Record<string, Record<string, number>>
   currentUser: { id: string; role: string }
   currentPeriod: { month: number; year: number }
 }
@@ -42,10 +44,11 @@ function buildRanking(pointRows: PointRow[], allUsers: UserRow[], badges: BadgeR
   })
 }
 
-export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, allUsers, rewards, currentUser, currentPeriod }: Props) {
+export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, allUsers, rewards, expBySource, currentUser, currentPeriod }: Props) {
   const [period, setPeriod] = useState<'month'|'last'|'all'>('month')
   const [divFilter, setDivFilter] = useState('Semua')
   const [showAddPoints, setShowAddPoints] = useState(false)
+  const [selected, setSelected] = useState<CharacterUser | null>(null)
 
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
@@ -131,11 +134,11 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
 
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '20px' }}>
             {/* 2nd */}
-            {top3[1] && <PodiumCard user={top3[1]} rank={2} isSelf={top3[1].id===currentUser.id}/>}
+            {top3[1] && <PodiumCard user={top3[1]} rank={2} isSelf={top3[1].id===currentUser.id} onClick={() => setSelected(top3[1])}/>}
             {/* 1st */}
-            {top3[0] && <PodiumCard user={top3[0]} rank={1} isSelf={top3[0].id===currentUser.id} tall/>}
+            {top3[0] && <PodiumCard user={top3[0]} rank={1} isSelf={top3[0].id===currentUser.id} tall onClick={() => setSelected(top3[0])}/>}
             {/* 3rd */}
-            {top3[2] && <PodiumCard user={top3[2]} rank={3} isSelf={top3[2].id===currentUser.id}/>}
+            {top3[2] && <PodiumCard user={top3[2]} rank={3} isSelf={top3[2].id===currentUser.id} onClick={() => setSelected(top3[2])}/>}
           </div>
         </div>
       )}
@@ -182,8 +185,11 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
             const isMe = u.id === currentUser.id
             const rankColor = u.rank === 1 ? '#F59E0B' : u.rank === 2 ? 'var(--text-faint)' : u.rank === 3 ? '#B45309' : 'var(--text-faint)'
             return (
-              <div key={u.id}
-                style={{ display: 'grid', gridTemplateColumns: isMobile ? '40px 1fr 70px' : '48px 1fr 120px 80px', gap: '12px', padding: '12px 16px', borderBottom: i<filtered.length-1?'1px solid var(--surface-hover)':'none', background: isMe?'rgba(255,106,26,0.04)':'transparent', alignItems: 'center' }}>
+              <div key={u.id} onClick={() => setSelected(u)}
+                title="Lihat kartu karakter"
+                style={{ display: 'grid', gridTemplateColumns: isMobile ? '40px 1fr 70px' : '48px 1fr 120px 80px', gap: '12px', padding: '12px 16px', borderBottom: i<filtered.length-1?'1px solid var(--surface-hover)':'none', background: isMe?'rgba(255,106,26,0.04)':'transparent', alignItems: 'center', cursor: 'pointer', transition: 'background 0.12s' }}
+                onMouseEnter={e => { if (!isMe) e.currentTarget.style.background = 'var(--surface-hover)' }}
+                onMouseLeave={e => { if (!isMe) e.currentTarget.style.background = 'transparent' }}>
                 {/* Rank */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {u.rank <= 3
@@ -236,16 +242,26 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
           onAdded={() => { setShowAddPoints(false); window.location.reload() }}
         />
       )}
+
+      {/* Character card modal */}
+      {selected && (
+        <CharacterCard
+          user={selected}
+          expBySource={expBySource[selected.id] ?? {}}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </div>
   )
 }
 
 /* ── Podium Card ─────────────────────────────────────── */
-function PodiumCard({ user, rank, isSelf, tall }: { user: ReturnType<typeof buildRanking>[0]; rank: number; isSelf: boolean; tall?: boolean }) {
+function PodiumCard({ user, rank, isSelf, tall, onClick }: { user: ReturnType<typeof buildRanking>[0]; rank: number; isSelf: boolean; tall?: boolean; onClick?: () => void }) {
   const c = rank===1 ? '#F59E0B' : rank===2 ? 'var(--text-faint)' : '#B45309'
   const h = tall ? 110 : 80
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', flex: 1, maxWidth: '160px' }}>
+    <div onClick={onClick} title="Lihat kartu karakter"
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', flex: 1, maxWidth: '160px', cursor: 'pointer' }}>
       {/* Avatar */}
       <div style={{ position: 'relative' }}>
         <div style={{ width: tall ? '72px' : '60px', height: tall ? '72px' : '60px', borderRadius: '50%', overflow: 'hidden', border: `3px solid ${c}`, background: 'var(--surface-hover)' }}>

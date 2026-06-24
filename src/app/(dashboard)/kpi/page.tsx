@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { kpiItems, users, divisions } from '@/lib/db/schema'
-import { eq, and, isNull, asc } from 'drizzle-orm'
+import { eq, and, isNull, asc, inArray } from 'drizzle-orm'
 import { KpiContent } from './kpi-content'
 import { canViewOthersKpi } from '@/lib/roles'
 
@@ -43,7 +43,34 @@ export default async function KpiPage({ searchParams }: { searchParams: Promise<
       .orderBy(asc(users.fullName))
   }
 
-  const myKpi = await db.select().from(kpiItems)
+  // Mode "Semua Orang" (#9): recap KPI seluruh user yang bisa dilihat utk periode terpilih.
+  const isAllMode = canView && sp.uid === 'all' && viewableUsers.length > 0
+  let recap: any[] = []
+  if (isAllMode) {
+    const ids = viewableUsers.map(u => u.id)
+    const rows = await db.select().from(kpiItems).where(and(
+      isNull(kpiItems.deletedAt), inArray(kpiItems.userId, ids),
+      eq(kpiItems.periodMonth, month), eq(kpiItems.periodYear, year),
+    ))
+    const byUser = new Map<string, { count: number; weight: number; final: number; anyFinal: boolean; anyReviewed: boolean }>()
+    for (const k of rows) {
+      const e = byUser.get(k.userId) ?? { count: 0, weight: 0, final: 0, anyFinal: false, anyReviewed: false }
+      e.count++; e.weight += Number(k.weight); e.final += Number(k.finalScore ?? k.autoScore ?? 0)
+      if (k.status === 'Final') e.anyFinal = true
+      if (k.status === 'Reviewed') e.anyReviewed = true
+      byUser.set(k.userId, e)
+    }
+    recap = viewableUsers.map(u => {
+      const e = byUser.get(u.id)
+      return {
+        userId: u.id, fullName: u.fullName, divisionName: u.divisionName,
+        count: e?.count ?? 0, totalWeight: Math.round(e?.weight ?? 0), totalFinal: e?.final ?? 0,
+        status: e ? (e.anyFinal ? 'Final' : e.anyReviewed ? 'Reviewed' : 'Draft') : '—',
+      }
+    }).sort((a, b) => b.totalFinal - a.totalFinal)
+  }
+
+  const myKpi = isAllMode ? [] : await db.select().from(kpiItems)
     .where(and(
       isNull(kpiItems.deletedAt),
       eq(kpiItems.userId, targetUserId),
@@ -59,11 +86,12 @@ export default async function KpiPage({ searchParams }: { searchParams: Promise<
       kpiItems={myKpi as any[]}
       viewableUsers={viewableUsers}
       month={month} year={year}
-      targetUserId={targetUserId}
+      targetUserId={isAllMode ? 'all' : targetUserId}
       currentUser={{ id: session.id, role: session.role }}
       totalWeight={totalWeight}
       totalFinal={totalFinal}
       canViewOthers={canView}
+      recap={recap}
     />
   )
 }

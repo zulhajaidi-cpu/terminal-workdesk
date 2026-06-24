@@ -19,9 +19,11 @@ import {
   PieChart, Pie, AreaChart, Area, Legend, TooltipProps,
 } from 'recharts'
 
+interface StatItem { id: string; name: string; status: string; dueDate: string | null; isOverdue: boolean; divisionName: string | null; projectName?: string | null }
 interface Props {
   profile: { full_name: string; role: string; avatar_url?: string | null; divisions?: { name: string } | null } | null
   stats: { totalProjects: number; overdueProjects: number; activeTasks: number; overdueTasks: number; completedThisMonth: number }
+  statLists: { projects: StatItem[]; tasks: StatItem[]; deadline: StatItem[]; completed: StatItem[] }
   recentProjects: Array<{ id: string; name: string; status: string; priority: string; progress: number; deadline: string; is_overdue: boolean; divisions?: { name: string } | null }>
   myTasks: Array<{ id: string; name: string; status: string; priority: string; due_date: string; is_overdue: boolean; projects?: { name: string } | null }>
   upcomingEvents: Array<{ id: string; title: string; event_type: string; start_at: string }>
@@ -113,9 +115,10 @@ function CompletionBar({ label, done, total, pct }: { label: string; done: numbe
   )
 }
 
-export function DashboardContent({ profile, stats, recentProjects, myTasks, upcomingEvents, myKpi, leaderboard, myPoints, myRank, monthlyReward, chartData, progress, divisions, selectedDivision, madingPosts, canPostMading, canModerateMading, currentUserId, todayMood }: Props) {
+export function DashboardContent({ profile, stats, statLists, recentProjects, myTasks, upcomingEvents, myKpi, leaderboard, myPoints, myRank, monthlyReward, chartData, progress, divisions, selectedDivision, madingPosts, canPostMading, canModerateMading, currentUserId, todayMood }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [statModal, setStatModal] = useState<null | 'projects' | 'tasks' | 'deadline' | 'completed'>(null)
   const now = new Date()
   const monthName = now.toLocaleString('id-ID', { month: 'long', timeZone: 'Asia/Jakarta' })
   const year = now.getFullYear()
@@ -183,12 +186,12 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <StatCard label="Project Aktif" value={stats.totalProjects} sub={`${stats.overdueProjects} overdue`} />
-        <StatCard label="Task Aktif" value={stats.activeTasks} />
-        <StatCard label="Deadline Alert" value={stats.overdueTasks} valueColor="#FF8A4C" sub="deadline ≤ 3 hari" />
-        <StatCard label={`Selesai ${monthName.slice(0, 3)}`} value={stats.completedThisMonth} valueColor="var(--green)" />
+        <StatCard label="Project Aktif" value={stats.totalProjects} sub={`${stats.overdueProjects} overdue`} onClick={() => setStatModal('projects')} />
+        <StatCard label="Task Aktif" value={stats.activeTasks} onClick={() => setStatModal('tasks')} />
+        <StatCard label="Deadline Alert" value={stats.overdueTasks} valueColor="#FF8A4C" sub="deadline ≤ 3 hari" onClick={() => setStatModal('deadline')} />
+        <StatCard label={`Selesai ${monthName.slice(0, 3)}`} value={stats.completedThisMonth} valueColor="var(--green)" onClick={() => setStatModal('completed')} />
         <div className="col-span-2 sm:col-span-1">
-          <Card style={{ background: 'linear-gradient(135deg,rgba(255,106,26,0.16),rgba(255,106,26,0.04))', borderColor: 'rgba(255,106,26,0.28)' }}>
+          <Card onClick={() => router.push('/arena')} style={{ background: 'linear-gradient(135deg,rgba(255,106,26,0.16),rgba(255,106,26,0.04))', borderColor: 'rgba(255,106,26,0.28)' }}>
             <div className="p-3 sm:p-4">
               <div className="font-mono text-[9.5px] tracking-widest text-[var(--peach)] uppercase mb-1">Poin Saya</div>
               <div className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">{myPoints}</div>
@@ -452,6 +455,54 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
                 ))}
               </div>
             </Card>
+          )}
+        </div>
+      </div>
+
+      {statModal && (
+        <StatModal kind={statModal} lists={statLists} onClose={() => setStatModal(null)} />
+      )}
+    </div>
+  )
+}
+
+/* ═══════════════ STAT DETAIL MODAL (#6) ═══════════════ */
+const STAT_META: Record<string, { title: string; type: 'project' | 'task' }> = {
+  projects:  { title: 'Project Aktif', type: 'project' },
+  tasks:     { title: 'Task Aktif', type: 'task' },
+  deadline:  { title: 'Deadline Alert (≤ 3 hari)', type: 'task' },
+  completed: { title: 'Selesai Bulan Ini', type: 'task' },
+}
+function StatModal({ kind, lists, onClose }: { kind: 'projects' | 'tasks' | 'deadline' | 'completed'; lists: Props['statLists']; onClose: () => void }) {
+  const meta = STAT_META[kind]
+  const items = lists[kind]
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 py-8" style={{ background: 'rgba(0,0,0,0.7)' }} onClick={onClose}>
+      <div className="w-full max-w-md rounded-2xl flex flex-col max-h-[85vh]" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }} onClick={e => e.stopPropagation()}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+          <h2 className="font-grotesk font-bold text-[15px] text-[var(--text-primary)]">{meta.title} <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>· {items.length}</span></h2>
+          <button onClick={onClose} aria-label="Tutup" style={{ color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>&times;</button>
+        </div>
+        <div style={{ padding: '10px', overflowY: 'auto' }}>
+          {items.length === 0 ? (
+            <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '28px 0' }}>Tidak ada data.</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {items.map(it => (
+                <Link key={it.id} href={meta.type === 'project' ? `/projects/${it.id}` : '/tasks'} onClick={onClose}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 10, textDecoration: 'none' }}
+                  className="hover:bg-[var(--surface-hover)]">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.name}</div>
+                    <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono',monospace", marginTop: 1 }}>
+                      {meta.type === 'task' && it.projectName ? `${it.projectName} · ` : ''}{it.divisionName ?? 'Tanpa divisi'}
+                      {it.dueDate ? ` · ${formatDate(it.dueDate, { day: 'numeric', month: 'short' })}` : ''}
+                    </div>
+                  </div>
+                  <StatusBadge status={it.isOverdue && it.status !== 'Completed' ? 'Overdue' : it.status} />
+                </Link>
+              ))}
+            </div>
           )}
         </div>
       </div>

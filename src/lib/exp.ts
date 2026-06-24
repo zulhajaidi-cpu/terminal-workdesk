@@ -1,11 +1,12 @@
 import { neon } from '@neondatabase/serverless'
 import { touchStreakAndBadges } from '@/lib/streak'
+// Math level/tier murni dipindah ke ./level (client-safe). Re-export agar import lama tetap jalan.
+import { levelFromExp, tierTitle } from '@/lib/level'
+export { levelFromExp, levelFloor, nextLevelExp, tierTitle, levelProgress } from '@/lib/level'
+export type { LevelInfo } from '@/lib/level'
 
 const sql = neon(process.env.DATABASE_URL!)
 
-/* ═══════════════════ LEVEL MATH (pure) ═══════════════════ */
-// Threshold total EXP untuk MENCAPAI level L = 50·(L-1)·L
-// → L1:0, L2:100, L3:300, L4:600, L5:1000 (increment 100,200,300,400…).
 export const DEFAULT_RULES: Record<string, number> = {
   task_complete: 20,
   task_early_bonus: 10,
@@ -14,39 +15,6 @@ export const DEFAULT_RULES: Record<string, number> = {
   project_complete: 100,
   kudos_give: 10,        // EXP yang diterima penerima kudos
   kudos_daily_cap: 3,    // maksimum kudos yang bisa diberi 1 user per hari
-}
-
-export function levelFromExp(total: number): number {
-  if (total <= 0) return 1
-  return Math.max(1, Math.floor((50 + Math.sqrt(2500 + 200 * total)) / 100))
-}
-export function levelFloor(level: number): number { return 50 * (level - 1) * level }
-export function nextLevelExp(level: number): number { return 50 * level * (level + 1) }
-
-const TIERS: { min: number; title: string }[] = [
-  { min: 15, title: 'Legend' },
-  { min: 10, title: 'Elite' },
-  { min: 7,  title: 'Veteran' },
-  { min: 5,  title: 'Hustler' },
-  { min: 3,  title: 'Grinder' },
-  { min: 1,  title: 'Rookie' },
-]
-export function tierTitle(level: number): string {
-  return TIERS.find(t => level >= t.min)?.title ?? 'Rookie'
-}
-
-export interface LevelInfo {
-  level: number; floor: number; next: number
-  pct: number; title: string; intoLevel: number; span: number
-}
-export function levelProgress(total: number): LevelInfo {
-  const level = levelFromExp(total)
-  const floor = levelFloor(level)
-  const next = nextLevelExp(level)
-  const span = next - floor
-  const intoLevel = total - floor
-  const pct = span > 0 ? Math.min(100, Math.round((intoLevel / span) * 100)) : 0
-  return { level, floor, next, pct, title: tierTitle(level), intoLevel, span }
 }
 
 /* ═══════════════════ RULES & TOTALS ═══════════════════ */
