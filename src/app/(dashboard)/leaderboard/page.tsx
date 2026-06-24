@@ -1,9 +1,12 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { neon } from '@neondatabase/serverless'
 import { pointsLedger, users, divisions, userBadges, badges, monthlyRewards } from '@/lib/db/schema'
 import { eq, desc, sql, and, notInArray } from 'drizzle-orm'
 import { LeaderboardContent } from './leaderboard-content'
+
+const sqlRaw = neon(process.env.DATABASE_URL!)
 
 export const metadata = { title: 'Leaderboard — Terminal Workdesk' }
 
@@ -62,6 +65,7 @@ export default async function LeaderboardPage() {
       id: users.id,
       fullName: users.fullName,
       avatarUrl: users.avatarUrl,
+      bio: users.bio,
       role: users.role,
       divisionId: users.divisionId,
       divisionName: divisions.name,
@@ -102,6 +106,14 @@ export default async function LeaderboardPage() {
     (expBySource[r.userId] ??= {})[r.sourceType] = r.total
   }
 
+  // Mood/feeling TERAKHIR yang dipilih tiap user (untuk character card).
+  const moodRows = (await sqlRaw`
+    SELECT DISTINCT ON (user_id) user_id AS "userId", mood_emoji AS emoji, mood_label AS label
+    FROM user_moods ORDER BY user_id, mood_date DESC
+  `) as { userId: string; emoji: string; label: string }[]
+  const moodByUser: Record<string, { emoji: string; label: string }> = {}
+  for (const m of moodRows) moodByUser[m.userId] = { emoji: m.emoji, label: m.label }
+
   return (
     <LeaderboardContent
       monthly={monthlyRows}
@@ -111,6 +123,7 @@ export default async function LeaderboardPage() {
       allUsers={allUsers as any[]}
       rewards={rewardRows as any[]}
       expBySource={expBySource}
+      moodByUser={moodByUser}
       currentUser={{ id: session.id, role: session.role }}
       currentPeriod={{ month, year }}
     />

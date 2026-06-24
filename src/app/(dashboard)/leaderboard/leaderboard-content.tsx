@@ -6,7 +6,7 @@ import { ROLE_LABELS } from '@/lib/roles'
 import { CharacterCard, type CharacterUser } from './character-card'
 
 interface PointRow { userId: string; totalPoints: number }
-interface UserRow  { id: string; fullName: string; avatarUrl: string|null; role: string; divisionId: string|null; divisionName: string|null }
+interface UserRow  { id: string; fullName: string; avatarUrl: string|null; bio: string|null; role: string; divisionId: string|null; divisionName: string|null }
 interface BadgeRow { userId: string; badgeName: string|null; badgeIcon: string|null; badgeId: string|null }
 interface RewardRow { periodMonth: number; periodYear: number; rank: number; rewardName: string; rewardImageLink: string|null; winnerUserId: string|null; winnerName: string|null; notes: string|null }
 
@@ -15,6 +15,7 @@ interface Props {
   badgeRows: BadgeRow[]; allUsers: UserRow[]
   rewards: RewardRow[]
   expBySource: Record<string, Record<string, number>>
+  moodByUser: Record<string, { emoji: string; label: string }>
   currentUser: { id: string; role: string }
   currentPeriod: { month: number; year: number }
 }
@@ -44,7 +45,7 @@ function buildRanking(pointRows: PointRow[], allUsers: UserRow[], badges: BadgeR
   })
 }
 
-export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, allUsers, rewards, expBySource, currentUser, currentPeriod }: Props) {
+export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, allUsers, rewards, expBySource, moodByUser, currentUser, currentPeriod }: Props) {
   const [period, setPeriod] = useState<'month'|'last'|'all'>('month')
   const [divFilter, setDivFilter] = useState('Semua')
   const [showAddPoints, setShowAddPoints] = useState(false)
@@ -248,6 +249,7 @@ export function LeaderboardContent({ monthly, allTime, lastMonth, badgeRows, all
         <CharacterCard
           user={selected}
           expBySource={expBySource[selected.id] ?? {}}
+          mood={moodByUser[selected.id] ?? null}
           onClose={() => setSelected(null)}
         />
       )}

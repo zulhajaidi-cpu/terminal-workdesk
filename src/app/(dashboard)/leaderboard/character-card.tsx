@@ -6,7 +6,7 @@ import { ROLE_LABELS, ROLE_COLORS } from '@/lib/roles'
 
 interface BadgeLite { badgeName: string | null; badgeIcon: string | null; badgeId: string | null }
 export interface CharacterUser {
-  id: string; fullName: string; avatarUrl: string | null
+  id: string; fullName: string; avatarUrl: string | null; bio: string | null
   role: string; divisionName: string | null; rank: number
   badges: BadgeLite[]
 }
@@ -30,9 +30,10 @@ const TIER_COLOR: Record<string, string> = {
 }
 const MEDAL = ['', '🥇', '🥈', '🥉']
 
-export function CharacterCard({ user, expBySource, onClose }: {
+export function CharacterCard({ user, expBySource, mood, onClose }: {
   user: CharacterUser
   expBySource: Record<string, number>
+  mood?: { emoji: string; label: string } | null
   onClose: () => void
 }) {
   const total = Object.values(expBySource).reduce((a, b) => a + b, 0)
@@ -84,7 +85,11 @@ export function CharacterCard({ user, expBySource, onClose }: {
           <div style={{ marginTop: 6, display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
             <span style={{ fontSize: 10.5, fontWeight: 700, color: roleColor, background: `${roleColor}1F`, borderRadius: 100, padding: '2px 9px' }}>{ROLE_LABELS[user.role] ?? user.role}</span>
             {user.divisionName && <span style={{ fontSize: 10.5, color: 'var(--text-secondary)', background: 'var(--surface-hover)', borderRadius: 100, padding: '2px 9px' }}>{user.divisionName}</span>}
+            {mood && <span title="Mood terakhir" style={{ fontSize: 10.5, color: 'var(--text-secondary)', background: 'var(--surface-hover)', borderRadius: 100, padding: '2px 9px' }}>{mood.emoji} {mood.label}</span>}
           </div>
+          {user.bio && (
+            <p style={{ marginTop: 10, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, fontStyle: 'italic', maxWidth: 320, marginInline: 'auto' }}>“{user.bio}”</p>
+          )}
         </div>
 
         {/* ── LEVEL PROGRESS ── */}
