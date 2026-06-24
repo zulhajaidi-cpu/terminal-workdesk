@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card'
 import { StatusBadge, PriorityBadge } from '@/components/ui/badge'
 import { ProgressBar, getProgressColor } from '@/components/ui/progress-bar'
 import { Plus, Search, FolderKanban, Pencil, Trash2, ChevronRight, Check, ListChecks, ArrowUpRight } from 'lucide-react'
-import { canCreateProject, canEditProject, canBulkData } from '@/lib/roles'
+import { canCreateProject, canEditProject, canBulkData, canSeeAllDivisions } from '@/lib/roles'
 import { ExcelToolbar } from '@/components/excel-toolbar'
 
 interface TaskLite { id: string; name: string; status: string; checked: boolean; isOverdue: boolean; assignees: string }
@@ -33,7 +33,8 @@ export function ProjectsContent({ projects: initialProjects, divisions, currentU
   const [projects, setProjects] = useState(initialProjects)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('Semua')
-  const [divisionFilter, setDivisionFilter] = useState('Semua')
+  const [divisionFilter, setDivisionFilter] = useState('Semua Divisi')
+  const showDivFilter = canSeeAllDivisions(currentUser.role)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkDeleting, setBulkDeleting] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -45,7 +46,7 @@ export function ProjectsContent({ projects: initialProjects, divisions, currentU
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.projectCode.toLowerCase().includes(search.toLowerCase())
     const matchStatus = statusFilter === 'Semua' || p.status === statusFilter
-    const matchDiv = divisionFilter === 'Semua' || p.divisionName === divisionFilter
+    const matchDiv = divisionFilter === 'Semua Divisi' || p.divisionName === divisionFilter
     return matchSearch && matchStatus && matchDiv
   })
 
@@ -158,12 +159,14 @@ export function ProjectsContent({ projects: initialProjects, divisions, currentU
           <input placeholder="Cari nama atau kode project..." value={search} onChange={e => setSearch(e.target.value)}
             className="bg-transparent border-none outline-none text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] flex-1" />
         </div>
-        <select value={divisionFilter} onChange={e => setDivisionFilter(e.target.value)}
-          className="px-3 py-2.5 rounded-xl text-[13px] text-[var(--text-primary)] outline-none cursor-pointer"
-          style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-          <option>Semua</option>
-          {divisions.map(d => <option key={d.id}>{d.name}</option>)}
-        </select>
+        {showDivFilter && (
+          <select value={divisionFilter} onChange={e => setDivisionFilter(e.target.value)}
+            className="px-3 py-2.5 rounded-xl text-[13px] text-[var(--text-primary)] outline-none cursor-pointer"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+            <option>Semua Divisi</option>
+            {divisions.map(d => <option key={d.id}>{d.name}</option>)}
+          </select>
+        )}
       </div>
 
       {/* Status chips */}

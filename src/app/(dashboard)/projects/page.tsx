@@ -2,8 +2,9 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { projects, divisions, users } from '@/lib/db/schema'
-import { isNull, desc, eq } from 'drizzle-orm'
+import { isNull, desc, eq, and, or } from 'drizzle-orm'
 import { neon } from '@neondatabase/serverless'
+import { canSeeAllDivisions } from '@/lib/roles'
 import { ProjectsContent } from './projects-content'
 
 export const metadata = { title: 'Projects — Terminal Workdesk' }
@@ -19,6 +20,12 @@ export default async function ProjectsPage() {
   const session = await getSession()
   if (!session) redirect('/login')
 
+  // Staff hanya lihat project divisinya sendiri (+ project tanpa divisi). Role lain lihat semua.
+  const restrictToOwnDivision = !canSeeAllDivisions(session.role)
+  const projectsWhere = restrictToOwnDivision
+    ? and(isNull(projects.deletedAt), or(eq(projects.divisionId, session.divisionId ?? '00000000-0000-0000-0000-000000000000'), isNull(projects.divisionId)))
+    : isNull(projects.deletedAt)
+
   const [projectRows, divisionRows, taskRows] = await Promise.all([
     db.select({
       id: projects.id, name: projects.name, projectCode: projects.projectCode,
@@ -32,7 +39,7 @@ export default async function ProjectsPage() {
       .from(projects)
       .leftJoin(divisions, eq(projects.divisionId, divisions.id))
       .leftJoin(users, eq(projects.picId, users.id))
-      .where(isNull(projects.deletedAt))
+      .where(projectsWhere)
       .orderBy(desc(projects.updatedAt)),
     db.select({ id: divisions.id, name: divisions.name }).from(divisions).where(isNull(divisions.deletedAt)),
     sql`

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { formatDate } from '@/lib/utils'
 import { StatusBadge, PriorityBadge } from '@/components/ui/badge'
 import { Plus, Search, CheckSquare, Pencil, Trash2, CheckCircle, X, ExternalLink, MessageSquare, Send, ListTodo } from 'lucide-react'
-import { ROLE_LABELS, canBulkData } from '@/lib/roles'
+import { ROLE_LABELS, canBulkData, canSeeAllDivisions } from '@/lib/roles'
 import { ExcelToolbar } from '@/components/excel-toolbar'
 
 interface Assignee { id: string; fullName: string; avatarUrl: string | null }
@@ -79,6 +79,8 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
   const [tasks, setTasks] = useState(initialTasks)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('Semua')
+  const [divFilter, setDivFilter] = useState('all')
+  const showDivFilter = canSeeAllDivisions(currentUser.role)
   const [sectionTab, setSectionTab] = useState<SectionTab>('Semua')
   const [showProjectModal, setShowProjectModal] = useState(false)
   const [showTodoModal, setShowTodoModal] = useState(false)
@@ -90,6 +92,8 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
       (t.projectName?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
       (t.picName?.toLowerCase().includes(search.toLowerCase()) ?? false)
     if (!matchSearch) return false
+    // Filter divisi: 'all' = semua; pilih divisi → task divisi itu + task tanpa divisi (lintas-divisi).
+    if (divFilter !== 'all' && t.divisionName !== divFilter && t.divisionName != null) return false
     if (statusFilter === 'Semua') return true
     if (statusFilter === 'Deadline Alert') return isDeadlineAlert(t)
     return t.status === statusFilter
@@ -107,13 +111,19 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
   }
 
   async function handleStatusChange(task: Task, newStatus: string) {
-    const res = await fetch(`/api/tasks/${task.id}`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus }),
-    })
-    if (res.ok) {
-      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t))
-      if (detailTask?.id === task.id) setDetailTask(prev => prev ? { ...prev, status: newStatus } : null)
+    const prevStatus = task.status
+    // Optimistic: ubah UI seketika, revert kalau server gagal.
+    setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t))
+    if (detailTask?.id === task.id) setDetailTask(prev => prev ? { ...prev, status: newStatus } : null)
+    try {
+      const res = await fetch(`/api/tasks/${task.id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      })
+      if (!res.ok) throw new Error('failed')
+    } catch {
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: prevStatus } : t))
+      if (detailTask?.id === task.id) setDetailTask(prev => prev ? { ...prev, status: prevStatus } : null)
     }
   }
 
@@ -201,6 +211,13 @@ export function TasksContent({ tasks: initialTasks, projects, divisions, users, 
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari task, project, atau PIC..."
               style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontSize: '13px', width: '100%' }} />
           </div>
+          {showDivFilter && (
+            <select value={divFilter} onChange={e => setDivFilter(e.target.value)}
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '11px', padding: '9px 12px', color: 'var(--text-primary)', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
+              <option value="all">Semua Divisi</option>
+              {divisions.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+            </select>
+          )}
           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {STATUS_CHIPS.map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}

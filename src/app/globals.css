@@ -114,6 +114,13 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+/* Native dropdown options: pakai warna tema agar terbaca di dark mode
+   (browser default sering putih-di-putih saat <select> diberi bg gelap). */
+select option {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 4px;

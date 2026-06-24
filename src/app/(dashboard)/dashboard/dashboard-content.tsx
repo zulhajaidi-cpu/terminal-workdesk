@@ -191,7 +191,7 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
           <Card style={{ background: 'linear-gradient(135deg,rgba(255,106,26,0.16),rgba(255,106,26,0.04))', borderColor: 'rgba(255,106,26,0.28)' }}>
             <div className="p-3 sm:p-4">
               <div className="font-mono text-[9.5px] tracking-widest text-[var(--peach)] uppercase mb-1">Poin Saya</div>
-              <div className="font-grotesk font-bold text-2xl text-white">{myPoints}</div>
+              <div className="font-grotesk font-bold text-2xl text-[var(--text-primary)]">{myPoints}</div>
               {myRank > 0 && <div className="text-[11px] text-[#FF8A4C] mt-0.5">Peringkat #{myRank}</div>}
             </div>
           </Card>
@@ -360,7 +360,7 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
               <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
                 <div className="flex items-center gap-2">
                   <Star size={16} className="text-[#FF8A4C]" />
-                  <span className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">KPI {monthName}</span>
+                  <span className="font-grotesk font-semibold text-[14px] text-[var(--text-primary)]">EXP {monthName}</span>
                 </div>
                 {kpiOverall !== null && (
                   <span className="font-grotesk font-bold text-lg" style={{ color: getProgressColor(kpiOverall) }}>
@@ -418,7 +418,7 @@ export function DashboardContent({ profile, stats, recentProjects, myTasks, upco
                     <div className="text-[12px] text-[var(--text-primary)] font-medium truncate">{l.name}</div>
                     <div className="font-mono text-[10px] text-[var(--text-muted)]">{l.division}</div>
                   </div>
-                  <span className="font-grotesk font-bold text-[13px] text-white flex-shrink-0">{l.total}</span>
+                  <span className="font-grotesk font-bold text-[13px] text-[var(--text-primary)] flex-shrink-0">{l.total}</span>
                 </div>
               ))}
               <Link href="/leaderboard" className="block text-center text-[12px] text-[#FF8A4C] hover:underline pt-1">

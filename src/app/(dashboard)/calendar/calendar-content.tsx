@@ -7,6 +7,7 @@ import {
   Clock, Pencil, Trash2, FolderKanban, CheckSquare, ClipboardCheck,
   Calendar as CalIcon, ArrowRight, AlertCircle,
 } from 'lucide-react'
+import { canSeeAllDivisions } from '@/lib/roles'
 
 /* ═══════════════════ CONSTANTS ═════════════════════════ */
 const GRID_START = 7        // 7:00 AM
@@ -204,6 +205,8 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
   const [view, setView]         = useState<'month'|'week'>('month')
   const [anchor, setAnchor]     = useState(() => new Date(today.getFullYear(), today.getMonth(), 1))
   const [filters, setFilters]   = useState<Set<FilterKey>>(new Set(['event','project','task','approval']))
+  const [divFilter, setDivFilter] = useState('all')
+  const showDivFilter = canSeeAllDivisions(currentUser.role)
   const [selDay, setSelDay]     = useState<Date>(today)
   const [selEvent, setSelEvent] = useState<DisplayEvent|null>(null)
   const [showModal, setShowModal]     = useState(false)
@@ -228,8 +231,10 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
   }, [])
 
   const allEvs = useMemo(
-    () => buildEvents(calEvents, projectRows, taskRows, approvalRows, filters),
-    [calEvents, projectRows, taskRows, approvalRows, filters]
+    () => buildEvents(calEvents, projectRows, taskRows, approvalRows, filters)
+      // Filter divisi: pilih divisi → item divisi itu + item tanpa divisi (lintas-divisi muncul di semua).
+      .filter(ev => divFilter === 'all' || ev.divisionId === divFilter || ev.divisionId == null),
+    [calEvents, projectRows, taskRows, approvalRows, filters, divFilter]
   )
 
   const periodLabel = useMemo(() => {
@@ -377,6 +382,13 @@ export function CalendarContent({ calEvents: initCal, projectRows, taskRows, app
             <span style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:'9px', opacity:0.65 }}>{fc.count}</span>
           </button>
         ))}
+        {showDivFilter && (
+          <select value={divFilter} onChange={e => setDivFilter(e.target.value)}
+            style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:'100px', padding:'5px 12px', color:'var(--text-primary)', fontSize:'11px', fontWeight:600, outline:'none', cursor:'pointer' }}>
+            <option value="all">Semua Divisi</option>
+            {divisions.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+          </select>
+        )}
         <div style={{ marginLeft:'auto', display:'flex', gap:'10px', flexWrap:'wrap', alignItems:'center' }}>
           <span style={{ fontSize:'10px', color:'var(--text-faint)', fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.05em' }}>DIVISI:</span>
           {[...Object.entries(DIVISION_COLORS), ['Tanpa divisi', NO_DIVISION_COLOR] as const].map(([name, c]) => (

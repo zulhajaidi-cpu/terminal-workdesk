@@ -29,6 +29,10 @@ export const ROLE_OPTIONS = [
 // Akun read-only — bisa lihat semua data tapi semua mutasi diblokir oleh middleware (src/middleware.ts)
 export const isSpectator = (role: string) => role === 'spectator'
 
+// Siapa yang bisa melihat SEMUA divisi (+ dapat dropdown filter divisi). Hanya Staff yang dibatasi
+// ke divisinya sendiri; SPV/Manager/Direktur/Spectator/Super Admin lihat semua.
+export const canSeeAllDivisions = (role: string) => role !== 'staff'
+
 export const canManageUsers = (role: string) =>
   role === 'super_admin'
 

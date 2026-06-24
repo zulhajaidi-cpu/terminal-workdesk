@@ -140,11 +140,18 @@ function TaskQuickModal({ task, allUsers, onClose, onTaskUpdated }: {
   }
 
   async function changeStatus(newStatus: string) {
-    const res = await fetch(`/api/tasks/${task.id}`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus }),
-    })
-    if (res.ok) { setLocalStatus(newStatus); onTaskUpdated({ status: newStatus }); setStatusEdit(false) }
+    const prev = localStatus
+    // Optimistic: tampilkan status baru seketika, revert kalau gagal.
+    setLocalStatus(newStatus); onTaskUpdated({ status: newStatus }); setStatusEdit(false)
+    try {
+      const res = await fetch(`/api/tasks/${task.id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      })
+      if (!res.ok) throw new Error('failed')
+    } catch {
+      setLocalStatus(prev); onTaskUpdated({ status: prev })
+    }
   }
 
   function fmtLog(iso: string) {
@@ -288,14 +295,16 @@ export function ProjectDetailContent({ project, currentUserRole, currentUserId, 
 
   async function handleStatusChange(newStatus: string) {
     if (newStatus === projectStatus || savingStatus) return
+    const prev = projectStatus
+    setProjectStatus(newStatus) // optimistic: badge berubah seketika
     setSavingStatus(true)
     const res = await fetch(`/api/projects/${project.id}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus }),
     })
     setSavingStatus(false)
-    if (res.ok) { setProjectStatus(newStatus); router.refresh() }
-    else { const d = await res.json().catch(() => ({})); alert(d.error ?? 'Gagal mengubah status') }
+    if (res.ok) { router.refresh() }
+    else { setProjectStatus(prev); const d = await res.json().catch(() => ({})); alert(d.error ?? 'Gagal mengubah status') }
   }
 
   const total = tasks.length
